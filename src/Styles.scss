@@ -1,0 +1,39 @@
+@font-face {
+    font-family: foundationGrotesk;
+    src: url(./assets/fonts/foundersgrotesktext-regular.otf);
+}
+
+body {
+    color: black;
+    font-family: foundationGrotesk;
+    font-size: 14pt;
+    margin: auto;
+    max-width: 1024px;
+}
+
+footer {
+    margin: 24px auto;
+    width: fit-content;
+}
+
+nav {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+
+    & > * {
+        margin: 5px;
+    }
+}
+
+.nav-text-link {
+    border-bottom: 2px solid black;
+    color: black;
+    text-decoration: none;
+
+    &:hover {
+        border-bottom: 2px solid #0000FF;
+        color: #0000FF;
+    }
+}
