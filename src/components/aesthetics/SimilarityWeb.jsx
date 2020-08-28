@@ -56,7 +56,7 @@ export default (props) => {
       .force('charge', forceManyBody())
       .force('center', forceCenter(0, 0));
 
-    const svg = select('#graphCanvas');
+    const svg = select('#similarityWebCanvas');
 
     const link = svg.selectAll('.link')
       .data(links)
@@ -119,10 +119,10 @@ export default (props) => {
 
       nodeGroup.attr('transform', d => `translate(${d.x}, ${d.y})`);
 
-      const graphCanvas = document.getElementById('graphCanvas');
+      const similarityWebCanvas = document.getElementById('similarityWebCanvas');
 
-      if(graphCanvas) {
-        const bbox = graphCanvas.getBBox()
+      if(similarityWebCanvas) {
+        const bbox = similarityWebCanvas.getBBox()
 
         setBboxX(bbox.x);
         setBboxY(bbox.y);
@@ -133,6 +133,6 @@ export default (props) => {
   }, [ props.aestheticData ]);
 
   return (
-    <svg id="graphCanvas" viewBox={`${bboxX} ${bboxY} ${bboxWidth} ${bboxHeight}`}></svg>
+    <svg id="similarityWebCanvas" viewBox={`${bboxX} ${bboxY} ${bboxWidth} ${bboxHeight}`}></svg>
   );
 };

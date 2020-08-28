@@ -18,6 +18,43 @@
                 "urlName": "boho-chic",
                 "type": "Shared concepts/appropriation/motifs"
             }
+        ],
+        "media": [
+            {
+                "url": "/test1.jpg",
+                "label": "Test image 1",
+                "description": "This is a test image",
+                "creator": "John Sayles",
+                "date": "1987-01-01T00:00:00Z"
+            },
+            {
+                "url": "/test2.jpg",
+                "label": "Test image 2",
+                "description": "This is a test image",
+                "creator": "Global Village Communication",
+                "date": "1993-01-01T00:00:00Z"
+            },
+            {
+                "url": "/test3.png",
+                "label": "Test image 3",
+                "description": "This is a test image",
+                "creator": "Rafael",
+                "date": "1993-01-01T00:00:00Z"
+            },
+            {
+                "url": "/test4.png",
+                "label": "Test image 4",
+                "description": "This is a test image",
+                "creator": "Unknown",
+                "date": "1990-01-01T00:00:00Z"
+            },
+            {
+                "url": "/test5.png",
+                "label": "Test image 5",
+                "description": "This is a test image",
+                "creator": "Unknown",
+                "date": "1997-01-01T00:00:00Z"
+            }
         ]
     }
 ]

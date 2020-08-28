@@ -40,11 +40,7 @@ export default (props) => {
   let gallery = null;
 
   if(showGallery) {
-    gallery = (
-      <div>
-        <Gallery />
-      </div>
-    );
+    gallery = <Gallery aestheticData={aestheticData} />;
   }
 
   let similarityWeb = null;
