@@ -1,37 +1,43 @@
 import React, { useEffect, useState } from 'react';
 
 import {
-  event,
   forceCenter,
   forceLink,
   forceManyBody,
   forceSimulation,
-  scaleOrdinal,
-  schemeCategory10,
+} from 'd3-force';
+
+import { scaleOrdinal } from 'd3-scale';
+import { schemeCategory10 } from 'd3-scale-chromatic';
+
+import {
+  event,
   select,
-} from 'd3';
+} from 'd3-selection';
 
 const color = scaleOrdinal(schemeCategory10);
 
 export default (props) => {
-  const [bboxX, setBboxX] = useState(0);
-  const [bboxY, setBboxY] = useState(0);
-  const [bboxWidth, setBboxWidth] = useState(0);
-  const [bboxHeight, setBboxHeight] = useState(0);
+  const [ bboxX, setBboxX ] = useState(0);
+  const [ bboxY, setBboxY ] = useState(0);
+  const [ bboxWidth, setBboxWidth ] = useState(0);
+  const [ bboxHeight, setBboxHeight ] = useState(0);
+
+  const data = props.aestheticData;
 
   useEffect(() => {
-    if(!props.aestheticData) {
+    if(!data) {
       return;
     }
 
     const rootAesthetic = {
-      id: props.aestheticData.name,
+      id: data.name,
       group: 1,
-      urlName: props.aestheticData.urlName,
+      urlName: data.urlName,
       type: 'You are here',
     };
 
-    const nodes = props.aestheticData.similarTo.reduce((accumulator, similarAesthetic) => {
+    const nodes = data.similarTo.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
         id: similarAesthetic.name,
         group: 2,
@@ -42,9 +48,9 @@ export default (props) => {
       return accumulator;
     }, [ rootAesthetic ]).map(n => Object.create(n));
 
-    const links = props.aestheticData.similarTo.reduce((accumulator, similarAesthetic) => {
+    const links = data.similarTo.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
-        source: props.aestheticData.name,
+        source: data.name,
         target: similarAesthetic.name,
       });
 
@@ -123,14 +129,13 @@ export default (props) => {
 
       if(similarityWebCanvas) {
         const bbox = similarityWebCanvas.getBBox()
-
         setBboxX(bbox.x);
         setBboxY(bbox.y);
         setBboxWidth(bbox.width);
         setBboxHeight(bbox.height);
       }
     });
-  }, [ props.aestheticData ]);
+  }, [ data ]);
 
   return (
     <svg id="similarityWebCanvas" viewBox={`${bboxX} ${bboxY} ${bboxWidth} ${bboxHeight}`}></svg>

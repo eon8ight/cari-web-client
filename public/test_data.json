@@ -26,7 +26,7 @@
                 "label": "Test image 1",
                 "description": "This is a test image",
                 "creator": "John Sayles",
-                "date": "1987-01-01T00:00:00Z"
+                "year": 1987
             },
             {
                 "url": "https://d2w9rnfcy7mm78.cloudfront.net/1986562/display_887ec03b4f30662497c53f3785604258.png?1522724961?bc=1",
@@ -34,7 +34,7 @@
                 "label": "Test image 2",
                 "description": "This is a test image",
                 "creator": "Global Village Communication",
-                "date": "1993-01-01T00:00:00Z"
+                "year": 1993
             },
             {
                 "url": "https://d2w9rnfcy7mm78.cloudfront.net/1986563/display_3223e1bccace4623bf407f33b8298606.png?1522724962?bc=1",
@@ -42,7 +42,7 @@
                 "label": "Test image 3",
                 "description": "This is a test image",
                 "creator": "Rafael",
-                "date": "1993-01-01T00:00:00Z"
+                "year": 1993
             },
             {
                 "url": "https://d2w9rnfcy7mm78.cloudfront.net/1986564/display_bd04d24b727edfe2110f050a744d412e.png?1522724963?bc=1",
@@ -50,7 +50,7 @@
                 "label": "Test image 4",
                 "description": "This is a test image",
                 "creator": "Unknown",
-                "date": "1990-01-01T00:00:00Z"
+                "year": 1990
             },
             {
                 "url": "https://d2w9rnfcy7mm78.cloudfront.net/1986565/display_e4d745c595b4cda4c33cff1c44ecea3e.png?1522724977?bc=1",
@@ -58,7 +58,7 @@
                 "label": "Test image 5",
                 "description": "This is a test image",
                 "creator": "Unknown",
-                "date": "1997-01-01T00:00:00Z"
+                "year": 1997
             }
         ]
     }

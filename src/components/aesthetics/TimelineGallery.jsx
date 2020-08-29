@@ -1,9 +1,19 @@
 import React, { useEffect } from 'react';
 
-import * as d3 from 'd3';
+import { extent } from 'd3-array';
+
+import {
+  axisBottom,
+  axisLeft,
+} from 'd3-axis';
+
+import { scaleLinear } from 'd3-scale';
+import { select } from 'd3-selection';
 
 const WIDTH = 300;
 const HEIGHT = 100;
+
+const MAX_PER_YEAR_BEFORE_SUBDIVIDING = 5;
 
 const MARGIN = {
   top: 20,
@@ -18,94 +28,120 @@ export default (props) => {
       return;
     }
 
-    const data = props.aestheticData.media.map(m => Object.create({
-      ...m,
-      date: new Date(m.date),
-    }));
-
-    const countPerYear = {};
-
-    data.forEach(d => {
-      const year = d.date.getFullYear();
-
-      if(!(year in countPerYear)) {
-        countPerYear[year] = 0;
-      }
-
-      countPerYear[year] += 1;
-      d.yPosition = countPerYear[year];
-    });
+    /*
+     * First, calculate the Y axis' range's max value. This number is the year that
+     * contains the greatest number of media.
+     */
 
     let yMax = 1;
 
-    Object.keys(countPerYear).forEach(year => {
-      const yearCount = countPerYear[year];
-
-      if(yearCount > yMax) {
-        yMax = yearCount;
+    props.aestheticData.media.reduce((counts, d) => {
+      if(!(d.year in counts)) {
+        counts[d.year] = 0;
       }
-    });
 
-    const xDomain = d3.extent(data, d => d.date);
+      counts[d.year]++;
+
+      if(counts[d.year] > yMax) {
+        yMax = counts[d.year];
+      }
+
+      return counts;
+    }, {});
 
     /*
-     * xDomain are pointers to dates in `data`, so modifying them will modify the data we're
-     * working with, hence the need to clone them
+     * Next, subdivide each year into a grid depending on how many media are in the
+     * year with the greatest amount of media, as determined by `yMax`. This prevents
+     * the graph from looking weird if there are too many previews to draw for
+     * a one-dimensional vertical row.
      */
 
-    xDomain[1] = new Date(xDomain[1].getTime());
-    xDomain[1].setFullYear(xDomain[1].getFullYear() + 1);
+    const subdivisions = Math.ceil(yMax / MAX_PER_YEAR_BEFORE_SUBDIVIDING);
+    yMax = Math.ceil(yMax / subdivisions);
 
-    const x = d3.scaleTime()
+    let subdivisionCounterByYear = {};
+    let yPositionByYear = {};
+
+    const data = props.aestheticData.media.map(m => {
+      if(!(m.year in subdivisionCounterByYear)) {
+        subdivisionCounterByYear[m.year] = 0;
+      }
+
+      if(!(m.year in yPositionByYear)) {
+        yPositionByYear[m.year] = 0;
+      }
+
+      /*
+       * The X-position of the preview is determined by taking its value in X's
+       * range - i.e., its year - and nudging it to the right slightly. i.e.,
+       * if `subdivisions` is 4, then for any given row, the first preview
+       * will have an X position of "year", the second preview will have an X
+       * position of "year + 0.25", the third preview will have an X position of
+       * "year + 0.5", and so forth.
+       */
+
+      const rval = Object.create({
+        ...m,
+        xPosition: m.year + ((1 / subdivisions) * subdivisionCounterByYear[m.year]),
+        yPosition: yPositionByYear[m.year] + 1,
+      });
+
+      subdivisionCounterByYear[m.year]++;
+
+      /*
+       * When we reach the end of a row, reset the X-position counter and
+       * increment the Y-position by 1.
+       */
+
+      if(subdivisionCounterByYear[m.year] > subdivisions - 1) {
+        subdivisionCounterByYear[m.year] = 0;
+        yPositionByYear[m.year]++;
+      }
+
+      return rval;
+    });
+
+    const xDomain = extent(data, d => d.year);
+    xDomain[1] += 1;
+
+    const x = scaleLinear()
       .domain(xDomain)
       .range([ MARGIN.left, WIDTH - MARGIN.right ]);
 
     const xAxis = g => g.attr('transform', `translate(0, ${HEIGHT - MARGIN.bottom})`)
-      .call(d3.axisBottom(x)
-        .ticks(d3.timeYear.every(1))
+      .call(axisBottom(x)
         .tickSizeOuter(0)
+        .tickFormat(d => d) // This prevents commas from being inserted in years
       );
 
-    const y = d3.scaleLinear()
+    const y = scaleLinear()
       .domain([ 0, yMax ])
       .range([HEIGHT - MARGIN.bottom, MARGIN.top ]);
 
     const yAxis = g => g.attr('transform', `translate(${MARGIN.left}, 0)`)
-      .call(d3.axisLeft(y)
-        .ticks(0)
-      )
+      .call(axisLeft(y).ticks(0))
       .call(g => g.select('.domain').remove());
 
-    const svg = d3.select('#galleryCanvas');
+    const svg = select('#galleryCanvas');
 
     const image = svg.selectAll('.images')
       .data(data)
       .enter()
       .insert('image')
       .attr('href', d => d.preview)
-      .attr('width', d => {
-        const date = d.date;
-        const nextYear = new Date(date.getTime());
-        nextYear.setFullYear(nextYear.getFullYear() + 1);
-        return x(nextYear) - x(date);
-      })
+      .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
       .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
-      .attr('preserveAspectRatio', 'xMidYMid slice')
-      .attr('x', d => x(d.date))
-      .attr('y', d => y(d.yPosition));
+      .attr('x', d => x(d.xPosition))
+      .attr('y', d => y(d.yPosition))
+      .attr('preserveAspectRatio', 'xMidYMid slice');
 
     svg.selectAll('.images')
       .data(data)
       .enter()
       .insert('rect')
-      .attr('width', d => {
-        const date = d.date;
-        const nextYear = new Date(date.getTime());
-        nextYear.setFullYear(nextYear.getFullYear() + 1);
-        return x(nextYear) - x(date);
-      })
+      .attr('width', d => x(d.xPosition + 1) - x(d.xPosition))
       .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
-      .attr('x', d => x(d.date))
+      .attr('x', d => x(d.xPosition))
       .attr('y', d => y(d.yPosition))
       .attr('fill', 'none')
       .attr('stroke', 'white');
@@ -116,7 +152,7 @@ export default (props) => {
     svg.append('g')
       .call(yAxis);
 
-    const viewer = d3.select('#viewer')
+    const viewer = select('#viewer')
 
     image.on('mousedown', d => {
       viewer.text('');
@@ -151,7 +187,7 @@ export default (props) => {
         .text('Year');
 
       galleryItemText.append('dd')
-        .text(d.date.getFullYear());
+        .text(d.year);
 
       galleryItemText.append('dt')
         .append('h3')
@@ -166,7 +202,7 @@ export default (props) => {
     <>
       <svg id="galleryCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       <div id="viewer">
-        <h2 style={{ 'text-align': 'center' }}>Select an image for more information.</h2>
+        <h2 style={{ textAlign: 'center' }}>Select an image for more information.</h2>
       </div>
     </>
   );
