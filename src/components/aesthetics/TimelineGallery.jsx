@@ -83,9 +83,32 @@ export default (props) => {
       .enter()
       .insert('image')
       .attr('href', d => d.preview)
-      .attr('width', '8%')
+      .attr('width', d => {
+        const date = d.date;
+        const nextYear = new Date(date.getTime());
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+        return x(nextYear) - x(date);
+      })
+      .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
+      .attr('preserveAspectRatio', 'xMidYMid slice')
       .attr('x', d => x(d.date))
       .attr('y', d => y(d.yPosition));
+
+    svg.selectAll('.images')
+      .data(data)
+      .enter()
+      .insert('rect')
+      .attr('width', d => {
+        const date = d.date;
+        const nextYear = new Date(date.getTime());
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+        return x(nextYear) - x(date);
+      })
+      .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
+      .attr('x', d => x(d.date))
+      .attr('y', d => y(d.yPosition))
+      .attr('fill', 'none')
+      .attr('stroke', 'white');
 
     svg.append('g')
       .call(xAxis);
@@ -96,26 +119,46 @@ export default (props) => {
     const viewer = d3.select('#viewer')
 
     image.on('mousedown', d => {
-      const galleryItemDiv = viewer.text('')
-        .insert('div')
-        .classed('viewerSelection', true);
+      viewer.text('');
 
-      galleryItemDiv.append('img')
+      viewer.append('div')
+        .attr('id', 'galleryImageContainer')
+        .append('img')
+        .attr('id', 'galleryImage')
         .attr('src', d.url);
 
-      const galleryItemText = galleryItemDiv.append('div');
+      const galleryItemText = viewer.append('div')
+        .attr('id', 'galleryImageMetadataContainer')
+        .append('dl')
+        .attr('id', 'galleryImageMetadata');
 
-      galleryItemText.append('p')
-        .text(`Title: ${d.label}`);
+      galleryItemText.append('dt')
+        .append('h3')
+        .text('Title');
 
-      galleryItemText.append('p')
-        .text(`Creator: ${d.creator}`);
+      galleryItemText.append('dd')
+        .text(d.label);
 
-      galleryItemText.append('p')
-        .text(`Date: ${d.date}`);
+      galleryItemText.append('dt')
+        .append('h3')
+        .text('Creator');
 
-      galleryItemText.append('p')
-        .text(`Description: ${d.description}`);
+      galleryItemText.append('dd')
+        .text(d.creator);
+
+      galleryItemText.append('dt')
+        .append('h3')
+        .text('Year');
+
+      galleryItemText.append('dd')
+        .text(d.date.getFullYear());
+
+      galleryItemText.append('dt')
+        .append('h3')
+        .text('Description');
+
+      galleryItemText.append('dd')
+        .text(d.description);
     });
   }, [ props.aestheticData ]);
 
@@ -123,7 +166,7 @@ export default (props) => {
     <>
       <svg id="galleryCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       <div id="viewer">
-        Select an image for more information.
+        <h2 style={{ 'text-align': 'center' }}>Select an image for more information.</h2>
       </div>
     </>
   );

@@ -5,8 +5,8 @@ import { useRouteMatch } from 'react-router-dom';
 import { json } from 'd3';
 
 import AestheticDetails from '../AestheticDetails';
-import Gallery from '../Gallery';
 import SimilarityWeb from '../SimilarityWeb';
+import TimelineGallery from '../TimelineGallery';
 
 export default (props) => {
   const match = useRouteMatch();
@@ -40,7 +40,7 @@ export default (props) => {
   let gallery = null;
 
   if(showGallery) {
-    gallery = <Gallery aestheticData={aestheticData} />;
+    gallery = <TimelineGallery aestheticData={aestheticData} />;
   }
 
   let similarityWeb = null;
