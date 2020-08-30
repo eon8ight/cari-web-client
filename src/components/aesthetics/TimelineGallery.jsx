@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 
-import { extent } from 'd3-array';
+import {
+  max,
+  min,
+} from 'd3-array';
 
 import {
   axisBottom,
@@ -8,7 +11,8 @@ import {
 } from 'd3-axis';
 
 import { scaleLinear } from 'd3-scale';
-import { select } from 'd3-selection';
+import { event, select } from 'd3-selection';
+import { zoom } from 'd3-zoom';
 
 const WIDTH = 300;
 const HEIGHT = 100;
@@ -59,6 +63,12 @@ export default (props) => {
     const subdivisions = Math.ceil(yMax / MAX_PER_YEAR_BEFORE_SUBDIVIDING);
     yMax = Math.ceil(yMax / subdivisions);
 
+    if(subdivisions > 1) {
+      select('#galleryCanvasContainer')
+        .insert('span', ':first-child')
+        .text('Scroll to zoom in. Click and drag to pan.');
+    }
+
     let subdivisionCounterByYear = {};
     let yPositionByYear = {};
 
@@ -78,6 +88,9 @@ export default (props) => {
        * will have an X position of "year", the second preview will have an X
        * position of "year + 0.25", the third preview will have an X position of
        * "year + 0.5", and so forth.
+       *
+       * Note that `xPosition` and `yPosition` are not X/Y-coordinates - they are
+       * instead values that correspond to specific ticks along the X/Y axis.
        */
 
       const rval = Object.create({
@@ -101,16 +114,17 @@ export default (props) => {
       return rval;
     });
 
-    const xDomain = extent(data, d => d.year);
-    xDomain[1] += 1;
+    const xMin = min(data, d => d.year);
+    const xMax = max(data, d => d.year) + 1;
 
     const x = scaleLinear()
-      .domain(xDomain)
+      .domain([ xMin, xMax ])
       .range([ MARGIN.left, WIDTH - MARGIN.right ]);
 
     const xAxis = g => g.attr('transform', `translate(0, ${HEIGHT - MARGIN.bottom})`)
       .call(axisBottom(x)
         .tickSizeOuter(0)
+        .ticks(xMax - xMin)
         .tickFormat(d => d) // This prevents commas from being inserted in years
       );
 
@@ -122,31 +136,56 @@ export default (props) => {
       .call(axisLeft(y).ticks(0))
       .call(g => g.select('.domain').remove());
 
-    const svg = select('#galleryCanvas');
+    const scrollZoom = (canvas) => {
+      const extent = [
+        [ MARGIN.left, MARGIN.top ],
+        [ WIDTH - MARGIN.right, HEIGHT - MARGIN.top ],
+      ];
+
+      const zoomed = () => {
+        x.range([ MARGIN.left, WIDTH - MARGIN.right ].map(d => event.transform.applyX(d)));
+
+        canvas.selectAll('image, rect')
+          .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
+          .attr('x', d => x(d.xPosition));
+
+        canvas.selectAll('#xAxis').call(xAxis);
+      };
+
+      canvas.call(zoom()
+        .scaleExtent([1, subdivisions])
+        .translateExtent(extent)
+        .extent(extent)
+        .on('zoom', zoomed));
+    };
+
+    const svg = select('#galleryCanvas')
+      .call(scrollZoom);
 
     const image = svg.selectAll('.images')
       .data(data)
       .enter()
-      .insert('image')
-      .attr('href', d => d.preview)
-      .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
-      .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
-      .attr('x', d => x(d.xPosition))
-      .attr('y', d => y(d.yPosition))
-      .attr('preserveAspectRatio', 'xMidYMid slice');
+        .insert('image')
+          .attr('href', d => d.preview)
+          .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
+          .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
+          .attr('x', d => x(d.xPosition))
+          .attr('y', d => y(d.yPosition))
+          .attr('preserveAspectRatio', 'xMidYMid slice');
 
     svg.selectAll('.images')
       .data(data)
       .enter()
-      .insert('rect')
-      .attr('width', d => x(d.xPosition + 1) - x(d.xPosition))
-      .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
-      .attr('x', d => x(d.xPosition))
-      .attr('y', d => y(d.yPosition))
-      .attr('fill', 'none')
-      .attr('stroke', 'white');
+        .insert('rect')
+          .attr('width', d => x(d.xPosition + 1) - x(d.xPosition))
+          .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
+          .attr('x', d => x(d.xPosition))
+          .attr('y', d => y(d.yPosition))
+          .attr('fill', 'none')
+          .attr('stroke', 'white');
 
     svg.append('g')
+      .attr('id', 'xAxis')
       .call(xAxis);
 
     svg.append('g')
@@ -160,38 +199,38 @@ export default (props) => {
       viewer.append('div')
         .attr('id', 'galleryImageContainer')
         .append('img')
-        .attr('id', 'galleryImage')
-        .attr('src', d.url);
+          .attr('id', 'galleryImage')
+          .attr('src', d.url);
 
       const galleryItemText = viewer.append('div')
         .attr('id', 'galleryImageMetadataContainer')
         .append('dl')
-        .attr('id', 'galleryImageMetadata');
+          .attr('id', 'galleryImageMetadata');
 
       galleryItemText.append('dt')
         .append('h3')
-        .text('Title');
+          .text('Title');
 
       galleryItemText.append('dd')
         .text(d.label);
 
       galleryItemText.append('dt')
         .append('h3')
-        .text('Creator');
+          .text('Creator');
 
       galleryItemText.append('dd')
         .text(d.creator);
 
       galleryItemText.append('dt')
         .append('h3')
-        .text('Year');
+          .text('Year');
 
       galleryItemText.append('dd')
         .text(d.year);
 
       galleryItemText.append('dt')
         .append('h3')
-        .text('Description');
+          .text('Description');
 
       galleryItemText.append('dd')
         .text(d.description);
@@ -200,7 +239,9 @@ export default (props) => {
 
   return (
     <>
-      <svg id="galleryCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
+      <div id="galleryCanvasContainer">
+        <svg id="galleryCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
+      </div>
       <div id="viewer">
         <h2 style={{ textAlign: 'center' }}>Select an image for more information.</h2>
       </div>
