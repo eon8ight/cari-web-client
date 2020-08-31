@@ -85,7 +85,12 @@ text {
 }
 
 #similarityWebCanvas {
+    border: 1px dashed black;
     margin-bottom: 24px;
+}
+
+#similarityWebScrollMessage {
+    margin-top: 0;
 }
 
 #viewer {

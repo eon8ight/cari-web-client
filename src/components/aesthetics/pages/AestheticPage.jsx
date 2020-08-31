@@ -5,8 +5,9 @@ import { useRouteMatch } from 'react-router-dom';
 import { json } from 'd3';
 
 import AestheticDetails from '../AestheticDetails';
+import Gallery from '../Gallery';
 import SimilarityWeb from '../SimilarityWeb';
-import TimelineGallery from '../TimelineGallery';
+import Timeline from '../Timeline';
 
 export default (props) => {
   const match = useRouteMatch();
@@ -16,6 +17,7 @@ export default (props) => {
 
   const [ showGallery, setShowGallery ] = useState(false);
   const [ showSimilarityWeb, setShowSimilarityWeb ] = useState(false);
+  const [ showTimeline, setShowTimeline ] = useState(false);
 
   useEffect(() => {
     if(!requestMade) {
@@ -37,21 +39,11 @@ export default (props) => {
     return null;
   }
 
-  let gallery = null;
-
-  if(showGallery) {
-    gallery = <TimelineGallery aestheticData={aestheticData} />;
-  }
-
-  let similarityWeb = null;
-
-  if(showSimilarityWeb) {
-    similarityWeb = (
-      <div style={{ margin: 'auto', width: '50%' }}>
-        <SimilarityWeb aestheticData={aestheticData} />
-      </div>
-    );
-  }
+  const timeline = showTimeline ? <Timeline aestheticData={aestheticData} /> : null;
+  const gallery = showGallery ? <Gallery aestheticData={aestheticData} /> : null;
+  const similarityWeb = showSimilarityWeb
+    ? <SimilarityWeb aestheticData={aestheticData} />
+    : null;
 
   return (
     <>
@@ -59,6 +51,13 @@ export default (props) => {
         <title>CARI | Aesthetic | {aestheticData.name}</title>
       </Helmet>
       <AestheticDetails aestheticData={aestheticData} />
+      <div className="section-header-line-button">
+        <h2>Timeline</h2>
+        <button onClick={() => setShowTimeline(!showTimeline)}>
+          {showTimeline ? '-' : '+'}
+        </button>
+      </div>
+      {timeline}
       <div className="section-header-line-button">
         <h2>Gallery</h2>
         <button onClick={() => setShowGallery(!showGallery)}>

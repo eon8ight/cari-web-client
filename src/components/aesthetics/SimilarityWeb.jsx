@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import {
   forceCenter,
@@ -15,14 +15,14 @@ import {
   select,
 } from 'd3-selection';
 
+import { zoom } from 'd3-zoom';
+
+const WIDTH = 500;
+const HEIGHT = 100;
+
 const color = scaleOrdinal(schemeCategory10);
 
 export default (props) => {
-  const [ bboxX, setBboxX ] = useState(0);
-  const [ bboxY, setBboxY ] = useState(0);
-  const [ bboxWidth, setBboxWidth ] = useState(0);
-  const [ bboxHeight, setBboxHeight ] = useState(0);
-
   const data = props.aestheticData;
 
   useEffect(() => {
@@ -57,12 +57,12 @@ export default (props) => {
       return accumulator;
     }, []).map(l => Object.create(l));
 
-    const simulation = forceSimulation(nodes)
-      .force('link', forceLink(links).id(d => d.id))
-      .force('charge', forceManyBody())
-      .force('center', forceCenter(0, 0));
+    const svg = select('#similarityWebCanvas')
 
-    const svg = select('#similarityWebCanvas');
+    const simulation = forceSimulation(nodes)
+      .force('link', forceLink(links).id(d => d.id).distance(50))
+      .force('charge', forceManyBody())
+      .force('center', forceCenter(WIDTH / 2, HEIGHT / 2));
 
     const link = svg.selectAll('.link')
       .data(links)
@@ -124,20 +124,43 @@ export default (props) => {
         .attr('y2', d => d.target.y);
 
       nodeGroup.attr('transform', d => `translate(${d.x}, ${d.y})`);
-
-      const similarityWebCanvas = document.getElementById('similarityWebCanvas');
-
-      if(similarityWebCanvas) {
-        const bbox = similarityWebCanvas.getBBox()
-        setBboxX(bbox.x);
-        setBboxY(bbox.y);
-        setBboxWidth(bbox.width);
-        setBboxHeight(bbox.height);
-      }
     });
+
+    const scrollZoom = (canvas) => {
+      const extent = [
+        [ 0, 0 ],
+        [ WIDTH, HEIGHT ],
+      ];
+
+      const zoomed = () => {
+        simulation.stop();
+
+        const transform = event.transform;
+
+        nodeGroup.attr('transform', d => (
+          `translate(${d.x + transform.x}, ${d.y + transform.y}) scale(${transform.k})`
+        ));
+
+        link.attr('x1', d => d.source.x + transform.x)
+          .attr('y1', d => d.source.y + transform.y)
+          .attr('x2', d => d.target.x + transform.x)
+          .attr('y2', d => d.target.y + transform.y);
+      };
+
+      canvas.call(zoom()
+        .scaleExtent([1, 2])
+        .translateExtent(extent)
+        .extent(extent)
+        .on('zoom', zoomed));
+    };
+
+    svg.call(scrollZoom);
   }, [ data ]);
 
   return (
-    <svg id="similarityWebCanvas" viewBox={`${bboxX} ${bboxY} ${bboxWidth} ${bboxHeight}`}></svg>
+    <>
+      <p id="similarityWebScrollMessage">Scroll to zoom in. Click and drag to pan.</p>
+      <svg id="similarityWebCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
+    </>
   );
 };
