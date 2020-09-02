@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useRouteMatch } from 'react-router-dom';
 
-import { json } from 'd3';
+import axios from 'axios';
 
 import AestheticDetails from '../AestheticDetails';
 import Gallery from '../Gallery';
@@ -23,15 +23,8 @@ export default (props) => {
     if(!requestMade) {
       setRequestMade(true);
 
-      json('/test_data.json')
-        .then(data => {
-
-          data.forEach(d => {
-            if(d.urlName === match.params.aestheticUrlName) {
-              setAestheticData(d);
-            }
-          });
-        });
+      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/${match.params.aestheticUrlName}`)
+        .then(res => setAestheticData(res.data));
     }
   }, [ match.params.aestheticUrlName, requestMade, setRequestMade ]);
 

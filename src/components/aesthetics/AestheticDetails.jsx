@@ -12,7 +12,7 @@ export default (props) => (
       <div className="section-header-line">
         <h3>circa</h3>
         <h2>
-          {props.aestheticData.start_year} - {props.aestheticData.end_year}
+          {props.aestheticData.startYear} - {props.aestheticData.endYear}
         </h2>
       </div>
     </div>
