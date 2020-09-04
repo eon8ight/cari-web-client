@@ -23,7 +23,7 @@ export default (props) => {
     if(!requestMade) {
       setRequestMade(true);
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/${match.params.aestheticUrlName}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findByUrlSlug/${match.params.aestheticUrlName}`)
         .then(res => setAestheticData(res.data));
     }
   }, [ match.params.aestheticUrlName, requestMade, setRequestMade ]);
@@ -32,10 +32,10 @@ export default (props) => {
     return null;
   }
 
-  const timeline = showTimeline ? <Timeline aestheticData={aestheticData} /> : null;
-  const gallery = showGallery ? <Gallery aestheticData={aestheticData} /> : null;
+  const timeline = showTimeline ? <Timeline aesthetic={aestheticData} /> : null;
+  const gallery = showGallery ? <Gallery aesthetic={aestheticData} /> : null;
   const similarityWeb = showSimilarityWeb
-    ? <SimilarityWeb aestheticData={aestheticData} />
+    ? <SimilarityWeb aesthetic={aestheticData} />
     : null;
 
   return (

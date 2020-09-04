@@ -23,34 +23,34 @@ const HEIGHT = 100;
 const color = scaleOrdinal(schemeCategory10);
 
 export default (props) => {
-  const data = props.aestheticData;
+  const similarAesthetics = props.aesthetic.similarAesthetics;
 
   useEffect(() => {
-    if(!data) {
+    if(!similarAesthetics) {
       return;
     }
 
     const rootAesthetic = {
-      id: data.name,
+      id: props.aesthetic.name,
       group: 1,
-      urlName: data.urlName,
-      type: 'You are here',
+      urlSlug: props.aesthetic.urlSlug,
+      description: 'You are here',
     };
 
-    const nodes = data.similarTo.reduce((accumulator, similarAesthetic) => {
+    const nodes = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
         id: similarAesthetic.name,
         group: 2,
-        urlName: similarAesthetic.urlName,
-        type: similarAesthetic.type,
+        urlSlug: similarAesthetic.urlSlug,
+        description: similarAesthetic.description,
       });
 
       return accumulator;
     }, [ rootAesthetic ]).map(n => Object.create(n));
 
-    const links = data.similarTo.reduce((accumulator, similarAesthetic) => {
+    const links = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
-        source: data.name,
+        source: props.aesthetic.name,
         target: similarAesthetic.name,
       });
 
@@ -85,7 +85,7 @@ export default (props) => {
       return d.group !== 1 ? this : null;
     })
       .insert('a')
-      .attr('href', d => `/aesthetics/${d.urlName}`);
+      .attr('href', d => `/aesthetics/${d.urlSlug}`);
 
     nodeGroup = centerNode.merge(relatedNode);
 
@@ -101,7 +101,7 @@ export default (props) => {
       .style('visibility', 'hidden');
 
     nodeCircle.on('mouseover', d => (
-        tooltip.text(d.type)
+        tooltip.text(d.description)
           .style('visibility', 'visible')
       ))
       .on('mousemove', d => (
@@ -155,7 +155,7 @@ export default (props) => {
     };
 
     svg.call(scrollZoom);
-  }, [ data ]);
+  }, [ props.aesthetic.name, props.aesthetic.urlSlug, similarAesthetics ]);
 
   return (
     <>

@@ -13,11 +13,8 @@ export default (props) => {
     if(!requestMade) {
       setRequestMade(true);
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetics/findAllNames`)
-        .then(res => setAesthetics(res.data.map(d => ({
-          name: d[0],
-          urlSlug: d[1],
-        }))));
+      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForAestheticsList`)
+        .then(res => setAesthetics(res.data));
     }
   }, [ requestMade, setRequestMade ]);
 

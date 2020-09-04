@@ -27,8 +27,10 @@ const MARGIN = {
 };
 
 export default (props) => {
+  const media = props.aesthetic.media;
+
   useEffect(() => {
-    if(!props.aestheticData) {
+    if(!media) {
       return;
     }
 
@@ -39,7 +41,7 @@ export default (props) => {
 
     let yMax = 1;
 
-    props.aestheticData.media.reduce((counts, d) => {
+    media.reduce((counts, d) => {
       if(!(d.year in counts)) {
         counts[d.year] = 0;
       }
@@ -72,7 +74,7 @@ export default (props) => {
     let subdivisionCounterByYear = {};
     let yPositionByYear = {};
 
-    const data = props.aestheticData.media.map(m => {
+    const data = media.map(m => {
       if(!(m.year in subdivisionCounterByYear)) {
         subdivisionCounterByYear[m.year] = 0;
       }
@@ -166,7 +168,7 @@ export default (props) => {
       .data(data)
       .enter()
         .insert('image')
-          .attr('href', d => d.preview)
+          .attr('href', d => d.previewImageUrl)
           .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
           .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
           .attr('x', d => x(d.xPosition))
@@ -219,7 +221,7 @@ export default (props) => {
           .text('Creator');
 
       galleryItemText.append('dd')
-        .text(d.creator);
+        .text(d.mediaCreator?.name || '(unknown)');
 
       galleryItemText.append('dt')
         .append('h3')
@@ -235,7 +237,7 @@ export default (props) => {
       galleryItemText.append('dd')
         .text(d.description);
     });
-  }, [ props.aestheticData ]);
+  }, [ media ]);
 
   return (
     <>
