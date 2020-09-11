@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { useLocation } from 'react-router-dom';
 
 import axios from 'axios';
+import { parse } from 'qs';
 
 import AestheticsList from '../AestheticsList';
 
 export default (props) => {
+  const location = useLocation();
+
   const [ requestMade, setRequestMade ] = useState(false);
   const [ aesthetics, setAesthetics ] = useState(null);
 
@@ -13,10 +17,12 @@ export default (props) => {
     if(!requestMade) {
       setRequestMade(true);
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForAestheticsList`)
-        .then(res => setAesthetics(res.data));
+      const queryParams = parse(location.search.substring(1));
+
+      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/find?page=${queryParams.page || 0}`)
+        .then(res => setAesthetics(res.data.content));
     }
-  }, [ requestMade, setRequestMade ]);
+  }, [ location, requestMade, setRequestMade ]);
 
   if(!aesthetics) {
     return null;

@@ -66,7 +66,7 @@ export default (props) => {
     yMax = Math.ceil(yMax / subdivisions);
 
     if(subdivisions > 1) {
-      select('#galleryCanvasContainer')
+      select('#timelineCanvasContainer')
         .insert('span', ':first-child')
         .text('Scroll to zoom in. Click and drag to pan.');
     }
@@ -161,7 +161,7 @@ export default (props) => {
         .on('zoom', zoomed));
     };
 
-    const svg = select('#galleryCanvas')
+    const svg = select('#timelineCanvas')
       .call(scrollZoom);
 
     const image = svg.selectAll('.images')
@@ -199,50 +199,50 @@ export default (props) => {
       viewer.text('');
 
       viewer.append('div')
-        .attr('id', 'galleryImageContainer')
+        .attr('id', 'timelineImageContainer')
         .append('img')
-          .attr('id', 'galleryImage')
+          .attr('id', 'timelineImage')
           .attr('src', d.url);
 
-      const galleryItemText = viewer.append('div')
-        .attr('id', 'galleryImageMetadataContainer')
+      const timelineItemText = viewer.append('div')
+        .attr('id', 'timelineImageMetadataContainer')
         .append('dl')
-          .attr('id', 'galleryImageMetadata');
+          .attr('id', 'timelineImageMetadata');
 
-      galleryItemText.append('dt')
+      timelineItemText.append('dt')
         .append('h3')
           .text('Title');
 
-      galleryItemText.append('dd')
+      timelineItemText.append('dd')
         .text(d.label);
 
-      galleryItemText.append('dt')
+      timelineItemText.append('dt')
         .append('h3')
           .text('Creator');
 
-      galleryItemText.append('dd')
+      timelineItemText.append('dd')
         .text(d.mediaCreator?.name || '(unknown)');
 
-      galleryItemText.append('dt')
+      timelineItemText.append('dt')
         .append('h3')
           .text('Year');
 
-      galleryItemText.append('dd')
+      timelineItemText.append('dd')
         .text(d.year);
 
-      galleryItemText.append('dt')
+      timelineItemText.append('dt')
         .append('h3')
           .text('Description');
 
-      galleryItemText.append('dd')
+      timelineItemText.append('dd')
         .text(d.description);
     });
   }, [ media ]);
 
   return (
     <>
-      <div id="galleryCanvasContainer">
-        <svg id="galleryCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
+      <div id="timelineCanvasContainer">
+        <svg id="timelineCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       </div>
       <div id="viewer">
         <h2 style={{ textAlign: 'center' }}>Select an image for more information.</h2>
