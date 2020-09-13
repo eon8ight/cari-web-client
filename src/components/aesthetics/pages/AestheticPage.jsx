@@ -9,6 +9,8 @@ import Gallery from '../Gallery';
 import SimilarityWeb from '../SimilarityWeb';
 import Timeline from '../Timeline';
 
+import styles from './styles/AestheticPage.module.scss';
+
 export default (props) => {
   const match = useRouteMatch();
 
@@ -23,8 +25,16 @@ export default (props) => {
     if(!requestMade) {
       setRequestMade(true);
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findByUrlSlug/${match.params.aestheticUrlName}`)
-        .then(res => setAestheticData(res.data));
+      axios.get(
+        `${process.env.REACT_APP_API_URL}/aesthetic/findForPage/${match.params.aestheticUrlName}`,
+        {
+          params: {
+            includeSimilarAesthetics: true,
+            includeMedia: true,
+            includeGalleryContent: true,
+          }
+        }
+      ).then(res => setAestheticData(res.data));
     }
   }, [ match.params.aestheticUrlName, requestMade, setRequestMade ]);
 
@@ -32,11 +42,53 @@ export default (props) => {
     return null;
   }
 
-  const timeline = showTimeline ? <Timeline aesthetic={aestheticData} /> : null;
-  const gallery = showGallery ? <Gallery aesthetic={aestheticData} /> : null;
-  const similarityWeb = showSimilarityWeb
-    ? <SimilarityWeb aesthetic={aestheticData} />
-    : null;
+  let timeline = null;
+
+  if(aestheticData.media && aestheticData.media.length > 0) {
+    timeline = (
+      <>
+        <div className={styles.sectionHeaderLineButton}>
+          <h2>Timeline</h2>
+          <button onClick={() => setShowTimeline(!showTimeline)}>
+            {showTimeline ? '-' : '+'}
+          </button>
+        </div>
+        {showTimeline && <Timeline aesthetic={aestheticData} />}
+      </>
+    );
+  }
+  
+  let gallery = null;
+
+  if(aestheticData.galleryContent && aestheticData.galleryContent.length > 0) {
+    gallery = (
+      <>
+        <div className={styles.sectionHeaderLineButton}>
+          <h2>Gallery</h2>
+          <button onClick={() => setShowGallery(!showGallery)}>
+            {showGallery ? '-' : '+'}
+          </button>
+        </div>
+        {showGallery && <Gallery aesthetic={aestheticData} />}
+      </>
+    );
+  }
+
+  let similarityWeb = null;
+
+  if(aestheticData.similarAesthetics && aestheticData.similarAesthetics.length > 0) {
+    similarityWeb = (
+      <>
+        <div className={styles.sectionHeaderLineButton}>
+          <h2>Related Aesthetics</h2>
+          <button onClick={() => setShowSimilarityWeb(!showSimilarityWeb)}>
+            {showSimilarityWeb ? '-' : '+'}
+          </button>
+        </div>
+        {showSimilarityWeb && <SimilarityWeb aesthetic={aestheticData} />}
+      </>
+    );
+  }
 
   return (
     <>
@@ -44,26 +96,8 @@ export default (props) => {
         <title>CARI | Aesthetic | {aestheticData.name}</title>
       </Helmet>
       <AestheticDetails aestheticData={aestheticData} />
-      <div className="section-header-line-button">
-        <h2>Timeline</h2>
-        <button onClick={() => setShowTimeline(!showTimeline)}>
-          {showTimeline ? '-' : '+'}
-        </button>
-      </div>
       {timeline}
-      <div className="section-header-line-button">
-        <h2>Gallery</h2>
-        <button onClick={() => setShowGallery(!showGallery)}>
-          {showGallery ? '-' : '+'}
-        </button>
-      </div>
       {gallery}
-      <div className="section-header-line-button">
-        <h2>Related Aesthetics</h2>
-        <button onClick={() => setShowSimilarityWeb(!showSimilarityWeb)}>
-          {showSimilarityWeb ? '-' : '+'}
-        </button>
-      </div>
       {similarityWeb}
     </>
   );

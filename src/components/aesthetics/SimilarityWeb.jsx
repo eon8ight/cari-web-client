@@ -17,6 +17,8 @@ import {
 
 import { zoom } from 'd3-zoom';
 
+import styles from './styles/SimilarityWeb.module.scss';
+
 const WIDTH = 500;
 const HEIGHT = 100;
 
@@ -39,9 +41,9 @@ export default (props) => {
 
     const nodes = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
-        id: similarAesthetic.name,
+        id: similarAesthetic.aesthetic.name,
         group: 2,
-        urlSlug: similarAesthetic.urlSlug,
+        urlSlug: similarAesthetic.aesthetic.urlSlug,
         description: similarAesthetic.description,
       });
 
@@ -51,13 +53,13 @@ export default (props) => {
     const links = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
         source: props.aesthetic.name,
-        target: similarAesthetic.name,
+        target: similarAesthetic.aesthetic.name,
       });
 
       return accumulator;
     }, []).map(l => Object.create(l));
 
-    const svg = select('#similarityWebCanvas')
+    const svg = select('#similarityWebCanvas');
 
     const simulation = forceSimulation(nodes)
       .force('link', forceLink(links).id(d => d.id).distance(50))
@@ -97,7 +99,7 @@ export default (props) => {
 
     const tooltip = select('body')
       .append('div')
-      .classed('tooltip', true)
+      .classed(styles.tooltip, true)
       .style('visibility', 'hidden');
 
     nodeCircle.on('mouseover', d => (

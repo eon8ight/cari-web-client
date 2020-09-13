@@ -193,7 +193,7 @@ export default (props) => {
     svg.append('g')
       .call(yAxis);
 
-    const viewer = select('#viewer')
+    const viewer = select('#timelineViewer')
 
     image.on('mousedown', d => {
       viewer.text('');
@@ -244,8 +244,8 @@ export default (props) => {
       <div id="timelineCanvasContainer">
         <svg id="timelineCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       </div>
-      <div id="viewer">
-        <h2 style={{ textAlign: 'center' }}>Select an image for more information.</h2>
+      <div id="timelineViewer">
+        <h2 id="timelineHint">Select an image for more information.</h2>
       </div>
     </>
   );

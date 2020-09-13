@@ -1,0 +1,87 @@
+$pagination-border: solid 1px black;
+$pagination-border-radius: 4px;
+$pagination-hover-background-color: lightgray;
+
+@mixin paginationDisabled {
+    background-color: $pagination-hover-background-color;
+    color: gray;
+
+    &:hover {
+        cursor: initial;
+    }
+}
+
+.image {
+    cursor: pointer;
+    margin: 8px 0;
+}
+
+.modal {
+    background-color: white;
+    border: 1px black solid;
+    border-radius: 6px;
+    bottom: auto;
+    left: 50%;
+    margin-right: -50%;
+    padding: 4px 24px 16px 24px;
+    position: absolute;
+    right: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.modalOverlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+.pagination {
+    list-style-type: none;
+    margin: auto;
+    margin-top: 24px;
+    padding: 0;
+    width: fit-content;
+}
+
+.paginationItem {
+    display: inline;
+}
+
+.paginationItemDisabled {
+    & > a {
+        @include paginationDisabled;
+    }
+}
+
+.paginationItemLink {
+    border-bottom: $pagination-border;
+    border-top: $pagination-border;
+    border-left: $pagination-border;
+    padding: 12px;
+
+    &:hover {
+        background-color: $pagination-hover-background-color;
+        cursor: pointer;
+    }
+}
+
+.paginationItemLinkActive {
+    @include paginationDisabled;
+}
+
+.paginationItemLinkNext {
+    @extend .paginationItemLink;
+    border-right: $pagination-border;
+    border-top-right-radius: $pagination-border-radius;
+    border-bottom-right-radius: $pagination-border-radius;
+}
+
+.paginationItemLinkPrevious {
+    @extend .paginationItemLink;
+    border-bottom-left-radius: $pagination-border-radius;
+    border-top-left-radius: $pagination-border-radius;
+}

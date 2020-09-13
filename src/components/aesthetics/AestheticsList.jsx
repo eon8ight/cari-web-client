@@ -9,7 +9,7 @@ export default (props) => {
   ));
 
   return (
-    <ul>
+    <ul id="aestheticList">
       {aestheticLis}
     </ul>
   );

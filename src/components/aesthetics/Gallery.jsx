@@ -4,16 +4,7 @@ import ReactPaginate from 'react-paginate';
 
 import axios from 'axios';
 
-const GALLERY_MODAL_STYLES = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  }
-};
+import styles from './styles/Gallery.module.scss';
 
 export default (props) => {
   const [ galleryModalBlock, setGalleryModalBlock ] = useState(null);
@@ -26,7 +17,7 @@ export default (props) => {
 
   const galleryContent = galleryData.map(block => {
     return (
-      <div className="gallery-image" key={block.id}>
+      <div className={styles.image} key={block.id}>
         <img src={block.image.thumb.url} alt={block.description}
              onClick={() => setGalleryModalBlock(block)} />
       </div>
@@ -54,10 +45,21 @@ export default (props) => {
         {galleryContent}
       </div>
       <ReactPaginate pageCount={totalPages} pageRangeDisplayed={5} marginPagesDisplayed={2}
-                     onPageChange={handlePageChange} initialPage={0}
-                     disableInitialCallback={true} />
-      <Modal isOpen={galleryModalBlock !== null} onRequestClose={() => setGalleryModalBlock(null)}
-             style={GALLERY_MODAL_STYLES}>
+                     previousLabel="<<" nextLabel=">>" breakClassName={styles.paginationItem}
+                     breakLinkClassName={styles.paginationItemLink} onPageChange={handlePageChange}
+                     initialPage={0} disableInitialCallback={true}
+                     containerClassName={styles.pagination} pageClassName={styles.paginationItem}
+                     pageLinkClassName={styles.paginationItemLink}
+                     activeClassName={styles.paginationItem}
+                     activeLinkClassName={styles.paginationItemLinkActive}
+                     previousClassName={styles.paginationItem}
+                     nextClassName={styles.paginationItem}
+                     previousLinkClassName={styles.paginationItemLinkPrevious}
+                     nextLinkClassName={styles.paginationItemLinkNext}
+                     disabledClassName={styles.paginationItemDisabled} />
+      <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
+             isOpen={galleryModalBlock !== null}
+             onRequestClose={() => setGalleryModalBlock(null)}>
         {galleryModalContent}
       </Modal>
     </>
