@@ -9,6 +9,8 @@ import Gallery from '../Gallery';
 import SimilarityWeb from '../SimilarityWeb';
 import Timeline from '../Timeline';
 
+import Spinner from '../../common/Spinner';
+
 import styles from './styles/AestheticPage.module.scss';
 
 export default (props) => {
@@ -39,7 +41,7 @@ export default (props) => {
   }, [ match.params.aestheticUrlName, requestMade, setRequestMade ]);
 
   if(!aestheticData) {
-    return null;
+    return <Spinner />;
   }
 
   let timeline = null;
@@ -95,7 +97,7 @@ export default (props) => {
       <Helmet>
         <title>CARI | Aesthetic | {aestheticData.name}</title>
       </Helmet>
-      <AestheticDetails aestheticData={aestheticData} />
+      <AestheticDetails aesthetic={aestheticData} />
       {timeline}
       {gallery}
       {similarityWeb}

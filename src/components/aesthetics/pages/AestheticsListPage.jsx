@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import ReactPaginate from 'react-paginate';
 
 import axios from 'axios';
 
 import AestheticsList from '../AestheticsList';
-
-import styles from './styles/AestheticsListPage.module.scss';
+import Paginator from '../../common/Paginator';
 
 export default (props) => {
   const [ requestMade, setRequestMade ] = useState(false);
@@ -42,19 +40,9 @@ export default (props) => {
       <Helmet>
         <title>CARI | Aesthetics</title>
       </Helmet>
-      <ReactPaginate pageCount={totalPages} pageRangeDisplayed={5} marginPagesDisplayed={2}
-                     previousLabel="<<" nextLabel=">>" breakClassName={styles.paginationItem}
-                     breakLinkClassName={styles.paginationItemLink} onPageChange={handlePageChange}
-                     initialPage={0} disableInitialCallback={true}
-                     containerClassName={styles.pagination} pageClassName={styles.paginationItem}
-                     pageLinkClassName={styles.paginationItemLink}
-                     activeClassName={styles.paginationItem}
-                     activeLinkClassName={styles.paginationItemLinkActive}
-                     previousClassName={styles.paginationItem}
-                     nextClassName={styles.paginationItem}
-                     previousLinkClassName={styles.paginationItemLinkPrevious}
-                     nextLinkClassName={styles.paginationItemLinkNext}
-                     disabledClassName={styles.paginationItemDisabled} />
+      <div id="aestheticsListPaginatorContainer">
+        <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
+      </div>
       <AestheticsList aesthetics={aesthetics} />
     </>
   );

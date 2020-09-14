@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
-import ReactPaginate from 'react-paginate';
 
 import axios from 'axios';
+
+import Paginator from '../common/Paginator';
+import Spinner from '../common/Spinner';
 
 import styles from './styles/Gallery.module.scss';
 
@@ -11,18 +13,24 @@ export default (props) => {
   const [ galleryData, setGalleryData ] = useState(props.aesthetic.galleryContent.contents);
 
   const handlePageChange = (data) => {
+    setGalleryData(null);
+  
     axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findGalleryContent/${props.aesthetic.aesthetic}?page=${data.selected + 1}`)
       .then(res => setGalleryData(res.data.contents));
   };
 
-  const galleryContent = galleryData.map(block => {
-    return (
-      <div className={styles.image} key={block.id}>
-        <img src={block.image.thumb.url} alt={block.description}
-             onClick={() => setGalleryModalBlock(block)} />
-      </div>
-    );
-  });
+  let galleryContent = <Spinner />;
+
+  if(galleryData) {
+    galleryContent = galleryData.map(block => {
+      return (
+        <div className={styles.image} key={block.id}>
+          <img src={block.image.thumb.url} alt={block.description}
+               onClick={() => setGalleryModalBlock(block)} />
+        </div>
+      );
+    });
+  }
 
   let galleryModalContent = null;
 
@@ -44,19 +52,9 @@ export default (props) => {
       <div id="galleryContainer">
         {galleryContent}
       </div>
-      <ReactPaginate pageCount={totalPages} pageRangeDisplayed={5} marginPagesDisplayed={2}
-                     previousLabel="<<" nextLabel=">>" breakClassName={styles.paginationItem}
-                     breakLinkClassName={styles.paginationItemLink} onPageChange={handlePageChange}
-                     initialPage={0} disableInitialCallback={true}
-                     containerClassName={styles.pagination} pageClassName={styles.paginationItem}
-                     pageLinkClassName={styles.paginationItemLink}
-                     activeClassName={styles.paginationItem}
-                     activeLinkClassName={styles.paginationItemLinkActive}
-                     previousClassName={styles.paginationItem}
-                     nextClassName={styles.paginationItem}
-                     previousLinkClassName={styles.paginationItemLinkPrevious}
-                     nextLinkClassName={styles.paginationItemLinkNext}
-                     disabledClassName={styles.paginationItemDisabled} />
+      <div id="galleryPaginatorContainer">
+        <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
+      </div>
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
              isOpen={galleryModalBlock !== null}
              onRequestClose={() => setGalleryModalBlock(null)}>

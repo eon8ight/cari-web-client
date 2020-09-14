@@ -1,7 +1,3 @@
-a {
-    text-decoration: none;
-}
-
 circle:hover {
     fill: red;
 }
@@ -18,9 +14,8 @@ text {
     font-size: 0.5em;
 }
 
-#aestheticList {
-    list-style-type: none;
-    padding: 0;
+#aestheticsListPaginatorContainer {
+    margin: 32px auto 0;
     width: fit-content;
 }
 
@@ -29,6 +24,11 @@ text {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+}
+
+#galleryPaginatorContainer {
+    margin: 32px auto 0;
+    width: fit-content;
 }
 
 #similarityWebCanvas {
