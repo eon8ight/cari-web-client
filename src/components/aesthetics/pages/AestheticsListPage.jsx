@@ -11,23 +11,40 @@ export default (props) => {
   const [ aesthetics, setAesthetics ] = useState(null);
   const [ totalPages, setTotalPages ] = useState(1);
 
-  const callApi = useCallback((pageNum) => {
+  const [ sortField, setSortField ] = useState(null);
+  const [ sortAsc, setSortAsc ] = useState(null);
+
+  const callApi = (pageNum, forceSortField, forceSortAsc) => {
     if(!requestMade) {
       setRequestMade(true);
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForList?page=${pageNum}`)
+      const params = { pageNum };
+
+      if(forceSortField !== null)
+        params.sortField = forceSortField;
+      else if(sortField !== null)
+        params.sortField = sortField;
+
+      if(forceSortAsc !== null)
+        params.asc = forceSortAsc;
+      else if(sortAsc !== null)
+        params.asc = sortAsc;
+
+      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForList`, { params })
         .then(res => {
           setAesthetics(res.data.content);
           setTotalPages(res.data.totalPages);
           setRequestMade(false);
         });
     }
-  }, [ requestMade ]);
+  };
+
+  const callApiCallback = useCallback(callApi);
 
   useEffect(() => {
     if(!aesthetics)
-      callApi(0);
-  }, [ aesthetics, callApi ]);
+      callApiCallback(0);
+  }, [ aesthetics, callApiCallback ]);
 
   if(!aesthetics) {
     return null;
@@ -43,7 +60,8 @@ export default (props) => {
       <div id="aestheticsListPaginatorContainer">
         <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
       </div>
-      <AestheticsList aesthetics={aesthetics} />
+      <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
+                      sortAsc={sortAsc} setSortAsc={setSortAsc} callApi={callApi} />
     </>
   );
 };
