@@ -13,22 +13,27 @@ export default (props) => {
 
   const [ sortField, setSortField ] = useState(null);
   const [ sortAsc, setSortAsc ] = useState(null);
+  const [ keyword, setKeyword ] = useState(null);
 
-  const callApi = (pageNum, forceSortField, forceSortAsc) => {
+  const callApi = (params) => {
     if(!requestMade) {
       setRequestMade(true);
 
-      const params = { pageNum };
+      if(!params.page) {
+        params.page = 0;
+      }
 
-      if(forceSortField !== null)
-        params.sortField = forceSortField;
-      else if(sortField !== null)
+      if(sortField && !params.sortField) {
         params.sortField = sortField;
+      }
 
-      if(forceSortAsc !== null)
-        params.asc = forceSortAsc;
-      else if(sortAsc !== null)
+      if(sortAsc !== null && params.sortAsc === null) {
         params.asc = sortAsc;
+      }
+
+      if(keyword && params.keyword === null) {
+        params.keyword = keyword;
+      }
 
       axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForList`, { params })
         .then(res => {
@@ -43,14 +48,19 @@ export default (props) => {
 
   useEffect(() => {
     if(!aesthetics)
-      callApiCallback(0);
+      callApiCallback({ page: 0 });
   }, [ aesthetics, callApiCallback ]);
 
   if(!aesthetics) {
     return null;
   }
 
-  const handlePageChange = (data) => callApi(data.selected);
+  const handleKeywordChange = event => {
+    setKeyword(event.target.value);
+    callApi({ keyword: event.target.value });
+  }
+
+  const handlePageChange = data => callApi({ page: data.selected });
 
   return (
     <>
@@ -58,7 +68,14 @@ export default (props) => {
         <title>CARI | Aesthetics</title>
       </Helmet>
       <div id="aestheticsListPaginatorContainer">
-        <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
+        <div id="aestheticsListFilters">
+          <div>
+            <label for="keyword">Keyword:</label>
+            &nbsp;
+            <input type="text" id="keyword" value={keyword} onChange={handleKeywordChange} />
+          </div>
+          <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
+        </div>
       </div>
       <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
                       sortAsc={sortAsc} setSortAsc={setSortAsc} callApi={callApi} />

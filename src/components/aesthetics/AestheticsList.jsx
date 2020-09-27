@@ -28,7 +28,7 @@ export default (props) => {
     }
 
     props.setSortAsc(newSortAsc);
-    props.callApi(0, newSortField, newSortAsc);
+    props.callApi({ page: 0, sortField: newSortField, asc: newSortAsc });
   };
 
   const getSortSymbol = (fieldName) => props.sortField === fieldName

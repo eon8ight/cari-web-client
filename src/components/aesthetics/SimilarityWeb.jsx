@@ -41,9 +41,9 @@ export default (props) => {
 
     const nodes = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
-        id: similarAesthetic.aesthetic.name,
+        id: similarAesthetic.name,
         group: 2,
-        urlSlug: similarAesthetic.aesthetic.urlSlug,
+        urlSlug: similarAesthetic.urlSlug,
         description: similarAesthetic.description,
       });
 
@@ -53,7 +53,7 @@ export default (props) => {
     const links = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
         source: props.aesthetic.name,
-        target: similarAesthetic.aesthetic.name,
+        target: similarAesthetic.name,
       });
 
       return accumulator;
