@@ -18,21 +18,21 @@ export default (props) => {
   ));
 
   const handleSortClick = (newSortField) => {
-    let newSortAsc;
-  
+    let newAsc;
+
     if (props.sortField === newSortField) {
-      newSortAsc = props.sortAsc === null ? true : !props.sortAsc;
+      newAsc = props.asc === null ? true : !props.asc;
     } else {
-      newSortAsc = true;
+      newAsc = true;
       props.setSortField(newSortField);
     }
 
-    props.setSortAsc(newSortAsc);
-    props.callApi({ page: 0, sortField: newSortField, asc: newSortAsc });
+    props.setAsc(newAsc);
+    props.callApi({ page: 0, sortField: newSortField, asc: newAsc });
   };
 
   const getSortSymbol = (fieldName) => props.sortField === fieldName
-    ? String.fromCharCode(props.sortAsc ? CHAR_CODE_DOWN_TRIANGLE : CHAR_CODE_UP_TRIANGLE)
+    ? String.fromCharCode(props.asc ? CHAR_CODE_DOWN_TRIANGLE : CHAR_CODE_UP_TRIANGLE)
     : null;
 
   return (

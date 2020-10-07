@@ -30,7 +30,7 @@ export default (props) => {
   const media = props.aesthetic.media;
 
   useEffect(() => {
-    if(!media) {
+    if (!media) {
       return;
     }
 
@@ -42,13 +42,13 @@ export default (props) => {
     let yMax = 1;
 
     media.reduce((counts, d) => {
-      if(!(d.year in counts)) {
+      if (!(d.year in counts)) {
         counts[d.year] = 0;
       }
 
       counts[d.year]++;
 
-      if(counts[d.year] > yMax) {
+      if (counts[d.year] > yMax) {
         yMax = counts[d.year];
       }
 
@@ -65,7 +65,7 @@ export default (props) => {
     const subdivisions = Math.ceil(yMax / MAX_PER_YEAR_BEFORE_SUBDIVIDING);
     yMax = Math.ceil(yMax / subdivisions);
 
-    if(subdivisions > 1) {
+    if (subdivisions > 1) {
       select('#timelineCanvasContainer')
         .insert('span', ':first-child')
         .text('Scroll to zoom in. Click and drag to pan.');
@@ -75,11 +75,11 @@ export default (props) => {
     let yPositionByYear = {};
 
     const data = media.map(m => {
-      if(!(m.year in subdivisionCounterByYear)) {
+      if (!(m.year in subdivisionCounterByYear)) {
         subdivisionCounterByYear[m.year] = 0;
       }
 
-      if(!(m.year in yPositionByYear)) {
+      if (!(m.year in yPositionByYear)) {
         yPositionByYear[m.year] = 0;
       }
 
@@ -108,7 +108,7 @@ export default (props) => {
        * increment the Y-position by 1.
        */
 
-      if(subdivisionCounterByYear[m.year] > subdivisions - 1) {
+      if (subdivisionCounterByYear[m.year] > subdivisions - 1) {
         subdivisionCounterByYear[m.year] = 0;
         yPositionByYear[m.year]++;
       }
@@ -120,8 +120,8 @@ export default (props) => {
     const xMax = max(data, d => d.year) + 1;
 
     const x = scaleLinear()
-      .domain([ xMin, xMax ])
-      .range([ MARGIN.left, WIDTH - MARGIN.right ]);
+      .domain([xMin, xMax])
+      .range([MARGIN.left, WIDTH - MARGIN.right]);
 
     const xAxis = g => g.attr('transform', `translate(0, ${HEIGHT - MARGIN.bottom})`)
       .call(axisBottom(x)
@@ -131,8 +131,8 @@ export default (props) => {
       );
 
     const y = scaleLinear()
-      .domain([ 0, yMax ])
-      .range([HEIGHT - MARGIN.bottom, MARGIN.top ]);
+      .domain([0, yMax])
+      .range([HEIGHT - MARGIN.bottom, MARGIN.top]);
 
     const yAxis = g => g.attr('transform', `translate(${MARGIN.left}, 0)`)
       .call(axisLeft(y).ticks(0))
@@ -140,12 +140,12 @@ export default (props) => {
 
     const scrollZoom = (canvas) => {
       const extent = [
-        [ MARGIN.left, MARGIN.top ],
-        [ WIDTH - MARGIN.right, HEIGHT - MARGIN.top ],
+        [MARGIN.left, MARGIN.top],
+        [WIDTH - MARGIN.right, HEIGHT - MARGIN.top],
       ];
 
       const zoomed = () => {
-        x.range([ MARGIN.left, WIDTH - MARGIN.right ].map(d => event.transform.applyX(d)));
+        x.range([MARGIN.left, WIDTH - MARGIN.right].map(d => event.transform.applyX(d)));
 
         canvas.selectAll('image, rect')
           .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
@@ -167,24 +167,24 @@ export default (props) => {
     const image = svg.selectAll('.images')
       .data(data)
       .enter()
-        .insert('image')
-          .attr('href', d => d.previewImageUrl)
-          .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
-          .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
-          .attr('x', d => x(d.xPosition))
-          .attr('y', d => y(d.yPosition))
-          .attr('preserveAspectRatio', 'xMidYMid slice');
+      .insert('image')
+      .attr('href', d => d.previewImageUrl)
+      .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
+      .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
+      .attr('x', d => x(d.xPosition))
+      .attr('y', d => y(d.yPosition))
+      .attr('preserveAspectRatio', 'xMidYMid slice');
 
     svg.selectAll('.images')
       .data(data)
       .enter()
-        .insert('rect')
-          .attr('width', d => x(d.xPosition + 1) - x(d.xPosition))
-          .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
-          .attr('x', d => x(d.xPosition))
-          .attr('y', d => y(d.yPosition))
-          .attr('fill', 'none')
-          .attr('stroke', 'white');
+      .insert('rect')
+      .attr('width', d => x(d.xPosition + 1) - x(d.xPosition))
+      .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
+      .attr('x', d => x(d.xPosition))
+      .attr('y', d => y(d.yPosition))
+      .attr('fill', 'none')
+      .attr('stroke', 'white');
 
     svg.append('g')
       .attr('id', 'xAxis')
@@ -201,43 +201,43 @@ export default (props) => {
       viewer.append('div')
         .attr('id', 'timelineImageContainer')
         .append('img')
-          .attr('id', 'timelineImage')
-          .attr('src', d.url);
+        .attr('id', 'timelineImage')
+        .attr('src', d.url);
 
       const timelineItemText = viewer.append('div')
         .attr('id', 'timelineImageMetadataContainer')
         .append('dl')
-          .attr('id', 'timelineImageMetadata');
+        .attr('id', 'timelineImageMetadata');
 
       timelineItemText.append('dt')
         .append('h3')
-          .text('Title');
+        .text('Title');
 
       timelineItemText.append('dd')
         .text(d.label);
 
       timelineItemText.append('dt')
         .append('h3')
-          .text('Creator');
+        .text('Creator');
 
       timelineItemText.append('dd')
         .text(d.mediaCreator?.name || '(unknown)');
 
       timelineItemText.append('dt')
         .append('h3')
-          .text('Year');
+        .text('Year');
 
       timelineItemText.append('dd')
         .text(d.year);
 
       timelineItemText.append('dt')
         .append('h3')
-          .text('Description');
+        .text('Description');
 
       timelineItemText.append('dd')
         .text(d.description);
     });
-  }, [ media ]);
+  }, [media]);
 
   return (
     <>

@@ -22,13 +22,15 @@ import styles from './styles/SimilarityWeb.module.scss';
 const WIDTH = 500;
 const HEIGHT = 100;
 
+const MAX_DESCRIPTION_LENGTH = 75;
+
 const color = scaleOrdinal(schemeCategory10);
 
 export default (props) => {
   const similarAesthetics = props.aesthetic.similarAesthetics;
 
   useEffect(() => {
-    if(!similarAesthetics) {
+    if (!similarAesthetics) {
       return;
     }
 
@@ -40,15 +42,25 @@ export default (props) => {
     };
 
     const nodes = similarAesthetics.reduce((accumulator, similarAesthetic) => {
+      let description = similarAesthetic.description;
+
+      if(description) {
+        if(description.length > MAX_DESCRIPTION_LENGTH) {
+          description = description.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
+        }
+      } else {
+        description = '(no description)'
+      }
+
       accumulator.push({
         id: similarAesthetic.name,
         group: 2,
         urlSlug: similarAesthetic.urlSlug,
-        description: similarAesthetic.description,
+        description: description,
       });
 
       return accumulator;
-    }, [ rootAesthetic ]).map(n => Object.create(n));
+    }, [rootAesthetic]).map(n => Object.create(n));
 
     const links = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
@@ -78,12 +90,12 @@ export default (props) => {
       .data(nodes)
       .enter();
 
-    const centerNode = nodeGroup.select(function(d) {
+    const centerNode = nodeGroup.select(function (d) {
       return d.group === 1 ? this : null;
     })
       .insert('g');
 
-    const relatedNode = nodeGroup.select(function(d) {
+    const relatedNode = nodeGroup.select(function (d) {
       return d.group !== 1 ? this : null;
     })
       .insert('a')
@@ -103,9 +115,9 @@ export default (props) => {
       .style('visibility', 'hidden');
 
     nodeCircle.on('mouseover', d => (
-        tooltip.text(d.description)
-          .style('visibility', 'visible')
-      ))
+      tooltip.text(d.description)
+        .style('visibility', 'visible')
+    ))
       .on('mousemove', d => (
         tooltip.style('top', `${event.pageY - 16}px`)
           .style('left', `${event.pageX + 16}px`)
@@ -130,8 +142,8 @@ export default (props) => {
 
     const scrollZoom = (canvas) => {
       const extent = [
-        [ 0, 0 ],
-        [ WIDTH, HEIGHT ],
+        [0, 0],
+        [WIDTH, HEIGHT],
       ];
 
       const zoomed = () => {
@@ -157,7 +169,7 @@ export default (props) => {
     };
 
     svg.call(scrollZoom);
-  }, [ props.aesthetic.name, props.aesthetic.urlSlug, similarAesthetics ]);
+  }, [props.aesthetic.name, props.aesthetic.urlSlug, similarAesthetics]);
 
   return (
     <>

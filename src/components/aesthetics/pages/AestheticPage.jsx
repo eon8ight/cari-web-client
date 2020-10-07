@@ -16,15 +16,15 @@ import styles from './styles/AestheticPage.module.scss';
 export default (props) => {
   const match = useRouteMatch();
 
-  const [ aestheticData, setAestheticData ] = useState(null);
-  const [ requestMade, setRequestMade ] = useState(false);
+  const [aestheticData, setAestheticData] = useState(null);
+  const [requestMade, setRequestMade] = useState(false);
 
-  const [ showGallery, setShowGallery ] = useState(false);
-  const [ showSimilarityWeb, setShowSimilarityWeb ] = useState(false);
-  const [ showTimeline, setShowTimeline ] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
+  const [showSimilarityWeb, setShowSimilarityWeb] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   useEffect(() => {
-    if(!requestMade) {
+    if (!requestMade) {
       setRequestMade(true);
 
       axios.get(
@@ -38,15 +38,15 @@ export default (props) => {
         }
       ).then(res => setAestheticData(res.data));
     }
-  }, [ match.params.aestheticUrlName, requestMade, setRequestMade ]);
+  }, [match.params.aestheticUrlName, requestMade, setRequestMade]);
 
-  if(!aestheticData) {
+  if (!aestheticData) {
     return <Spinner />;
   }
 
   let timeline = null;
 
-  if(aestheticData.media && aestheticData.media.length > 0) {
+  if (aestheticData.media && aestheticData.media.length > 0) {
     timeline = (
       <>
         <div className={styles.sectionHeaderLineButton}>
@@ -59,10 +59,10 @@ export default (props) => {
       </>
     );
   }
-  
+
   let gallery = null;
 
-  if(aestheticData.galleryContent && aestheticData.galleryContent.length > 0) {
+  if (aestheticData.galleryContent && aestheticData.galleryContent.length > 0) {
     gallery = (
       <>
         <div className={styles.sectionHeaderLineButton}>
@@ -78,7 +78,7 @@ export default (props) => {
 
   let similarityWeb = null;
 
-  if(aestheticData.similarAesthetics && aestheticData.similarAesthetics.length > 0) {
+  if (aestheticData.similarAesthetics && aestheticData.similarAesthetics.length > 0) {
     similarityWeb = (
       <>
         <div className={styles.sectionHeaderLineButton}>
