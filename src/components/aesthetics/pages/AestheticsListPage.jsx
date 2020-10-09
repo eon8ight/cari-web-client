@@ -7,6 +7,8 @@ import AestheticsList from '../AestheticsList';
 import Paginator from '../../common/Paginator';
 import Spinner from '../../common/Spinner';
 
+import styles from './styles/AestheticsListPage.module.scss';
+
 const valueExists = (arr, key) => (typeof arr[key] !== 'undefined') && arr[key] !== null;
 
 export default (props) => {
@@ -96,24 +98,24 @@ export default (props) => {
         <title>CARI | Aesthetics</title>
       </Helmet>
       <div id="aestheticsListPaginatorContainer">
-        <div id="aestheticsListFilters">
-          <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} id="aestheticsListFilters">
+          <div>
             <label htmlFor="keyword">Keyword:</label>
-              &nbsp;
-              <input type="text" id="keyword" value={keyword || ''} onChange={handleKeywordChange} />
-              &nbsp;
-              <label htmlFor="startYear">Between:</label>
-              &nbsp;
-              <input type="number" id="startYear" value={startYear || ''} onChange={handleStartYearChange} />
-              &nbsp;
-              <label htmlFor="endYear">and</label>
-              &nbsp;
-              <input type="number" id="endYear" value={endYear || ''} onChange={handleEndYearChange} />
-              &nbsp;
-              <input type="submit" value="Search" />
-          </form>
+            &nbsp;
+            <input type="text" id="keyword" value={keyword || ''} onChange={handleKeywordChange} />
+          </div>
+          <div>
+            <label htmlFor="startYear">Between:</label>
+            &nbsp;
+            <input type="number" id="startYear" className={styles.yearInput} value={startYear || ''} onChange={handleStartYearChange} />
+            &nbsp;
+            <label htmlFor="endYear">and</label>
+            &nbsp;
+            <input type="number" id="endYear" className={styles.yearInput} value={endYear || ''} onChange={handleEndYearChange} />
+          </div>
+          <input type="submit" value="Search" />
           <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
-        </div>
+        </form>
       </div>
       {aestheticsList}
     </>

@@ -19,8 +19,8 @@ import { zoom } from 'd3-zoom';
 
 import styles from './styles/SimilarityWeb.module.scss';
 
-const WIDTH = 500;
-const HEIGHT = 100;
+const WIDTH = 400;
+const HEIGHT = 250;
 
 const MAX_DESCRIPTION_LENGTH = 75;
 
@@ -49,7 +49,7 @@ export default (props) => {
           description = description.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
         }
       } else {
-        description = '(no description)'
+        description = '(no description)';
       }
 
       accumulator.push({
@@ -142,23 +142,24 @@ export default (props) => {
 
     const scrollZoom = (canvas) => {
       const extent = [
-        [0, 0],
-        [WIDTH, HEIGHT],
+        [-100, -100],
+        [WIDTH - 100, HEIGHT - 100],
       ];
 
       const zoomed = () => {
         simulation.stop();
 
         const transform = event.transform;
+        console.log(transform);
 
         nodeGroup.attr('transform', d => (
-          `translate(${d.x + transform.x}, ${d.y + transform.y}) scale(${transform.k})`
+          `translate(${d.x + (transform.x * transform.k)}, ${d.y + (transform.y * transform.k)}) scale(${transform.k})`
         ));
 
-        link.attr('x1', d => d.source.x + transform.x)
-          .attr('y1', d => d.source.y + transform.y)
-          .attr('x2', d => d.target.x + transform.x)
-          .attr('y2', d => d.target.y + transform.y);
+        link.attr('x1', d => d.source.x + (transform.x * transform.k))
+          .attr('y1', d => d.source.y + (transform.y * transform.k))
+          .attr('x2', d => d.target.x + (transform.x * transform.k))
+          .attr('y2', d => d.target.y + (transform.y * transform.k));
       };
 
       canvas.call(zoom()

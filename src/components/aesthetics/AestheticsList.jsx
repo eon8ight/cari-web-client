@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 
 import styles from './styles/AestheticsList.module.scss';
 
-const SORT_FIELD_NAME = "name";
-const SORT_FIELD_START_YEAR = "startYear";
+const SORT_FIELD_NAME = 'name';
+const SORT_FIELD_START_YEAR = 'startYear';
+const SORT_FIELD_END_YEAR = 'endYear';
 
 const CHAR_CODE_DOWN_TRIANGLE = 9660;
 const CHAR_CODE_UP_TRIANGLE = 9652;
@@ -12,8 +13,9 @@ const CHAR_CODE_UP_TRIANGLE = 9652;
 export default (props) => {
   const aestheticRows = props.aesthetics.map(a => (
     <tr key={a.aesthetic}>
-      <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
-      <td>{a.startYear} - {a.endYear || 'present'}</td>
+      <td><Link to={`/aesthetics/${a.urlSlug}`} className={styles.rowLink}>{a.name}</Link></td>
+      <td>{a.startYear}</td>
+      <td>{a.endYear || 'present'}</td>
     </tr>
   ));
 
@@ -40,6 +42,7 @@ export default (props) => {
       <colgroup>
         <col span="1" className={styles.nameColumn} />
         <col span="1" />
+        <col span="1" />
       </colgroup>
       <thead>
         <tr>
@@ -47,7 +50,10 @@ export default (props) => {
             Name {getSortSymbol(SORT_FIELD_NAME)}
           </th>
           <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_START_YEAR)}>
-            Circa {getSortSymbol(SORT_FIELD_START_YEAR)}
+            Circa Start {getSortSymbol(SORT_FIELD_START_YEAR)}
+          </th>
+          <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_END_YEAR)}>
+            Circa End {getSortSymbol(SORT_FIELD_END_YEAR)}
           </th>
         </tr>
       </thead>

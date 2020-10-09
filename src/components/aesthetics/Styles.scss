@@ -43,7 +43,9 @@ text {
 
 #similarityWebCanvas {
     border: 1px dashed black;
-    margin-bottom: 24px;
+    display: block;
+    margin: 0 auto 24px;
+    width: 70%;
 }
 
 #similarityWebScrollMessage {
