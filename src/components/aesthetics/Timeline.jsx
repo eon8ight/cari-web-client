@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Modal from 'react-modal';
 
 import {
   max,
@@ -14,6 +15,8 @@ import { scaleLinear } from 'd3-scale';
 import { event, select } from 'd3-selection';
 import { zoom } from 'd3-zoom';
 
+import styles from './styles/Timeline.module.scss';
+
 const WIDTH = 300;
 const HEIGHT = 100;
 
@@ -27,6 +30,8 @@ const MARGIN = {
 };
 
 export default (props) => {
+  const [timelineModalSelection, setTimelineModalSelection] = useState(null);
+
   const media = props.aesthetic.media;
 
   useEffect(() => {
@@ -193,60 +198,53 @@ export default (props) => {
     svg.append('g')
       .call(yAxis);
 
-    const viewer = select('#timelineViewer')
-
-    image.on('mousedown', d => {
-      viewer.text('');
-
-      viewer.append('div')
-        .attr('id', 'timelineImageContainer')
-        .append('img')
-        .attr('id', 'timelineImage')
-        .attr('src', d.url);
-
-      const timelineItemText = viewer.append('div')
-        .attr('id', 'timelineImageMetadataContainer')
-        .append('dl')
-        .attr('id', 'timelineImageMetadata');
-
-      timelineItemText.append('dt')
-        .append('h3')
-        .text('Title');
-
-      timelineItemText.append('dd')
-        .text(d.label);
-
-      timelineItemText.append('dt')
-        .append('h3')
-        .text('Creator');
-
-      timelineItemText.append('dd')
-        .text(d.mediaCreator?.name || '(unknown)');
-
-      timelineItemText.append('dt')
-        .append('h3')
-        .text('Year');
-
-      timelineItemText.append('dd')
-        .text(d.year);
-
-      timelineItemText.append('dt')
-        .append('h3')
-        .text('Description');
-
-      timelineItemText.append('dd')
-        .text(d.description);
-    });
+    image.on('mousedown', setTimelineModalSelection);
   }, [media]);
+
+  let timelineModalContent = null;
+
+  if (timelineModalSelection) {
+    timelineModalContent = (
+      <div id="timelineViewer">
+        <div id="timelineImageContainer">
+          <a href={timelineModalSelection.url} target="_blank" rel="noopener noreferrer">
+            <img id="timelineImage" src={timelineModalSelection.url} alt={timelineModalSelection.label} />
+          </a>
+        </div>
+        <div id="timelineImageMetadataContainer">
+          <dl id="timelineImageMetadata">
+            <dt>
+              <h3>Title</h3>
+            </dt>
+            <dd>{timelineModalSelection.label}</dd>
+            <dt>
+              <h3>Creator</h3>
+            </dt>
+            <dd>{timelineModalSelection.mediaCreator?.name || '(unknown)'}</dd>
+            <dt>
+              <h3>Year</h3>
+            </dt>
+            <dd>{timelineModalSelection.year}</dd>
+            <dt>
+              <h3>Description</h3>
+            </dt>
+            <dd>{timelineModalSelection.description}</dd>
+          </dl>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <div id="timelineCanvasContainer">
         <svg id="timelineCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       </div>
-      <div id="timelineViewer">
-        <h2 id="timelineHint">Select an image for more information.</h2>
-      </div>
+      <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
+        isOpen={timelineModalSelection !== null}
+        onRequestClose={() => setTimelineModalSelection(null)}>
+        {timelineModalContent}
+      </Modal>
     </>
   );
 };

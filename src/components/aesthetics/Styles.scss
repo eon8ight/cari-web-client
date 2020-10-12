@@ -52,10 +52,6 @@ text {
     margin-top: 0;
 }
 
-#timelineHint {
-    text-align: center;
-};
-
 #timelineImage {
     display: block;
     margin: auto;
@@ -81,7 +77,6 @@ text {
 }
 
 #timelineViewer {
-    border: 1px dashed black;
     display: flex;
     height: 600px;
     padding: 16px 0;
