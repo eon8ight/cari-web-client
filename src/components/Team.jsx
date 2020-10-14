@@ -84,7 +84,7 @@ since mid 2018.
     },
     {
         avatar: jackCircle,
-        title: 'Jack Grimes - Community Organizer',
+        title: 'Jack Grimes - Designer / Curator',
         bio: `
 Jack Grimes is a graphic designer and researcher currently based in North Carolina who's worked for
 clients from DESKPOP to Warner Music. With a focus on exploring narrative and object by blending
