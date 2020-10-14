@@ -14,8 +14,8 @@ export default (props) => {
   const aestheticRows = props.aesthetics.map(a => (
     <tr key={a.aesthetic}>
       <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
-      <td>{a.startYear}</td>
-      <td>{a.endYear || 'present'}</td>
+      <td>{a.startYear || '?'}</td>
+      <td>{a.endYear || 'Present'}</td>
     </tr>
   ));
 
