@@ -3,6 +3,14 @@
     src: url(./assets/fonts/foundersgrotesktext-regular.otf);
 }
 
+a {
+    color: black;
+
+    &:hover {
+        color: #0000FF;
+    }
+}
+
 body {
     color: black;
     font-family: foundationGrotesk;
@@ -36,7 +44,7 @@ td, th {
     &:not(:first-child) {
         border-left: 1px solid lightgrey;
     }
-    
+
     padding: 8px;
     text-align: left;
 }

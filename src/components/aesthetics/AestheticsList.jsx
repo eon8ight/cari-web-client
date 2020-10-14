@@ -13,7 +13,7 @@ const CHAR_CODE_UP_TRIANGLE = 9652;
 export default (props) => {
   const aestheticRows = props.aesthetics.map(a => (
     <tr key={a.aesthetic}>
-      <td><Link to={`/aesthetics/${a.urlSlug}`} className={styles.rowLink}>{a.name}</Link></td>
+      <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
       <td>{a.startYear}</td>
       <td>{a.endYear || 'present'}</td>
     </tr>
