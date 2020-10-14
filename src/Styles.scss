@@ -3,6 +3,11 @@
     src: url(./assets/fonts/foundersgrotesktext-regular.otf);
 }
 
+@font-face {
+    font-family: epilogue;
+    src: url('./assets/fonts/Epilogue-Regular.woff');
+}
+
 a {
     color: black;
 
@@ -13,7 +18,7 @@ a {
 
 body {
     color: black;
-    font-family: foundationGrotesk;
+    font-family: epilogue;
     font-size: 14pt;
     margin: auto;
     max-width: 1024px;
