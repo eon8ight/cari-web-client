@@ -34,7 +34,7 @@ export default (props) => {
         <div className={styles.sectionHeaderLine}>
           <h3>circa</h3>
           <h2>
-            {props.aesthetic.startYear || '?'} - {props.aesthetic.endYear || 'Present'}
+            {props.aesthetic.startYear || '?'} - {props.aesthetic.peakYear || '?'}
           </h2>
         </div>
       </div>

@@ -111,7 +111,7 @@ export default (props) => {
     const teamDataElem = TEAM_DATA.map(teamMember => (
         <article class={styles.teamArticle}>
             <img alt="Consumer Aesthetics Research Institute"
-                src={teamMember.avatar} width="10%" />
+                src={teamMember.avatar} width="85" />
             <div>
                 <h3>{teamMember.title}</h3>
                 <p>{parse(teamMember.bio)}</p>
