@@ -3,3 +3,15 @@
     margin-left: auto;
     width: 80%;
 }
+
+#teamContainer {
+    align-items: flex-start;
+    display: flex;
+    margin-top: 48px;
+}
+
+#teamLabel {
+    font-weight: initial;
+    min-width: fit-content;
+    margin-right: 48px;
+}
