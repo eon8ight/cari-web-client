@@ -44,11 +44,11 @@ Design Museum, where she was also the 2017-2018 Curatorial Fellow in Textiles.
         avatar: evanCircle,
         title: 'Evan Collins - Lead Curator / Architecture',
         bio: `
-Evan Collins is an architect and design archivist based in Pasadena, California. His early research
-into the 'Y2K Aesthetic' beginning in 2014 helped to lay the foundation for the many branching eras
-studied by CARI; he brings expertise particularly in the fields of graphic, industrial, and
-interior design of the 1990s. He holds a Bachelors in Architecture from Cal Poly San Luis Obispo
-and a Masters in Architecture from Columbia University.
+Evan Collins is an architect and design archivist based in Hollywood, California. His early
+research into the 'Y2K Aesthetic' beginning in 2014 helped to lay the foundation for the many
+branching eras studied by CARI; he brings expertise particularly in the fields of graphic,
+industrial, and interior design of the 1990s. He holds a Bachelors in Architecture from Cal Poly
+San Luis Obispo and a Masters in Architecture from Columbia University.
 `.trim(),
     },
     {

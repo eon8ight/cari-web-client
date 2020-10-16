@@ -173,7 +173,7 @@ export default (props) => {
       .data(data)
       .enter()
       .insert('image')
-      .attr('href', d => d.previewImageUrl)
+      .attr('href', d => d.mediaImage.previewImageUrl)
       .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
       .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
       .attr('x', d => x(d.xPosition))
@@ -207,8 +207,8 @@ export default (props) => {
     timelineModalContent = (
       <div id="timelineViewer">
         <div id="timelineImageContainer">
-          <a href={timelineModalSelection.url} target="_blank" rel="noopener noreferrer">
-            <img id="timelineImage" src={timelineModalSelection.url} alt={timelineModalSelection.label} />
+          <a href={timelineModalSelection.mediaImage.url} target="_blank" rel="noopener noreferrer">
+            <img id="timelineImage" src={timelineModalSelection.mediaImage.url} alt={timelineModalSelection.label} />
           </a>
         </div>
         <div id="timelineImageMetadataContainer">
