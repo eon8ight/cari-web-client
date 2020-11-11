@@ -4,7 +4,7 @@ import parse from 'html-react-parser';
 
 import styles from './styles/AestheticDetails.module.scss';
 
-export default (props) => {
+const AestheticDetails = (props) => {
   let websites = null;
 
   if (props.aesthetic.websites && props.aesthetic.websites.length > 0) {
@@ -43,3 +43,5 @@ export default (props) => {
     </>
   );
 };
+
+export default AestheticDetails;

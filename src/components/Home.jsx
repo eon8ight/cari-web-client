@@ -2,7 +2,7 @@ import React from 'react';
 
 import './Styles.scss';
 
-export default (props) => (
+const Home = (props) => (
     <section id="homeText">
         <p>
             CARI, or Consumer Aesthetics Research Institute, is an online community dedicated to
@@ -14,3 +14,5 @@ export default (props) => (
         </p>
     </section>
 );
+
+export default Home;

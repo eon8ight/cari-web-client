@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 
 import axios from 'axios';
+import { Spinner } from '@blueprintjs/core';
 
 import Paginator from '../common/Paginator';
-import Spinner from '../common/Spinner';
 
 import styles from './styles/Gallery.module.scss';
 
-export default (props) => {
+const Gallery = (props) => {
   const [galleryModalBlock, setGalleryModalBlock] = useState(null);
   const [galleryData, setGalleryData] = useState(props.aesthetic.galleryContent.contents);
 
@@ -19,7 +19,7 @@ export default (props) => {
       .then(res => setGalleryData(res.data.contents));
   };
 
-  let galleryContent = <Spinner />;
+  let galleryContent = <Spinner size={Spinner.SIZE_LARGE} />;
 
   if (galleryData) {
     galleryContent = galleryData.filter(block => block.image !== null).map(block => {
@@ -52,9 +52,7 @@ export default (props) => {
       <div id="galleryContainer">
         {galleryContent}
       </div>
-      <div id="galleryPaginatorContainer">
-        <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
-      </div>
+      <Paginator id="galleryPaginator" pageCount={totalPages} onPageChange={handlePageChange} />
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
         isOpen={galleryModalBlock !== null}
         onRequestClose={() => setGalleryModalBlock(null)}>
@@ -63,3 +61,5 @@ export default (props) => {
     </>
   );
 }
+
+export default Gallery;

@@ -1,20 +1,42 @@
 import React from 'react';
 import ReactPaginate from 'react-paginate';
 
-import styles from './styles/Paginator.module.scss';
+import { pick } from 'lodash/object';
 
-export default (props) => (
-    <ReactPaginate pageCount={props.pageCount} pageRangeDisplayed={5} marginPagesDisplayed={2}
+import styles from './styles/Paginator.module.scss';
+import { useEffect } from 'react';
+
+const ACTIVE_CLASS_NAME = 'bp3-intent-primary';
+const DISABLED_CLASS_NAME = 'bp3-disabled';
+const LINK_CLASS_NAME = 'bp3-button';
+
+const Paginator = (props) => {
+  // Hack to set the value of a disabled <li>'s <a> to be disabled
+  useEffect(() => {
+    document.querySelectorAll(`a.${DISABLED_CLASS_NAME}`)
+      .forEach(item => item.classList.remove(DISABLED_CLASS_NAME));
+
+    document.querySelectorAll(`a.${ACTIVE_CLASS_NAME}, li.paginationDisabled > a`)
+      .forEach(item => item.classList.add(DISABLED_CLASS_NAME))
+  });
+
+  return (
+    <div {...pick(props, 'id', 'className')}>
+      <ReactPaginate pageCount={props.pageCount} pageRangeDisplayed={5} marginPagesDisplayed={2}
         previousLabel="<<" nextLabel=">>" breakClassName={styles.paginationItem}
-        breakLinkClassName={styles.paginationItemLink} onPageChange={props.onPageChange}
+        breakLinkClassName={LINK_CLASS_NAME} onPageChange={props.onPageChange}
         initialPage={0} disableInitialCallback={true}
         containerClassName={styles.pagination} pageClassName={styles.paginationItem}
-        pageLinkClassName={styles.paginationItemLink}
+        pageLinkClassName={LINK_CLASS_NAME}
         activeClassName={styles.paginationItem}
-        activeLinkClassName={styles.paginationItemLinkActive}
+        activeLinkClassName={ACTIVE_CLASS_NAME}
         previousClassName={styles.paginationItem}
         nextClassName={styles.paginationItem}
-        previousLinkClassName={styles.paginationItemLink}
-        nextLinkClassName={styles.paginationItemLink}
-        disabledClassName={styles.paginationItemDisabled} />
-);
+        previousLinkClassName={LINK_CLASS_NAME}
+        nextLinkClassName={LINK_CLASS_NAME}
+        disabledClassName="paginationDisabled" />
+    </div>
+  );
+};
+
+export default Paginator;

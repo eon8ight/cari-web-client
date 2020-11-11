@@ -5,7 +5,7 @@ import cariLogo from '../../assets/images/cari_logo.png';
 
 import styles from './styles/Header.module.scss';
 
-export default (props) => (
+const Header = (props) => (
   <header>
     <nav>
       <Link to="/">
@@ -19,3 +19,5 @@ export default (props) => (
     </nav>
   </header>
 );
+
+export default Header;

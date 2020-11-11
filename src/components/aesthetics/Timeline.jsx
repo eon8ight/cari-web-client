@@ -29,7 +29,7 @@ const MARGIN = {
   left: 30,
 };
 
-export default (props) => {
+const Timeline = (props) => {
   const [timelineModalSelection, setTimelineModalSelection] = useState(null);
 
   const media = props.aesthetic.media;
@@ -248,3 +248,5 @@ export default (props) => {
     </>
   );
 };
+
+export default Timeline;

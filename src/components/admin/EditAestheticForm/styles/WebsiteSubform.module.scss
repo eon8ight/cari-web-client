@@ -1,0 +1,10 @@
+@import '@blueprintjs/core/lib/scss/variables';
+
+.oneLineInput {
+    align-items: baseline;
+    display: flex;
+
+    & > *:not(:first-child) {
+        margin-left: $pt-grid-size;
+    }
+}

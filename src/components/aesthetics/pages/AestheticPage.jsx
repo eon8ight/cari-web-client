@@ -3,17 +3,16 @@ import { Helmet } from 'react-helmet';
 import { useRouteMatch } from 'react-router-dom';
 
 import axios from 'axios';
+import { Button, Spinner } from '@blueprintjs/core';
 
 import AestheticDetails from '../AestheticDetails';
 import Gallery from '../Gallery';
 import SimilarityWeb from '../SimilarityWeb';
 import Timeline from '../Timeline';
 
-import Spinner from '../../common/Spinner';
-
 import styles from './styles/AestheticPage.module.scss';
 
-export default (props) => {
+const AestheticPage = (props) => {
   const match = useRouteMatch();
 
   const [aestheticData, setAestheticData] = useState(null);
@@ -41,7 +40,7 @@ export default (props) => {
   }, [match.params.aestheticUrlName, requestMade, setRequestMade]);
 
   if (!aestheticData) {
-    return <Spinner />;
+    return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
   let timeline = null;
@@ -51,9 +50,7 @@ export default (props) => {
       <>
         <div className={styles.sectionHeaderLineButton}>
           <h2>Timeline</h2>
-          <button onClick={() => setShowTimeline(!showTimeline)}>
-            {showTimeline ? '-' : '+'}
-          </button>
+          <Button icon={showTimeline ? 'minus' : 'plus'} onClick={() => setShowTimeline(!showTimeline)} />
         </div>
         {showTimeline && <Timeline aesthetic={aestheticData} />}
       </>
@@ -67,9 +64,7 @@ export default (props) => {
       <>
         <div className={styles.sectionHeaderLineButton}>
           <h2>Gallery</h2>
-          <button onClick={() => setShowGallery(!showGallery)}>
-            {showGallery ? '-' : '+'}
-          </button>
+          <Button icon={showGallery ? 'minus' : 'plus'} onClick={() => setShowGallery(!showGallery)} />
         </div>
         {showGallery && <Gallery aesthetic={aestheticData} />}
       </>
@@ -83,9 +78,7 @@ export default (props) => {
       <>
         <div className={styles.sectionHeaderLineButton}>
           <h2>Related Aesthetics</h2>
-          <button onClick={() => setShowSimilarityWeb(!showSimilarityWeb)}>
-            {showSimilarityWeb ? '-' : '+'}
-          </button>
+          <Button icon={showSimilarityWeb ? 'minus' : 'plus'} onClick={() => setShowSimilarityWeb(!showSimilarityWeb)} />
         </div>
         {showSimilarityWeb && <SimilarityWeb aesthetic={aestheticData} />}
       </>
@@ -104,3 +97,5 @@ export default (props) => {
     </>
   );
 };
+
+export default AestheticPage;

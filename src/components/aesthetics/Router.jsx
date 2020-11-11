@@ -6,7 +6,7 @@ import AestheticsListPage from './pages/AestheticsListPage';
 
 import './Styles.scss'
 
-export default (props) => {
+const Router = (props) => {
   const match = useRouteMatch();
 
   return (
@@ -20,3 +20,5 @@ export default (props) => {
     </Switch>
   );
 };
+
+export default Router;

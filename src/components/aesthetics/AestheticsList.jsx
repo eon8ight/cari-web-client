@@ -10,7 +10,7 @@ const SORT_FIELD_PEAK_YEAR = 'peakYear';
 const CHAR_CODE_DOWN_TRIANGLE = 9660;
 const CHAR_CODE_UP_TRIANGLE = 9652;
 
-export default (props) => {
+const AestheticsList = (props) => {
   const aestheticRows = props.aesthetics.map(a => (
     <tr key={a.aesthetic}>
       <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
@@ -63,3 +63,5 @@ export default (props) => {
     </table>
   );
 };
+
+export default AestheticsList;

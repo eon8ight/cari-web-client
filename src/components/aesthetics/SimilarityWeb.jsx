@@ -26,7 +26,7 @@ const MAX_DESCRIPTION_LENGTH = 75;
 
 const color = scaleOrdinal(schemeCategory10);
 
-export default (props) => {
+const SimilarityWeb = (props) => {
   const similarAesthetics = props.aesthetic.similarAesthetics;
 
   useEffect(() => {
@@ -179,3 +179,5 @@ export default (props) => {
     </>
   );
 };
+
+export default SimilarityWeb;

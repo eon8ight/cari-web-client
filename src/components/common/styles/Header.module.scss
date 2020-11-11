@@ -1,6 +1,6 @@
 .link {
     border-bottom: 2px solid black;
-    text-decoration: none;
+    text-decoration: none !important;
 
     &:hover {
         border-bottom: 2px solid #0000FF;
