@@ -17,6 +17,8 @@ import { zoom } from 'd3-zoom';
 
 import styles from './styles/Timeline.module.scss';
 
+Modal.setAppElement('#root');
+
 const WIDTH = 300;
 const HEIGHT = 100;
 

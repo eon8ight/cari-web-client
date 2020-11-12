@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 
 import {
+  Button,
   Card,
+  ControlGroup,
   FormGroup,
   InputGroup,
+  Intent,
   NumericInput,
   TextArea,
 } from '@blueprintjs/core';
@@ -25,6 +28,14 @@ const EditAestheticForm = (props) => {
   const websitesState = useState(props.aesthetic.websites);
   const similarAestheticsState = useState(props.aesthetic.similarAesthetics);
   const mediaState = useState(props.aesthetic.media);
+
+  const handleCancel = () => {
+
+  };
+
+  const handleSave = () => {
+
+  };
 
   return (
     <form>
@@ -61,6 +72,14 @@ const EditAestheticForm = (props) => {
       <Card>
         <MediaSubform media={mediaState} />
       </Card>
+      <br />
+      <FormGroup>
+        <ControlGroup>
+          <Button icon="undo" large={true} onClick={handleCancel}>Cancel</Button>
+          <Button icon="floppy-disk" intent={Intent.SUCCESS} large={true}
+            onClick={handleSave}>Save</Button>
+        </ControlGroup>
+      </FormGroup>
     </form>
   );
 };

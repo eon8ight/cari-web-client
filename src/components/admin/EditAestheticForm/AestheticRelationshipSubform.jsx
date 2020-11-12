@@ -16,6 +16,11 @@ import {
 
 import { Suggest } from '@blueprintjs/select';
 
+import ConfirmDelete from './ConfirmDelete';
+import ExpandableSection from './ExpandableSection';
+
+import { API_ROUTE_AESTHETIC_NAMES } from '../../../functions/Constants';
+
 import '@blueprintjs/core/lib/css/blueprint.css';
 
 import styles from './styles/AestheticRelationshipSubform.module.scss';
@@ -28,114 +33,150 @@ const SUGGEST_POPOVER_PROPS = {
 };
 
 const AESTHETIC_RELATIONSHIP_TEMPLATE = {
-  aesthetic: 0,
-  name: '',
+  aesthetic: null,
   description: '',
+  reverseDescription: '',
 };
 
-const aestheticNameInputValueRenderer = aestheticName => aestheticName.name;
-const compareAestheticNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aesthetic === aestheticNameB.aesthetic;
-
-const aestheticNameRenderer = (aestheticName, { modifiers, handleClick }) => {
-  if(!modifiers.matchesPredicate) {
-    return null;
-  }
-
-  return (
-    <MenuItem active={modifiers.active} className={styles.tooltipText}
-      key={aestheticName.aesthetic} onClick={handleClick}
-      text={aestheticName.name} shouldDismissPopover={false} />
-  );
-};
+const compareNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aesthetic === aestheticNameB.aesthetic;
 
 const AestheticRelationshipSubform = (props) => {
-  console.log(props);
   const [similarAesthetics, setSimilarAesthetics] = props.similarAesthetics;
 
   const [isLoading, setIsLoading] = useState(false);
-  const [aestheticNames, setAestheticNames] = useState([]);
-  const [filteredAestheticNames, setFilteredAestheticNames] = useState([]);
+  const [names, setNames] = useState([]);
+  const [namesMap, setNamesMap] = useState([]);
+  const [filteredNames, setFilteredNames] = useState([]);
 
-  const name = props.aesthetic.name;
+  const refilter = (fromSimilarAesthetics, fromNames) => {
+    const alreadySelectedAesthetics = fromSimilarAesthetics.map(aesthetic => aesthetic.aesthetic);
+    alreadySelectedAesthetics.push(props.aesthetic.aesthetic);
 
-  const refilterAestheticNames = fromAestheticNames => {
-    const alreadySelectedAestheticNames = similarAesthetics.map(aesthetic => aesthetic.name);
-    alreadySelectedAestheticNames.push(name);
-
-    setFilteredAestheticNames(fromAestheticNames.filter(
-      aestheticName => !alreadySelectedAestheticNames.includes(aestheticName.name)
+    setFilteredNames(fromNames.filter(
+      aestheticName => !alreadySelectedAesthetics.includes(aestheticName.aesthetic)
     ));
   };
 
-  const refilterAestheticNamesCallback = useCallback(refilterAestheticNames, [name, similarAesthetics]);
+  const refilterCallback = useCallback(refilter, [props.aesthetic.aesthetic]);
 
   useEffect(() => {
     if (!isLoading) {
       setIsLoading(true);
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/names`)
+      axios.get(API_ROUTE_AESTHETIC_NAMES)
         .then(res => {
-          const newAestheticNames = res.data.filter(aestheticName => aestheticName.name !== name);
-          newAestheticNames.sort((a, b) => a.name.localeCompare(b.name))
+          const newNamesMap = res.data.reduce((map, aestheticName) => {
+            map[aestheticName.aesthetic] = aestheticName.name;
+            return map
+          }, {});
 
-          setAestheticNames(newAestheticNames);
-          refilterAestheticNamesCallback(newAestheticNames);
+          setNamesMap(newNamesMap);
+
+          const newNames = res.data.filter(aestheticName => aestheticName.aesthetic !== props.aesthetic.aesthetic);
+          newNames.sort((a, b) => newNamesMap[a.aesthetic].localeCompare(newNamesMap[b.aesthetic]))
+
+          setNames(newNames);
+          refilterCallback(similarAesthetics, newNames);
         });
     }
-  }, [isLoading, setIsLoading, similarAesthetics, name, refilterAestheticNamesCallback]);
+  }, [isLoading, setIsLoading, similarAesthetics, refilterCallback, props.aesthetic.aesthetic]);
 
-  if(!aestheticNames) {
+  if(!names) {
     return <Spinner />;
   }
 
-  const handleAddSimilarAestheticButtonClick = () => {
+  const nameInputValueRenderer = similarAesthetic => namesMap[similarAesthetic.aesthetic];
+
+  const nameRenderer = (aestheticName, { modifiers, handleClick }) => {
+    if(!modifiers.matchesPredicate) {
+      return null;
+    }
+
+    return (
+      <MenuItem active={modifiers.active} className={styles.tooltipText}
+        key={aestheticName.aesthetic} onClick={handleClick}
+        text={namesMap[aestheticName.aesthetic]} shouldDismissPopover={false} />
+    );
+  };
+
+  const handleAdd = () => {
     const newSimilarAesthetics = cloneDeep(similarAesthetics);
     newSimilarAesthetics.push(cloneDeep(AESTHETIC_RELATIONSHIP_TEMPLATE));
     setSimilarAesthetics(newSimilarAesthetics);
   };
 
-  const handleAestheticNameSelect = (aestheticName, idx) => {
+  const handleNameSelect = (aestheticName, idx) => {
     const newSimilarAesthetics = cloneDeep(similarAesthetics);
     newSimilarAesthetics[idx].aesthetic = aestheticName.aesthetic;
-    newSimilarAesthetics[idx].name = aestheticName.name;
     setSimilarAesthetics(newSimilarAesthetics);
-    refilterAestheticNames(aestheticNames);
+    refilter(newSimilarAesthetics, names);
   };
 
-  const similarAestheticElems = similarAesthetics.map((similarAesthetic, idx) => (
-    <li key={similarAesthetic.aesthetic}>
-      <FormGroup>
-        <ControlGroup>
-          <Suggest inputValueRenderer={aestheticNameInputValueRenderer}
-            itemRenderer={aestheticNameRenderer} items={filteredAestheticNames}
-            itemsEqual={compareAestheticNames} noResults={MENU_ITEM_NO_RESULTS}
-            onItemSelect={aestheticName => handleAestheticNameSelect(aestheticName, idx)}
-            onQueryChange={() => refilterAestheticNames(aestheticNames)}
-            popoverProps={SUGGEST_POPOVER_PROPS} query={similarAesthetic.name} resetOnClose={true}
-            selectedItem={similarAesthetic} />
-          <Button icon="trash" intent={Intent.DANGER}>Delete</Button>
-        </ControlGroup>
-      </FormGroup>
-      <FormGroup label={<>How does <strong>{similarAesthetic.name}</strong> relate to <strong>{name}</strong>?</>}>
-        <InputGroup value={similarAesthetic.description} />
-      </FormGroup>
-      <FormGroup label={<>How does <strong>{name}</strong> relate to <strong>{similarAesthetic.name}</strong>?</>}>
-        <InputGroup value={similarAesthetic.reverseDescription} />
-      </FormGroup>
-    </li>
-  ));
+  const handleChange = (value, key, idx) => {
+    const newSimilarAesthetics = cloneDeep(similarAesthetics);
+    newSimilarAesthetics[idx][key] = value;
+    setSimilarAesthetics(newSimilarAesthetics);
+  }
 
-  return (
+  const handleDelete = idx => {
+    const newSimilarAesthetics = cloneDeep(similarAesthetics);
+    newSimilarAesthetics.splice(idx, 1);
+    setSimilarAesthetics(newSimilarAesthetics);
+  };
+
+  const elems = similarAesthetics.map((similarAesthetic, idx) => {
+    const similarAestheticName = namesMap[similarAesthetic.aesthetic];
+
+    let inputs = null;
+
+    if(similarAesthetics[idx].aesthetic) {
+      inputs = (
+        <>
+          <FormGroup label={<>How does <strong>{similarAestheticName}</strong> relate to <strong>{props.aesthetic.name}</strong>?</>}
+            labelInfo="(required)">
+              <InputGroup value={similarAesthetic.description}
+                onChange={(event) => handleChange(event.target.value, 'description', idx)} />
+            </FormGroup>
+            <FormGroup label={<>How does <strong>{props.aesthetic.name}</strong> relate to <strong>{similarAestheticName}</strong>?</>}
+              labelInfo="(required)">
+              <InputGroup value={similarAesthetic.reverseDescription}
+                onChange={(event) => handleChange(event.target.value, 'reverseDescription', idx)} />
+            </FormGroup>
+          </>
+      );
+    }
+
+    return (
+      <li key={similarAesthetic.aesthetic}>
+        <FormGroup>
+          <ControlGroup>
+            <Suggest inputValueRenderer={nameInputValueRenderer}
+              itemRenderer={nameRenderer} items={filteredNames}
+              itemsEqual={compareNames} noResults={MENU_ITEM_NO_RESULTS}
+              onItemSelect={aestheticName => handleNameSelect(aestheticName, idx)}
+              onQueryChange={() => refilter(similarAesthetics, names)}
+              popoverProps={SUGGEST_POPOVER_PROPS} query={similarAestheticName} resetOnClose={true}
+              selectedItem={similarAesthetic} />
+            <ConfirmDelete onClick={() => handleDelete(idx)} />
+          </ControlGroup>
+        </FormGroup>
+        {inputs}
+      </li>
+    );
+  });
+
+  const relationshipContent = (
     <>
-      <h2>Related Aesthetics</h2>
-      <OL>{similarAestheticElems}</OL>
+      <OL>{elems}</OL>
       <FormGroup>
-        <Button icon="add" intent={Intent.PRIMARY} onClick={handleAddSimilarAestheticButtonClick}>
+        <Button icon="add" intent={Intent.PRIMARY} onClick={handleAdd}>
           Add Related Aesthetic
         </Button>
       </FormGroup>
     </>
   );
+
+  return <ExpandableSection content={relationshipContent} header="Related Aesthetics" />;
 };
 
 export default AestheticRelationshipSubform;

@@ -15,6 +15,8 @@ import {
 import AestheticsList from '../AestheticsList';
 import Paginator from '../../common/Paginator';
 
+import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/Constants';
+
 import '@blueprintjs/core/lib/css/blueprint.css';
 
 const valueExists = (arr, key) => (typeof arr[key] !== 'undefined') && arr[key] !== null;
@@ -62,7 +64,7 @@ const AestheticsListPage = (props) => {
         params.peakYear = peakYear;
       }
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForList`, { params })
+      axios.get(API_ROUTE_AESTHETIC_FIND_FOR_LIST, { params })
         .then(res => {
           setAesthetics(res.data.content);
           setTotalPages(res.data.totalPages);

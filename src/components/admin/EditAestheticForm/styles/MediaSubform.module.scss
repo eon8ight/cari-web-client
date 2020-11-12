@@ -1,3 +1,26 @@
+.dataListNoIndent {
+    display: grid;
+    grid-template-columns: min-content auto;
+    row-gap: 8px;
+
+    & > dd {
+        margin-inline-start: 1em;
+    }
+}
+
+.mediaPreview {
+    align-items: center;
+    display: flex;
+
+    & > * {
+        margin: 0 4px;
+    }
+}
+
+.mediaPreviewButtons {
+    float: right;
+}
+
 .modal {
     background-color: white;
     border: 1px black solid;
@@ -8,7 +31,7 @@
     right: auto;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: min-content;
+    width: 950px;
 }
 
 .modalOverlay {

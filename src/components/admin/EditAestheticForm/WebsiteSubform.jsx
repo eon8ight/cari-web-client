@@ -17,12 +17,18 @@ import {
   Spinner,
 } from '@blueprintjs/core';
 
+import ConfirmDelete from './ConfirmDelete';
+import ExpandableSection from './ExpandableSection';
+
+import {
+  API_ROUTE_WEBSITE_TYPES,
+  ARENA_API_URL,
+  WEBSITE_TYPE_ARENA,
+} from '../../../functions/Constants';
+
 import '@blueprintjs/core/lib/css/blueprint.css';
 
 import styles from './styles/WebsiteSubform.module.scss';
-
-const ARENA_API_URL = 'https://api.are.na/v2/channels/';
-const WEBSITE_TYPE_ARENA = 1;
 
 const WEBSITE_TEMPLATE = {
   url: '',
@@ -40,14 +46,14 @@ const WebsiteSubform = (props) => {
     if (!isLoading) {
       setIsLoading(true);
 
-      axios.get(`${process.env.REACT_APP_API_URL}/websiteTypes`)
+      axios.get(API_ROUTE_WEBSITE_TYPES)
         .then(res => {
           const websiteTypeData = res.data.map(websiteType => ({
             label: websiteType.label,
             value: websiteType.websiteType
           }));
 
-          websiteTypeData.unshift({ label: '--', value: 0 });
+          websiteTypeData.unshift({ label: '--', value: null });
           setWebsiteTypes(websiteTypeData);
         });
     }
@@ -75,7 +81,13 @@ const WebsiteSubform = (props) => {
     setWebsites(newWebsites);
   }
 
-  const websiteElems = websites.map((website, idx) => {
+  const handleDelete = idx => {
+    const newWebsites = cloneDeep(websites);
+    newWebsites.splice(idx, 1);
+    setWebsites(newWebsites);
+  };
+
+  const elems = websites.map((website, idx) => {
     let mediaSourceCheckbox = null;
 
     if (website.websiteType.websiteType === WEBSITE_TYPE_ARENA) {
@@ -100,8 +112,8 @@ const WebsiteSubform = (props) => {
             <HTMLSelect className={Classes.FIXED} onChange={event => handleWebsiteTypeChange(event.target.value, idx)}
               options={websiteTypes} value={website.websiteType.websiteType} />
             <InputGroup onChange={event => handleWebsiteChange(event.target.value, idx)}
-              placeholder={website.websiteType.placeholderText} value={website.url} />
-            <Button className={Classes.FIXED} icon="trash" intent={Intent.DANGER}>Delete</Button>
+              placeholder={website.websiteType.url} value={website.url} />
+            <ConfirmDelete onClick={() => handleDelete(idx)} />
           </ControlGroup>
         </FormGroup>
         {mediaSourceCheckbox}
@@ -109,21 +121,22 @@ const WebsiteSubform = (props) => {
     );
   });
 
-  return (
+  const websiteContent = (
     <>
-      <h2>Websites</h2>
       <Callout icon="help" intent={Intent.PRIMARY} title="Media Sources">
         Are.na websites can be used as a media source. If an aesthetic only has one Are.na website,
         it will automatically be selected and used. If there are more than one, the one selected
         will be used.
       </Callout>
       <br />
-      <OL>{websiteElems}</OL>
+      <OL>{elems}</OL>
       <FormGroup>
         <Button icon="add" intent={Intent.PRIMARY} onClick={handleAdd}>Add Website</Button>
       </FormGroup>
     </>
-  )
+  );
+
+  return <ExpandableSection content={websiteContent} header="Websites" />;
 };
 
 export default WebsiteSubform;

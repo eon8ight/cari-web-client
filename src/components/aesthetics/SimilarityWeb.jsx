@@ -148,9 +148,7 @@ const SimilarityWeb = (props) => {
 
       const zoomed = () => {
         simulation.stop();
-
         const transform = event.transform;
-        console.log(transform);
 
         nodeGroup.attr('transform', d => (
           `translate(${d.x + (transform.x * transform.k)}, ${d.y + (transform.y * transform.k)}) scale(${transform.k})`

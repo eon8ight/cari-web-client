@@ -6,6 +6,8 @@ import { Spinner } from '@blueprintjs/core';
 
 import Paginator from '../common/Paginator';
 
+import { API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT } from '../../functions/Constants';
+
 import styles from './styles/Gallery.module.scss';
 
 const Gallery = (props) => {
@@ -15,7 +17,7 @@ const Gallery = (props) => {
   const handlePageChange = (data) => {
     setGalleryData(null);
 
-    axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findGalleryContent/${props.aesthetic.aesthetic}?page=${data.selected + 1}`)
+    axios.get(`${API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT}/${props.aesthetic.aesthetic}?page=${data.selected + 1}`)
       .then(res => setGalleryData(res.data.contents));
   };
 

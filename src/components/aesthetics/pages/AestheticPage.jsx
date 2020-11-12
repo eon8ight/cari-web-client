@@ -10,6 +10,8 @@ import Gallery from '../Gallery';
 import SimilarityWeb from '../SimilarityWeb';
 import Timeline from '../Timeline';
 
+import { API_ROUTE_AESTHETIC_FIND_FOR_PAGE } from '../../../functions/Constants';
+
 import styles from './styles/AestheticPage.module.scss';
 
 const AestheticPage = (props) => {
@@ -27,7 +29,7 @@ const AestheticPage = (props) => {
       setRequestMade(true);
 
       axios.get(
-        `${process.env.REACT_APP_API_URL}/aesthetic/findForPage/${match.params.aestheticUrlName}`,
+        `${API_ROUTE_AESTHETIC_FIND_FOR_PAGE}/${match.params.aestheticUrlName}`,
         {
           params: {
             includeSimilarAesthetics: true,
