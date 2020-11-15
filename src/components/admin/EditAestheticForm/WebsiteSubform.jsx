@@ -28,8 +28,6 @@ import {
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
-import styles from './styles/WebsiteSubform.module.scss';
-
 const WEBSITE_TEMPLATE = {
   url: '',
   websiteType: { websiteType: 0 },
@@ -38,6 +36,9 @@ const WEBSITE_TEMPLATE = {
 const WebsiteSubform = (props) => {
   const [mediaSourceUrl, setMediaSourceUrl] = props.mediaSourceUrl;
   const [websites, setWebsites] = props.websites;
+
+  const intent = props.intent;
+  const helperText = props.helperText;
 
   const [isLoading, setIsLoading] = useState(false);
   const [websiteTypes, setWebsiteTypes] = useState([]);
@@ -106,12 +107,14 @@ const WebsiteSubform = (props) => {
     }
 
     return (
-      <li key={website.website}>
-        <FormGroup contentClassName={styles.oneLineInput}>
+      <li key={website.website || `new_${idx}`}>
+        <FormGroup helperText={helperText[idx]} intent={intent[idx]}>
           <ControlGroup fill={true}>
-            <HTMLSelect className={Classes.FIXED} onChange={event => handleWebsiteTypeChange(event.target.value, idx)}
+            <HTMLSelect className={Classes.FIXED} intent={intent[idx]}
+              onChange={event => handleWebsiteTypeChange(event.target.value, idx)}
               options={websiteTypes} value={website.websiteType.websiteType} />
-            <InputGroup onChange={event => handleWebsiteChange(event.target.value, idx)}
+            <InputGroup intent={intent[idx]}
+              onChange={event => handleWebsiteChange(event.target.value, idx)}
               placeholder={website.websiteType.url} value={website.url} />
             <ConfirmDelete onClick={() => handleDelete(idx)} />
           </ControlGroup>

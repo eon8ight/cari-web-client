@@ -47,15 +47,26 @@ const MediaSubform = (props) => {
   const [editIndex, setEditIndex] = useState(null);
   const [saved, setSaved] = useState(false);
 
+  const [urlIntent, setUrlIntent] = useState(Intent.NONE);
+  const [previewImageUrlIntent, setPreviewImageUrlIntent] = useState(Intent.NONE);
+  const [labelIntent, setLabelIntent] = useState(Intent.NONE);
+  const [descriptionIntent, setDescriptionIntent] = useState(Intent.NONE);
+  const [yearIntent, setYearIntent] = useState(Intent.NONE);
+
+  const [urlHelperText, setUrlHelperText] = useState('');
+  const [previewImageUrlHelperText, setPreviewImageUrlHelperText] = useState('');
+  const [labelHelperText, setLabelHelperText] = useState('');
+  const [descriptionHelperText, setDescriptionHelperText] = useState('');
+  const [yearHelperText, setYearHelperText] = useState('');
+
   const handleModalOpen = (medium, idx) => {
     const newSwapSpace = cloneDeep(medium);
     setSwapSpace(newSwapSpace);
-    setSaved(false);
     setEditIndex(typeof idx === 'undefined' ? null : idx);
   };
 
-  const handleModalClose = () => {
-    if(saved) {
+  const handleModalClose = (didSave) => {
+    if(didSave) {
       const newMedia = cloneDeep(media);
 
       if(editIndex === null) {
@@ -76,9 +87,9 @@ const MediaSubform = (props) => {
     setMedia(newMedia);
   };
 
-  const handleChange = (property, event) => {
+  const handleChange = (property, value) => {
     const newSwapSpace = cloneDeep(swapSpace);
-    newSwapSpace[property] = event.target.value;
+    newSwapSpace[property] = value;
     setSwapSpace(newSwapSpace);
   };
 
@@ -94,9 +105,93 @@ const MediaSubform = (props) => {
     setSwapSpace(newSwapSpace);
   };
 
+  const validateUrl = () => {
+    let hasError = false;
+
+    if(!swapSpace.mediaImage.url) {
+      setUrlIntent(Intent.DANGER);
+      setUrlHelperText('URL is required.');
+      hasError = true;
+    } else {
+      setUrlIntent(Intent.NONE);
+      setUrlHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validatePreviewImageUrl = () => {
+    let hasError = false;
+
+    if(!swapSpace.mediaImage.previewImageUrl) {
+      setPreviewImageUrlIntent(Intent.DANGER);
+      setPreviewImageUrlHelperText('Preview image URL is required.');
+      hasError = true;
+    } else {
+      setPreviewImageUrlIntent(Intent.NONE);
+      setPreviewImageUrlHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validateLabel = () => {
+    let hasError = false;
+
+    if(!swapSpace.label) {
+      setLabelIntent(Intent.DANGER);
+      setLabelHelperText('Label is required.');
+      hasError = true;
+    } else {
+      setLabelIntent(Intent.NONE);
+      setLabelHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validateDescription = () => {
+    let hasError = false;
+
+    if(!swapSpace.description) {
+      setDescriptionIntent(Intent.DANGER);
+      setDescriptionHelperText('Description is required.');
+      hasError = true;
+    } else {
+      setDescriptionIntent(Intent.NONE);
+      setDescriptionHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validateYear = () => {
+    let hasError = false;
+
+    if(!swapSpace.year) {
+      setYearIntent(Intent.DANGER);
+      setYearHelperText('Year is required.');
+      hasError = true;
+    } else {
+      setYearIntent(Intent.NONE);
+      setYearHelperText('');
+    }
+
+    return hasError;
+  };
+
   const handleSave = () => {
-    setSaved(true);
-    handleModalClose();
+    let hasUrlError = validateUrl();
+    let hasPreviewImageUrlError = validatePreviewImageUrl();
+    let hasLabelError = validateLabel();
+    let hasDescriptionError = validateDescription();
+    let hasYearError = validateYear();
+
+    if(hasUrlError || hasPreviewImageUrlError || hasLabelError || hasDescriptionError || hasYearError) {
+      return;
+    }
+
+    handleModalClose(true);
   }
 
   let mediaModalContent = null;
@@ -105,25 +200,37 @@ const MediaSubform = (props) => {
     mediaModalContent = (
       <form>
         <h2>{swapSpace.title}</h2>
-        <FormGroup label="URL" labelInfo="(required)">
-          <InputGroup onChange={event => handleImageChange('url', event)} value={swapSpace.mediaImage.url} />
+        <FormGroup helperText={urlHelperText} intent={urlIntent} label="URL"
+          labelInfo="(required)">
+          <InputGroup intent={urlIntent} onChange={event => handleImageChange('url', event)}
+            value={swapSpace.mediaImage.url} />
         </FormGroup>
-        <FormGroup label="Preview Image URL" labelInfo="(required)">
-          <InputGroup onChange={event => handleImageChange('previewImageUrl', event)}
-          value={swapSpace.mediaImage.previewImageUrl} />
+        <FormGroup helperText={previewImageUrlHelperText} intent={previewImageUrlIntent}
+          label="Preview Image URL" labelInfo="(required)">
+          <InputGroup intent={previewImageUrlIntent}
+            onChange={event => handleImageChange('previewImageUrl', event)}
+            value={swapSpace.mediaImage.previewImageUrl} />
         </FormGroup>
-        <FormGroup label="Label" labelInfo="(required)">
-          <InputGroup onChange={event => handleChange('label', event)} value={swapSpace.label} />
+        <FormGroup helperText={labelHelperText} intent={labelIntent} label="Label"
+          labelInfo="(required)">
+          <InputGroup intent={labelIntent}
+            onChange={event => handleChange('label', event.target.value)}
+            value={swapSpace.label} />
         </FormGroup>
-        <FormGroup label="Description" labelInfo="(required)">
+        <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
+          label="Description" labelInfo="(required)">
           <TextArea growVertically={true} fill={true}
-            onChange={event => handleChange('description', event)} value={swapSpace.description} />
+            intent={descriptionIntent}
+            onChange={event => handleChange('description', event.target.value)}
+            value={swapSpace.description} />
         </FormGroup>
         <FormGroup label="Creator" helperText="Leave blank if unknown.">
           <InputGroup onChange={handleCreatorChange} value={swapSpace.mediaCreator.name} />
         </FormGroup>
-        <FormGroup label="Year" labelInfo="(required)">
-          <NumericInput onChange={event => handleChange('year', event)} value={swapSpace.year} />
+        <FormGroup helperText={yearHelperText} intent={yearIntent} label="Year"
+          labelInfo="(required)">
+          <NumericInput intent={yearIntent} onValueChange={value => handleChange('year', value)}
+            value={swapSpace.year} />
         </FormGroup>
         <ControlGroup>
           <Button icon="floppy-disk" intent={Intent.PRIMARY}
@@ -177,7 +284,7 @@ const MediaSubform = (props) => {
     <>
       <ExpandableSection content={mediaContent} header="Media" />
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
-        isOpen={swapSpace !== null} onRequestClose={handleModalClose}>
+        isOpen={swapSpace !== null} onRequestClose={() => handleModalClose(false)}>
         {mediaModalContent}
       </Modal>
     </>

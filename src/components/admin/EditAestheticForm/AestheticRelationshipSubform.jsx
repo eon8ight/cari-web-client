@@ -43,18 +43,29 @@ const compareNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aestheti
 const AestheticRelationshipSubform = (props) => {
   const [similarAesthetics, setSimilarAesthetics] = props.similarAesthetics;
 
+  const intent = props.intent;
+  const helperText = props.helperText;
+
   const [isLoading, setIsLoading] = useState(false);
   const [names, setNames] = useState([]);
   const [namesMap, setNamesMap] = useState([]);
   const [filteredNames, setFilteredNames] = useState([]);
 
-  const refilter = (fromSimilarAesthetics, fromNames) => {
+  const refilter = (fromSimilarAesthetics, fromNames, query) => {
     const alreadySelectedAesthetics = fromSimilarAesthetics.map(aesthetic => aesthetic.aesthetic);
     alreadySelectedAesthetics.push(props.aesthetic.aesthetic);
 
-    setFilteredNames(fromNames.filter(
+    let newFilteredNames = fromNames.filter(
       aestheticName => !alreadySelectedAesthetics.includes(aestheticName.aesthetic)
-    ));
+    );
+
+    if(query) {
+      newFilteredNames = newFilteredNames.filter(
+        aestheticName => aestheticName.name.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    setFilteredNames(newFilteredNames);
   };
 
   const refilterCallback = useCallback(refilter, [props.aesthetic.aesthetic]);
@@ -132,17 +143,20 @@ const AestheticRelationshipSubform = (props) => {
     if(similarAesthetics[idx].aesthetic) {
       inputs = (
         <>
-          <FormGroup label={<>How does <strong>{similarAestheticName}</strong> relate to <strong>{props.aesthetic.name}</strong>?</>}
+          <FormGroup helperText={helperText[idx].description} intent={intent[idx].description}
+            label={<>How does <strong>{similarAestheticName}</strong> relate to <strong>{props.aesthetic.name}</strong>?</>}
             labelInfo="(required)">
-              <InputGroup value={similarAesthetic.description}
+              <InputGroup intent={intent[idx].description} value={similarAesthetic.description}
                 onChange={(event) => handleChange(event.target.value, 'description', idx)} />
-            </FormGroup>
-            <FormGroup label={<>How does <strong>{props.aesthetic.name}</strong> relate to <strong>{similarAestheticName}</strong>?</>}
-              labelInfo="(required)">
-              <InputGroup value={similarAesthetic.reverseDescription}
-                onChange={(event) => handleChange(event.target.value, 'reverseDescription', idx)} />
-            </FormGroup>
-          </>
+          </FormGroup>
+          <FormGroup helperText={helperText[idx].reverseDescription}
+            intent={intent[idx].reverseDescription}
+            label={<>How does <strong>{props.aesthetic.name}</strong> relate to <strong>{similarAestheticName}</strong>?</>}
+            labelInfo="(required)">
+            <InputGroup intent={intent[idx].reverseDescription} value={similarAesthetic.reverseDescription}
+              onChange={(event) => handleChange(event.target.value, 'reverseDescription', idx)} />
+          </FormGroup>
+        </>
       );
     }
 
@@ -154,7 +168,7 @@ const AestheticRelationshipSubform = (props) => {
               itemRenderer={nameRenderer} items={filteredNames}
               itemsEqual={compareNames} noResults={MENU_ITEM_NO_RESULTS}
               onItemSelect={aestheticName => handleNameSelect(aestheticName, idx)}
-              onQueryChange={() => refilter(similarAesthetics, names)}
+              onQueryChange={query => refilter(similarAesthetics, names, query)}
               popoverProps={SUGGEST_POPOVER_PROPS} query={similarAestheticName} resetOnClose={true}
               selectedItem={similarAesthetic} />
             <ConfirmDelete onClick={() => handleDelete(idx)} />

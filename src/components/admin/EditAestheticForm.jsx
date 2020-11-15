@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 
+import axios from 'axios';
+import { cloneDeep } from 'lodash/lang';
+
 import {
   Button,
   Card,
@@ -15,9 +18,19 @@ import AestheticRelationshipSubform from './EditAestheticForm/AestheticRelations
 import MediaSubform from './EditAestheticForm/MediaSubform';
 import WebsiteSubform from './EditAestheticForm/WebsiteSubform';
 
+import { API_ROUTE_AESTHETIC_EDIT } from '../../functions/Constants';
+
 import '@blueprintjs/core/lib/css/blueprint.css';
 
+const POST_AESTHETIC_EDIT_OPTS = {
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+};
+
 const EditAestheticForm = (props) => {
+  const originalWebsites = props.aesthetic.websites;
+  const originalSimilarAesthetics = props.aesthetic.similarAesthetics;
+
   const [name, setName] = useState(props.aesthetic.name);
   const [symbol, setSymbol] = useState(props.aesthetic.symbol);
   const [startYear, setStartYear] = useState(props.aesthetic.startYear);
@@ -25,47 +38,231 @@ const EditAestheticForm = (props) => {
   const [description, setDescription] = useState(props.aesthetic.description);
 
   const mediaSourceUrlState = useState(props.aesthetic.mediaSourceUrl);
-  const websitesState = useState(props.aesthetic.websites);
-  const similarAestheticsState = useState(props.aesthetic.similarAesthetics);
+  const websitesState = useState(originalWebsites);
+  const similarAestheticsState = useState(originalSimilarAesthetics);
   const mediaState = useState(props.aesthetic.media);
+
+  const [nameIntent, setNameIntent] = useState(Intent.NONE);
+  const [startYearIntent, setStartYearIntent] = useState(Intent.NONE);
+  const [peakYearIntent, setPeakYearIntent] = useState(Intent.NONE);
+  const [descriptionIntent, setDescriptionIntent] = useState(Intent.NONE);
+  const [websiteIntents, setWebsiteIntents] = useState(originalWebsites.map(() => Intent.NONE));
+  const [similarAestheticIntents, setSimilarAestheticIntents] = useState(originalSimilarAesthetics.map(() => ({
+    description: Intent.NONE,
+    reverseDescription: Intent.NONE,
+  })));
+
+  const [nameHelperText, setNameHelperText] = useState('');
+  const [startYearHelperText, setStartYearHelperText] = useState('');
+  const [peakYearHelperText, setPeakYearHelperText] = useState('');
+  const [descriptionHelperText, setDescriptionHelperText] = useState('');
+  const [websiteHelperTexts, setWebsiteHelperTexts] = useState(originalWebsites.map(() => ''));
+  const [similarAestheticHelperTexts, setSimilarAestheticHelperTexts] = useState(originalSimilarAesthetics.map(() => ({
+    description: '',
+    reverseDescription: '',
+  })));
+
+  const handleSymbolChange = event => {
+    let newSymbol = event.target.value.replace(/[^a-z]/gi, '');
+    newSymbol = newSymbol.substring(0, 1).toUpperCase() + newSymbol.substring(1, 3).toLowerCase();
+    setSymbol(newSymbol);
+  };
 
   const handleCancel = () => {
 
   };
 
-  const handleSave = () => {
+  const validateName = () => {
+    let hasError = false;
 
+    if (!name) {
+      setNameIntent(Intent.DANGER);
+      setNameHelperText('Name is required.');
+      hasError = true;
+    } else {
+      setNameIntent(Intent.NONE);
+      setNameHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validateStartYear = () => {
+    let hasError = false;
+
+    if (!startYear) {
+      setStartYearIntent(Intent.DANGER);
+      setStartYearHelperText('Start year is required.');
+      hasError = true;
+    } else {
+      setStartYearIntent(Intent.NONE);
+      setStartYearHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validatePeakYear = () => {
+    let hasError = false;
+
+    if (peakYear < startYear) {
+      setPeakYearIntent(Intent.DANGER);
+      setPeakYearHelperText('Peak year cannot be before first year observed.');
+      hasError = true;
+    } else {
+      setPeakYearHelperText('');
+      setPeakYearIntent(Intent.NONE);
+    }
+
+    return hasError;
+  };
+
+  const validateDescription = () => {
+    let hasError = false;
+
+    if (!description) {
+      setDescriptionIntent(Intent.DANGER);
+      setDescriptionHelperText('Description is required.');
+      hasError = true;
+    } else {
+      setDescriptionIntent(Intent.NONE);
+      setDescriptionHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validateWebsites = () => {
+    let hasError = false;
+    const newWebsiteIntents = cloneDeep(websiteIntents);
+    const newWebsiteHelperTexts = cloneDeep(websiteHelperTexts);
+
+    websitesState[0].forEach((website, idx) => {
+      let websiteHasError = false;
+
+      if (!website.url) {
+        newWebsiteHelperTexts[idx] = 'URL is required.';
+        websiteHasError = true;
+      } else if (!website.websiteType.websiteType) {
+        newWebsiteHelperTexts[idx] = 'Website type is required.';
+        websiteHasError = true;
+      }
+
+      if (websiteHasError) {
+        newWebsiteIntents[idx] = Intent.DANGER;
+        hasError = true;
+      } else {
+        newWebsiteIntents[idx] = Intent.NONE;
+        newWebsiteHelperTexts[idx] = '';
+      }
+    });
+
+    setWebsiteIntents(newWebsiteIntents);
+    setWebsiteHelperTexts(newWebsiteHelperTexts);
+
+    return hasError;
+  };
+
+  const validateSimilarAesthetics = () => {
+    let hasError = false;
+
+    const newSimilarAestheticIntents = cloneDeep(similarAestheticIntents);
+    const newSimilarAestheticHelperTexts = cloneDeep(similarAestheticHelperTexts);
+
+    similarAestheticsState[0].forEach((similarAesthetic, idx) => {
+      if (!similarAesthetic.description) {
+        newSimilarAestheticIntents[idx].description = Intent.DANGER;
+        newSimilarAestheticHelperTexts[idx].description = 'Description is required.';
+        hasError = true;
+      } else {
+        newSimilarAestheticIntents[idx].description = Intent.NONE;
+        newSimilarAestheticHelperTexts[idx].description = '';
+      }
+
+      if (!similarAesthetic.reverseDescription) {
+        newSimilarAestheticIntents[idx].reverseDescription = Intent.DANGER;
+        newSimilarAestheticHelperTexts[idx].reverseDescription = 'Description is required.';
+        hasError = true;
+      } else {
+        newSimilarAestheticIntents[idx].reverseDescription = Intent.NONE;
+        newSimilarAestheticHelperTexts[idx].reverseDescription = '';
+      }
+    });
+
+    setSimilarAestheticIntents(newSimilarAestheticIntents);
+    setSimilarAestheticHelperTexts(newSimilarAestheticHelperTexts);
+
+    return hasError;
+  }
+
+  const handleSave = () => {
+    const hasNameError = validateName();
+    const hasStartYearError = validateStartYear();
+    const hasPeakYearError = validatePeakYear();
+    const hasDescriptionError = validateDescription();
+    const hasWebsiteError = validateWebsites();
+    const hasSimilarAestheticError = validateSimilarAesthetics();
+
+    if (hasNameError || hasStartYearError || hasPeakYearError || hasDescriptionError
+      || hasWebsiteError || hasSimilarAestheticError) {
+      return;
+    }
+
+    const newAesthetic = {
+      name,
+      symbol,
+      peakYear,
+      startYear,
+      description,
+      websites: websitesState[0],
+      similarAesthetics: similarAestheticsState[0],
+      media: mediaState[0],
+    };
+
+    axios.post(API_ROUTE_AESTHETIC_EDIT, { aesthetic: newAesthetic }, POST_AESTHETIC_EDIT_OPTS)
+      .then(res => {
+        // TODO
+      });
   };
 
   return (
     <form>
       <Card>
         <h2>Basic Information</h2>
-        <FormGroup label="Name" labelInfo="(required)">
-          <InputGroup onChange={event => setName(event.target.value)} value={name} />
+        <FormGroup helperText={nameHelperText} intent={nameIntent} label="Name"
+          labelInfo="(required)">
+          <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
+            value={name} />
         </FormGroup>
-        <FormGroup label="Symbol">
-          <InputGroup onChange={event => setSymbol(event.target.value)} value={symbol || ''} />
+        <FormGroup helperText="2-3 letters. Like the Periodic Table, but for aesthetics."
+          label="Symbol">
+          <InputGroup onChange={handleSymbolChange}
+            value={symbol || ''} />
         </FormGroup>
-        <FormGroup label="Year First Observed" labelInfo="(required)">
-          <NumericInput onChange={event => setStartYear(event.target.value)}
+        <FormGroup helperText={startYearHelperText} intent={startYearIntent}
+          label="Year First Observed" labelInfo="(required)">
+          <NumericInput intent={startYearIntent} onValueChange={value => setStartYear(value)}
             value={startYear || ''} />
         </FormGroup>
-        <FormGroup label="Peak Year">
-          <NumericInput onChange={event => setPeakYear(event.target.value)} value={peakYear || ''} />
+        <FormGroup helperText={peakYearHelperText} intent={peakYearIntent} label="Peak Year">
+          <NumericInput intent={peakYearIntent} onValueChange={value => setPeakYear(value)}
+            value={peakYear || ''} />
         </FormGroup>
-        <FormGroup label="Description" labelInfo="(required)">
-          <TextArea growVertically={true} fill={true}
+        <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
+          label="Description" labelInfo="(required)">
+          <TextArea intent={descriptionIntent} growVertically={true} fill={true}
             onChange={event => setDescription(event.target.value)} value={description} />
         </FormGroup>
       </Card>
       <br />
       <Card>
-        <WebsiteSubform mediaSourceUrl={mediaSourceUrlState} websites={websitesState} />
+        <WebsiteSubform helperText={websiteHelperTexts} intent={websiteIntents}
+          mediaSourceUrl={mediaSourceUrlState} websites={websitesState} />
       </Card>
       <br />
       <Card>
         <AestheticRelationshipSubform aesthetic={props.aesthetic}
+          helperText={similarAestheticHelperTexts} intent={similarAestheticIntents}
           similarAesthetics={similarAestheticsState} />
       </Card>
       <br />
