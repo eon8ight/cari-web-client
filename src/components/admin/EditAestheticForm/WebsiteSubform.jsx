@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
 
 import {
@@ -14,14 +13,12 @@ import {
   InputGroup,
   Intent,
   OL,
-  Spinner,
 } from '@blueprintjs/core';
 
 import ConfirmDelete from './ConfirmDelete';
 import ExpandableSection from './ExpandableSection';
 
 import {
-  API_ROUTE_WEBSITE_TYPES,
   ARENA_API_URL,
   WEBSITE_TYPE_ARENA,
 } from '../../../functions/Constants';
@@ -40,29 +37,12 @@ const WebsiteSubform = (props) => {
   const intent = props.intent;
   const helperText = props.helperText;
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [websiteTypes, setWebsiteTypes] = useState([]);
+  const websiteTypeOptions = Object.keys(props.websiteTypes).map(websiteType => ({
+    label: props.websiteTypes[websiteType].label,
+    value: websiteType
+  }));
 
-  useEffect(() => {
-    if (!isLoading) {
-      setIsLoading(true);
-
-      axios.get(API_ROUTE_WEBSITE_TYPES)
-        .then(res => {
-          const websiteTypeData = res.data.map(websiteType => ({
-            label: websiteType.label,
-            value: websiteType.websiteType
-          }));
-
-          websiteTypeData.unshift({ label: '--', value: null });
-          setWebsiteTypes(websiteTypeData);
-        });
-    }
-  }, [isLoading, setIsLoading]);
-
-  if (!websiteTypes) {
-    return <Spinner size={Spinner.SIZE_LARGE} />;
-  }
+  websiteTypeOptions.unshift({ label: '--', value: null });
 
   const handleAdd = () => {
     const newWebsites = cloneDeep(websites);
@@ -112,7 +92,7 @@ const WebsiteSubform = (props) => {
           <ControlGroup fill={true}>
             <HTMLSelect className={Classes.FIXED} intent={intent[idx]}
               onChange={event => handleWebsiteTypeChange(event.target.value, idx)}
-              options={websiteTypes} value={website.websiteType.websiteType} />
+              options={websiteTypeOptions} value={website.websiteType.websiteType} />
             <InputGroup intent={intent[idx]}
               onChange={event => handleWebsiteChange(event.target.value, idx)}
               placeholder={website.websiteType.url} value={website.url} />

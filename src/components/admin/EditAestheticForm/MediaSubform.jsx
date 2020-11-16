@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
+import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
 
 import {
@@ -9,14 +10,19 @@ import {
   FormGroup,
   InputGroup,
   Intent,
+  MenuItem,
   NumericInput,
   OL,
   Position,
+  Spinner,
   TextArea,
 } from '@blueprintjs/core';
 
+import { Suggest } from '@blueprintjs/select';
+
 import ConfirmDelete from './ConfirmDelete';
 import ExpandableSection from './ExpandableSection';
+import { API_ROUTE_MEDIA_CREATORS } from '../../../functions/Constants';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
@@ -31,21 +37,31 @@ const MEDIA_TEMPLATE = {
   mediaCreator: {
     name: '',
   },
-  mediaImage: {
-    previewImageUrl: '',
-    url: '',
-  },
+  previewImageUrl: '',
+  url: '',
   year: '',
 };
 
+const MENU_ITEM_NO_RESULTS = <MenuItem className={styles.tooltipText} disabled={true} key={0} text="No results." />;
+
+const SUGGEST_POPOVER_PROPS = {
+  minimal: true,
+  popoverClassName: styles.creatorNameSuggest
+};
+
 const ellipsize = string => string.length > 50 ? string.substring(0, 50) + '...' : string;
+const compareNames = (creatorNameA, creatorNameB) => creatorNameA.mediaCreator === creatorNameB.mediaCreator;
+
+const menuItemCreate = (query, active, handleClick) => (
+  <MenuItem active={active} className={styles.tooltipText} icon="add" key={0} onClick={handleClick}
+    shouldDismissPopover={false} text={`Create "${query}"`} />
+);
 
 const MediaSubform = (props) => {
   const [media, setMedia] = props.media;
 
   const [swapSpace, setSwapSpace] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
-  const [saved, setSaved] = useState(false);
 
   const [urlIntent, setUrlIntent] = useState(Intent.NONE);
   const [previewImageUrlIntent, setPreviewImageUrlIntent] = useState(Intent.NONE);
@@ -59,6 +75,43 @@ const MediaSubform = (props) => {
   const [descriptionHelperText, setDescriptionHelperText] = useState('');
   const [yearHelperText, setYearHelperText] = useState('');
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [creatorNames, setCreatorNames] = useState([]);
+  const [creatorNamesMap, setCreatorNamesMap] = useState([]);
+  const [filteredCreatorNames, setFilteredCreatorNames] = useState([]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIsLoading(true);
+
+      axios.get(API_ROUTE_MEDIA_CREATORS)
+        .then(res => {
+          const newCreatorNames = res.data;
+
+          const newCreatorNamesMap = newCreatorNames.reduce((map, creatorName) => {
+            map[creatorName.mediaCreator] = creatorName.name;
+            return map
+          }, {});
+
+          setCreatorNames(newCreatorNames);
+          setCreatorNamesMap(newCreatorNamesMap);
+          setFilteredCreatorNames(newCreatorNames);
+        });
+    }
+  }, [isLoading, setIsLoading]);
+
+  if (!creatorNames) {
+    return <Spinner />;
+  }
+
+  const refilter = query => {
+    const newFilteredCreatorNames = cloneDeep(creatorNames);
+
+    setFilteredCreatorNames(newFilteredCreatorNames.filter(
+      creatorName => creatorName.name.toLowerCase().includes(query.toLowerCase())
+    ));
+  };
+
   const handleModalOpen = (medium, idx) => {
     const newSwapSpace = cloneDeep(medium);
     setSwapSpace(newSwapSpace);
@@ -66,10 +119,10 @@ const MediaSubform = (props) => {
   };
 
   const handleModalClose = (didSave) => {
-    if(didSave) {
+    if (didSave) {
       const newMedia = cloneDeep(media);
 
-      if(editIndex === null) {
+      if (editIndex === null) {
         newMedia.push(swapSpace);
       } else {
         newMedia[editIndex] = swapSpace;
@@ -93,22 +146,17 @@ const MediaSubform = (props) => {
     setSwapSpace(newSwapSpace);
   };
 
-  const handleImageChange = (property, event) => {
+  const handleCreatorChange = creatorName => {
     const newSwapSpace = cloneDeep(swapSpace);
-    newSwapSpace.mediaImage[property] = event.target.value;
+    newSwapSpace.mediaCreator = creatorName;
     setSwapSpace(newSwapSpace);
-  };
-
-  const handleCreatorChange = event => {
-    const newSwapSpace = cloneDeep(swapSpace);
-    newSwapSpace.mediaCreator.name = event.target.value;
-    setSwapSpace(newSwapSpace);
+    setFilteredCreatorNames(creatorNames);
   };
 
   const validateUrl = () => {
     let hasError = false;
 
-    if(!swapSpace.mediaImage.url) {
+    if (!swapSpace.url) {
       setUrlIntent(Intent.DANGER);
       setUrlHelperText('URL is required.');
       hasError = true;
@@ -123,7 +171,7 @@ const MediaSubform = (props) => {
   const validatePreviewImageUrl = () => {
     let hasError = false;
 
-    if(!swapSpace.mediaImage.previewImageUrl) {
+    if (!swapSpace.previewImageUrl) {
       setPreviewImageUrlIntent(Intent.DANGER);
       setPreviewImageUrlHelperText('Preview image URL is required.');
       hasError = true;
@@ -138,7 +186,7 @@ const MediaSubform = (props) => {
   const validateLabel = () => {
     let hasError = false;
 
-    if(!swapSpace.label) {
+    if (!swapSpace.label) {
       setLabelIntent(Intent.DANGER);
       setLabelHelperText('Label is required.');
       hasError = true;
@@ -153,7 +201,7 @@ const MediaSubform = (props) => {
   const validateDescription = () => {
     let hasError = false;
 
-    if(!swapSpace.description) {
+    if (!swapSpace.description) {
       setDescriptionIntent(Intent.DANGER);
       setDescriptionHelperText('Description is required.');
       hasError = true;
@@ -168,7 +216,7 @@ const MediaSubform = (props) => {
   const validateYear = () => {
     let hasError = false;
 
-    if(!swapSpace.year) {
+    if (!swapSpace.year) {
       setYearIntent(Intent.DANGER);
       setYearHelperText('Year is required.');
       hasError = true;
@@ -181,35 +229,61 @@ const MediaSubform = (props) => {
   };
 
   const handleSave = () => {
-    let hasUrlError = validateUrl();
-    let hasPreviewImageUrlError = validatePreviewImageUrl();
-    let hasLabelError = validateLabel();
-    let hasDescriptionError = validateDescription();
-    let hasYearError = validateYear();
+    const hasUrlError = validateUrl();
+    const hasPreviewImageUrlError = validatePreviewImageUrl();
+    const hasLabelError = validateLabel();
+    const hasDescriptionError = validateDescription();
+    const hasYearError = validateYear();
 
-    if(hasUrlError || hasPreviewImageUrlError || hasLabelError || hasDescriptionError || hasYearError) {
+    if (hasUrlError || hasPreviewImageUrlError || hasLabelError || hasDescriptionError
+      || hasYearError) {
       return;
     }
 
     handleModalClose(true);
   }
 
+  const createNewMediaCreatorFromQuery = query => {
+    const newCreatorNamesMap = cloneDeep(creatorNamesMap);
+    newCreatorNamesMap[null] = query;
+    setCreatorNamesMap(newCreatorNamesMap);
+
+    return {
+      mediaCreator: null,
+      name: query,
+    };
+  };
+
+  const creatorNameInputValueRenderer = creatorName => creatorNamesMap[creatorName.mediaCreator];
+
+  const creatorNameRenderer = (creatorName, { modifiers, handleClick }) => {
+    if (!modifiers.matchesPredicate) {
+      return null;
+    }
+
+    return (
+      <MenuItem active={modifiers.active} className={styles.tooltipText}
+        key={creatorName.mediaCreator} onClick={handleClick}
+        text={creatorNamesMap[creatorName.mediaCreator]} shouldDismissPopover={false} />
+    );
+  };
+
   let mediaModalContent = null;
 
-  if(swapSpace) {
+  if (swapSpace) {
     mediaModalContent = (
       <form>
         <h2>{swapSpace.title}</h2>
         <FormGroup helperText={urlHelperText} intent={urlIntent} label="URL"
           labelInfo="(required)">
-          <InputGroup intent={urlIntent} onChange={event => handleImageChange('url', event)}
-            value={swapSpace.mediaImage.url} />
+          <InputGroup intent={urlIntent} onChange={event => handleChange('url', event)}
+            value={swapSpace.url} />
         </FormGroup>
         <FormGroup helperText={previewImageUrlHelperText} intent={previewImageUrlIntent}
           label="Preview Image URL" labelInfo="(required)">
           <InputGroup intent={previewImageUrlIntent}
-            onChange={event => handleImageChange('previewImageUrl', event)}
-            value={swapSpace.mediaImage.previewImageUrl} />
+            onChange={event => handleChange('previewImageUrl', event)}
+            value={swapSpace.previewImageUrl} />
         </FormGroup>
         <FormGroup helperText={labelHelperText} intent={labelIntent} label="Label"
           labelInfo="(required)">
@@ -224,8 +298,18 @@ const MediaSubform = (props) => {
             onChange={event => handleChange('description', event.target.value)}
             value={swapSpace.description} />
         </FormGroup>
-        <FormGroup label="Creator" helperText="Leave blank if unknown.">
-          <InputGroup onChange={handleCreatorChange} value={swapSpace.mediaCreator.name} />
+        <FormGroup label="Creator">
+          <ControlGroup>
+            <Suggest createNewItemFromQuery={createNewMediaCreatorFromQuery}
+              createNewItemRenderer={menuItemCreate}
+              inputValueRenderer={creatorNameInputValueRenderer}
+              itemRenderer={creatorNameRenderer} items={filteredCreatorNames}
+              itemsEqual={compareNames} noResults={MENU_ITEM_NO_RESULTS}
+              onItemSelect={handleCreatorChange} onQueryChange={refilter}
+              popoverProps={SUGGEST_POPOVER_PROPS}
+              query={creatorNamesMap[swapSpace.mediaCreator.mediaCreator]} resetOnClose={true}
+              selectedItem={swapSpace.mediaCreator} />
+          </ControlGroup>
         </FormGroup>
         <FormGroup helperText={yearHelperText} intent={yearIntent} label="Year"
           labelInfo="(required)">
@@ -242,15 +326,15 @@ const MediaSubform = (props) => {
   };
 
   const mediaElems = media.map((medium, idx) => (
-    <li key={medium.media}>
+    <li key={medium.aestheticMedia}>
       <FormGroup>
         <ControlGroup className={styles.mediaPreviewButtons}>
           <Button icon="edit" onClick={() => handleModalOpen(medium, idx)}>Edit</Button>
           <ConfirmDelete onClick={() => handleDelete(idx)} position={Position.BOTTOM_RIGHT} />
         </ControlGroup>
         <div className={styles.mediaPreview}>
-          <a href={medium.mediaImage.url} target="_blank" rel="noopener noreferrer">
-            <img src={medium.mediaImage.previewImageUrl} alt={medium.label} />
+          <a href={medium.url} target="_blank" rel="noopener noreferrer">
+            <img src={medium.previewImageUrl} alt={medium.label} />
           </a>
           <div>
             <dl className={styles.dataListNoIndent}>

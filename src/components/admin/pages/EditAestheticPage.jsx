@@ -9,41 +9,6 @@ import EditAestheticForm from '../EditAestheticForm';
 
 import { API_ROUTE_AESTHETIC_FIND_FOR_EDIT } from '../../../functions/Constants';
 
-const AESTHETIC_TEMPLATE = {
-  description: '',
-  media: [
-    {
-      description: '',
-      label: '',
-      mediaCreator: {
-        name: '',
-      },
-      mediaImage: {
-        previewImageUrl: '',
-        url: '',
-      },
-      year: 0,
-    },
-  ],
-  mediaSourceUrl: '',
-  name: '',
-  peakYear: 0,
-  similarAesthetics: [
-    {
-      aesthetic: 0,
-      description: '',
-      reverseDescription: '',
-    },
-  ],
-  startYear: 0,
-  websites: [
-    {
-      url: '',
-      websiteType: 0
-    },
-  ],
-};
-
 const EditAestheticPage = (props) => {
   const match = useRouteMatch();
 

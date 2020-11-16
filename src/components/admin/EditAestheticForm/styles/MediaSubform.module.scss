@@ -1,3 +1,8 @@
+.creatorNameSuggest {
+    max-height: 300px;
+    overflow: auto;
+}
+
 .dataListNoIndent {
     display: grid;
     grid-template-columns: min-content auto;
@@ -41,4 +46,8 @@
     position: fixed;
     right: 0;
     top: 0;
+}
+
+.tooltipText {
+    font-size: 10pt;
 }

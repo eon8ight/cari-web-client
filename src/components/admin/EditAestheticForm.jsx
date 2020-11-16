@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
@@ -11,6 +11,7 @@ import {
   InputGroup,
   Intent,
   NumericInput,
+  Spinner,
   TextArea,
 } from '@blueprintjs/core';
 
@@ -18,13 +19,15 @@ import AestheticRelationshipSubform from './EditAestheticForm/AestheticRelations
 import MediaSubform from './EditAestheticForm/MediaSubform';
 import WebsiteSubform from './EditAestheticForm/WebsiteSubform';
 
-import { API_ROUTE_AESTHETIC_EDIT } from '../../functions/Constants';
+import {
+  API_ROUTE_AESTHETIC_EDIT,
+  API_ROUTE_WEBSITE_TYPES,
+} from '../../functions/Constants';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
 const POST_AESTHETIC_EDIT_OPTS = {
   headers: { 'Content-Type': 'application/json' },
-  withCredentials: true,
 };
 
 const EditAestheticForm = (props) => {
@@ -62,6 +65,32 @@ const EditAestheticForm = (props) => {
     reverseDescription: '',
   })));
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [websiteTypes, setWebsiteTypes] = useState([]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setIsLoading(true);
+
+      axios.get(API_ROUTE_WEBSITE_TYPES)
+        .then(res => {
+          setWebsiteTypes(res.data.reduce((map, websiteType) => {
+            map[websiteType.websiteType] = {
+              article: 'a' + (websiteType.label.toLowerCase().match('^[aeiou]') ? 'n' : ''),
+              label: websiteType.label,
+              validationRegex: websiteType.validationRegex,
+            };
+
+            return map;
+          }, {}));
+        });
+    }
+  }, [isLoading, setIsLoading]);
+
+  if (!websiteTypes) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
   const handleSymbolChange = event => {
     let newSymbol = event.target.value.replace(/[^a-z]/gi, '');
     newSymbol = newSymbol.substring(0, 1).toUpperCase() + newSymbol.substring(1, 3).toLowerCase();
@@ -69,7 +98,7 @@ const EditAestheticForm = (props) => {
   };
 
   const handleCancel = () => {
-
+    // TODO
   };
 
   const validateName = () => {
@@ -139,12 +168,16 @@ const EditAestheticForm = (props) => {
 
     websitesState[0].forEach((website, idx) => {
       let websiteHasError = false;
+      const websiteType = website.websiteType.websiteType;
 
-      if (!website.url) {
+      if (!websiteType) {
+        newWebsiteHelperTexts[idx] = 'Website type is required.';
+        websiteHasError = true;
+      } else if (!website.url) {
         newWebsiteHelperTexts[idx] = 'URL is required.';
         websiteHasError = true;
-      } else if (!website.websiteType.websiteType) {
-        newWebsiteHelperTexts[idx] = 'Website type is required.';
+      } else if (!website.url.match(websiteTypes[websiteType].validationRegex)) {
+        newWebsiteHelperTexts[idx] = `URL must be ${websiteTypes[websiteType].article} ${websiteTypes[websiteType].label} URL.`;
         websiteHasError = true;
       }
 
@@ -209,17 +242,19 @@ const EditAestheticForm = (props) => {
     }
 
     const newAesthetic = {
+      aesthetic: props.aesthetic.aesthetic,
       name,
       symbol,
       peakYear,
       startYear,
       description,
+      mediaSourceUrl: mediaSourceUrlState[0],
       websites: websitesState[0],
       similarAesthetics: similarAestheticsState[0],
       media: mediaState[0],
     };
 
-    axios.post(API_ROUTE_AESTHETIC_EDIT, { aesthetic: newAesthetic }, POST_AESTHETIC_EDIT_OPTS)
+    axios.post(API_ROUTE_AESTHETIC_EDIT, newAesthetic, POST_AESTHETIC_EDIT_OPTS)
       .then(res => {
         // TODO
       });
@@ -257,7 +292,8 @@ const EditAestheticForm = (props) => {
       <br />
       <Card>
         <WebsiteSubform helperText={websiteHelperTexts} intent={websiteIntents}
-          mediaSourceUrl={mediaSourceUrlState} websites={websitesState} />
+          mediaSourceUrl={mediaSourceUrlState} websites={websitesState}
+          websiteTypes={websiteTypes} />
       </Card>
       <br />
       <Card>
