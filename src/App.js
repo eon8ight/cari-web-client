@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import AestheticsRouter from './components/aesthetics/Router';
+import Faq from './components/Faq';
 import Footer from './components/common/Footer';
 import Header from './components/common/Header';
 import Home from './components/Home';
@@ -19,6 +20,9 @@ export default (props) => (
       </Route>
       <Route path="/team">
         <Team />
+      </Route>
+      <Route path="/faq">
+        <Faq />
       </Route>
       <Route path="/aesthetics">
         <AestheticsRouter />
