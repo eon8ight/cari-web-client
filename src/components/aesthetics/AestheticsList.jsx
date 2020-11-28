@@ -1,14 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { Icon } from '@blueprintjs/core';
+
 import styles from './styles/AestheticsList.module.scss';
 
 const SORT_FIELD_NAME = 'name';
 const SORT_FIELD_START_YEAR = 'startYear';
 const SORT_FIELD_END_YEAR = 'endYear';
-
-const CHAR_CODE_DOWN_TRIANGLE = 9660;
-const CHAR_CODE_UP_TRIANGLE = 9652;
 
 const AestheticsList = (props) => {
   let aestheticRows = (
@@ -42,7 +41,7 @@ const AestheticsList = (props) => {
   };
 
   const getSortSymbol = (fieldName) => props.sortField === fieldName
-    ? String.fromCharCode(props.asc ? CHAR_CODE_DOWN_TRIANGLE : CHAR_CODE_UP_TRIANGLE)
+    ? <Icon icon={props.asc ? 'sort-asc' : 'sort-desc'} />
     : null;
 
   return (
