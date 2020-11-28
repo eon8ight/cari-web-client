@@ -11,10 +11,12 @@ import { API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT } from '../../functions/Consta
 import styles from './styles/Gallery.module.scss';
 
 const Gallery = (props) => {
+  const [currentPage, setCurrentPage] = useState(0);
   const [galleryModalBlock, setGalleryModalBlock] = useState(null);
   const [galleryData, setGalleryData] = useState(props.aesthetic.galleryContent.contents);
 
   const handlePageChange = (data) => {
+    setCurrentPage(data.selected);
     setGalleryData(null);
 
     axios.get(`${API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT}/${props.aesthetic.aesthetic}?page=${data.selected + 1}`)
@@ -54,7 +56,8 @@ const Gallery = (props) => {
       <div id="galleryContainer">
         {galleryContent}
       </div>
-      <Paginator id="galleryPaginator" pageCount={totalPages} onPageChange={handlePageChange} />
+      {totalPages > 0 && <Paginator currentPage={currentPage} id="galleryPaginator"
+        pageCount={totalPages} onPageChange={handlePageChange} />}
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
         isOpen={galleryModalBlock !== null}
         onRequestClose={() => setGalleryModalBlock(null)}>

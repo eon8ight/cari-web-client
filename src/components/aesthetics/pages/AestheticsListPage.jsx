@@ -24,6 +24,7 @@ const valueExists = (arr, key) => (typeof arr[key] !== 'undefined') && arr[key] 
 const AestheticsListPage = (props) => {
   const [requestMade, setRequestMade] = useState(false);
   const [aesthetics, setAesthetics] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
   const [sortField, setSortField] = useState(null);
@@ -80,7 +81,11 @@ const AestheticsListPage = (props) => {
       callApiCallback({ page: 0 });
   }, [aesthetics, callApiCallback]);
 
-  const handlePageChange = data => callApi({ page: data.selected });
+  const handlePageChange = data => {
+    setCurrentPage(data.selected);
+    callApi({ page: data.selected });
+  };
+
   let aestheticsList = null;
 
   if (!aesthetics) {
@@ -90,7 +95,8 @@ const AestheticsListPage = (props) => {
       <>
         <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
           asc={asc} setAsc={setAsc} callApi={callApi} />
-        <Paginator id="aestheticFiltersPaginator" pageCount={totalPages} onPageChange={handlePageChange} />
+        {totalPages > 0 && <Paginator currentPage={currentPage} id="aestheticFiltersPaginator"
+          pageCount={totalPages} onPageChange={handlePageChange} />}
       </>
     );
   }
