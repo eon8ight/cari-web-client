@@ -102,7 +102,14 @@ const AestheticsListPage = (props) => {
   const handleSubmit = event => {
     event.preventDefault();
     callApi();
-  }
+  };
+
+  const handleClearFilters = event => {
+    event.preventDefault();
+    setKeyword('');
+    setStartYear(0);
+    setEndYear(0);
+  };
 
   return (
     <>
@@ -119,6 +126,9 @@ const AestheticsListPage = (props) => {
             <NumericInput onValueChange={handleEndYearChange}
               placeholder="Year of End of Popularity" value={endYear || ''} />
             <Button icon="search" type="submit">Search</Button>
+            <Button icon="filter-remove" onClick={handleClearFilters} type="reset">
+              Clear Filters
+            </Button>
           </ControlGroup>
         </FormGroup>
       </form>

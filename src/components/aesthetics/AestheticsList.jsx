@@ -11,13 +11,21 @@ const CHAR_CODE_DOWN_TRIANGLE = 9660;
 const CHAR_CODE_UP_TRIANGLE = 9652;
 
 const AestheticsList = (props) => {
-  const aestheticRows = props.aesthetics.map(a => (
-    <tr key={a.aesthetic}>
-      <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
-      <td>{a.startYear || '?'}</td>
-      <td>{a.endYear || '?'}</td>
+  let aestheticRows = (
+    <tr>
+      <td colspan="3" className={styles.fullSpanCell}>No aesthetics match the filter criteria.</td>
     </tr>
-  ));
+  );
+
+  if(props.aesthetics.length > 0) {
+    aestheticRows = props.aesthetics.map(a => (
+      <tr key={a.aesthetic}>
+        <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
+        <td>{a.startYear || '?'}</td>
+        <td>{a.endYear || '?'}</td>
+      </tr>
+    ));
+  }
 
   const handleSortClick = (newSortField) => {
     let newAsc;
