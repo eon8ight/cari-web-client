@@ -26,7 +26,7 @@ const MAX_DESCRIPTION_LENGTH = 75;
 
 const color = scaleOrdinal(schemeCategory10);
 
-export default (props) => {
+const SimilarityWeb = (props) => {
   const similarAesthetics = props.aesthetic.similarAesthetics;
 
   useEffect(() => {
@@ -148,9 +148,7 @@ export default (props) => {
 
       const zoomed = () => {
         simulation.stop();
-
         const transform = event.transform;
-        console.log(transform);
 
         nodeGroup.attr('transform', d => (
           `translate(${d.x + (transform.x * transform.k)}, ${d.y + (transform.y * transform.k)}) scale(${transform.k})`
@@ -179,3 +177,5 @@ export default (props) => {
     </>
   );
 };
+
+export default SimilarityWeb;

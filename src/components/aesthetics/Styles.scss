@@ -14,18 +14,8 @@ text {
     font-size: 0.5em;
 }
 
-#aestheticsListFilters {
-    align-items: baseline;
-    display: flex;
-    margin-bottom: 16px;
-
-    & > *:not(:last-child) {
-        margin-right: 8px;
-    }
-}
-
-#aestheticsListPaginatorContainer {
-    margin: 32px auto 0;
+#aestheticFiltersPaginator {
+    margin: 24px auto 0;
     width: fit-content;
 }
 
@@ -36,7 +26,7 @@ text {
     justify-content: space-between;
 }
 
-#galleryPaginatorContainer {
+#galleryPaginator {
     margin: 32px auto 0;
     width: fit-content;
 }

@@ -1,0 +1,26 @@
+const API_ROUTE_AESTHETIC_NAMES = `${process.env.REACT_APP_API_URL}/aesthetic/names`;
+const API_ROUTE_AESTHETIC_FIND_FOR_EDIT = `${process.env.REACT_APP_API_URL}/aesthetic/findForEdit`;
+const API_ROUTE_AESTHETIC_FIND_FOR_LIST = `${process.env.REACT_APP_API_URL}/aesthetic/findForList`;
+const API_ROUTE_AESTHETIC_FIND_FOR_PAGE = `${process.env.REACT_APP_API_URL}/aesthetic/findForPage`;
+const API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT = `${process.env.REACT_APP_API_URL}/aesthetic/findGalleryContent`;
+const API_ROUTE_AESTHETIC_EDIT = `${process.env.REACT_APP_API_URL}/aesthetic/edit`;
+
+const API_ROUTE_MEDIA_CREATORS = `${process.env.REACT_APP_API_URL}/mediaCreators`;
+
+const API_ROUTE_WEBSITE_TYPES = `${process.env.REACT_APP_API_URL}/websiteTypes`;
+
+const ARENA_API_URL = 'https://api.are.na/v2/channels/';
+const WEBSITE_TYPE_ARENA = 1;
+
+export {
+  API_ROUTE_AESTHETIC_NAMES,
+  API_ROUTE_AESTHETIC_FIND_FOR_EDIT,
+  API_ROUTE_AESTHETIC_FIND_FOR_LIST,
+  API_ROUTE_AESTHETIC_FIND_FOR_PAGE,
+  API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT,
+  API_ROUTE_AESTHETIC_EDIT,
+  API_ROUTE_MEDIA_CREATORS,
+  API_ROUTE_WEBSITE_TYPES,
+  ARENA_API_URL,
+  WEBSITE_TYPE_ARENA,
+};

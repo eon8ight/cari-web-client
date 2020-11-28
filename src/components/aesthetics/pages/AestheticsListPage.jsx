@@ -3,15 +3,25 @@ import { Helmet } from 'react-helmet';
 
 import axios from 'axios';
 
+import {
+  Button,
+  ControlGroup,
+  FormGroup,
+  InputGroup,
+  NumericInput,
+  Spinner,
+} from '@blueprintjs/core';
+
 import AestheticsList from '../AestheticsList';
 import Paginator from '../../common/Paginator';
-import Spinner from '../../common/Spinner';
 
-import styles from './styles/AestheticsListPage.module.scss';
+import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/Constants';
+
+import '@blueprintjs/core/lib/css/blueprint.css';
 
 const valueExists = (arr, key) => (typeof arr[key] !== 'undefined') && arr[key] !== null;
 
-export default (props) => {
+const AestheticsListPage = (props) => {
   const [requestMade, setRequestMade] = useState(false);
   const [aesthetics, setAesthetics] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
@@ -54,7 +64,7 @@ export default (props) => {
         params.endYear = endYear;
       }
 
-      axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForList`, { params })
+      axios.get(API_ROUTE_AESTHETIC_FIND_FOR_LIST, { params })
         .then(res => {
           setAesthetics(res.data.content);
           setTotalPages(res.data.totalPages);
@@ -63,21 +73,25 @@ export default (props) => {
     }
   };
 
-  const callApiCallback = useCallback(callApi);
+  const callApiCallback = useCallback(callApi, [asc, keyword, endYear, requestMade, sortField, startYear]);
 
   useEffect(() => {
     if (!aesthetics)
       callApiCallback({ page: 0 });
   }, [aesthetics, callApiCallback]);
 
+  const handlePageChange = data => callApi({ page: data.selected });
   let aestheticsList = null;
 
   if (!aesthetics) {
-    aestheticsList = <Spinner />;
+    aestheticsList = <Spinner size={Spinner.SIZE_LARGE} />;
   } else {
     aestheticsList = (
-      <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
-        asc={asc} setAsc={setAsc} callApi={callApi} />
+      <>
+        <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
+          asc={asc} setAsc={setAsc} callApi={callApi} />
+        <Paginator id="aestheticFiltersPaginator" pageCount={totalPages} onPageChange={handlePageChange} />
+      </>
     );
   }
 
@@ -90,34 +104,24 @@ export default (props) => {
     callApi();
   }
 
-  const handlePageChange = data => callApi({ page: data.selected });
-
   return (
     <>
       <Helmet>
         <title>CARI | Aesthetics</title>
       </Helmet>
-      <div id="aestheticsListPaginatorContainer">
-        <form onSubmit={handleSubmit} id="aestheticsListFilters">
-          <div>
-            <label htmlFor="keyword">Keyword:</label>
-            &nbsp;
-            <input type="text" id="keyword" value={keyword || ''} onChange={handleKeywordChange} />
-          </div>
-          <div>
-            <label htmlFor="startYear">Between:</label>
-            &nbsp;
-            <input type="number" id="startYear" className={styles.yearInput} value={startYear || ''} onChange={handleStartYearChange} />
-            &nbsp;
-            <label htmlFor="endYear">and</label>
-            &nbsp;
-            <input type="number" id="endYear" className={styles.yearInput} value={endYear || ''} onChange={handleEndYearChange} />
-          </div>
-          <input type="submit" value="Search" />
-          <Paginator pageCount={totalPages} onPageChange={handlePageChange} />
-        </form>
-      </div>
+      <form onSubmit={handleSubmit}>
+        <FormGroup label="Search and filter by...">
+          <ControlGroup>
+            <InputGroup fill={true} onChange={handleKeywordChange} placeholder="Keyword" value={keyword || ''} />
+            <NumericInput onChange={handleStartYearChange} placeholder="Year First Observed" value={startYear || ''} />
+            <NumericInput onChange={handleEndYearChange} placeholder="End Year" value={endYear || ''} />
+            <Button icon="search" type="submit">Search</Button>
+          </ControlGroup>
+        </FormGroup>
+      </form>
       {aestheticsList}
     </>
   );
 };
+
+export default AestheticsListPage;

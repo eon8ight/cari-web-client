@@ -107,7 +107,7 @@ He has been involved with the CARI project since 2020.
     },
 ]
 
-export default (props) => {
+const Team = (props) => {
     const teamDataElem = TEAM_DATA.map(teamMember => (
         <article class={styles.teamArticle}>
             <img alt="Consumer Aesthetics Research Institute"
@@ -126,3 +126,5 @@ export default (props) => {
         </section>
     );
 };
+
+export default Team;

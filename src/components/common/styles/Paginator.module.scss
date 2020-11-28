@@ -1,43 +1,12 @@
 .pagination {
-    list-style-type: none;
-    padding: 0;
+    padding-inline-start: 0;
     width: fit-content;
 
-    & > li {
-        margin: 0 3px;
+    & > li:not(:first-child) {
+        margin-left: 2px;
     }
 }
 
 .paginationItem {
     display: inline;
-}
-
-.paginationItemDisabled {
-    & > a {
-        color: gray;
-
-        &:hover {
-            background-color: initial;
-            cursor: initial;
-        }
-    }
-}
-
-.paginationItemLink {
-    border-radius: 4px;
-    padding: 12px;
-
-    &:hover {
-        background-color: lightgray;
-        cursor: pointer;
-    }
-}
-
-.paginationItemLinkActive {
-    background-color: lightgray;
-    color: gray;
-
-    &:hover {
-        cursor: initial;
-    }
 }

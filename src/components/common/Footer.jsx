@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default (props) => (
+const Footer = (props) => (
   <>
     <hr />
     <footer>
@@ -8,3 +8,5 @@ export default (props) => (
     </footer>
   </>
 );
+
+export default Footer;

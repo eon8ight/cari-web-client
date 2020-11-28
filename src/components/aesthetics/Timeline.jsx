@@ -17,6 +17,8 @@ import { zoom } from 'd3-zoom';
 
 import styles from './styles/Timeline.module.scss';
 
+Modal.setAppElement('#root');
+
 const WIDTH = 300;
 const HEIGHT = 100;
 
@@ -29,7 +31,7 @@ const MARGIN = {
   left: 30,
 };
 
-export default (props) => {
+const Timeline = (props) => {
   const [timelineModalSelection, setTimelineModalSelection] = useState(null);
 
   const media = props.aesthetic.media;
@@ -173,7 +175,7 @@ export default (props) => {
       .data(data)
       .enter()
       .insert('image')
-      .attr('href', d => d.mediaImage.previewImageUrl)
+      .attr('href', d => d.previewImageUrl)
       .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
       .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
       .attr('x', d => x(d.xPosition))
@@ -207,8 +209,8 @@ export default (props) => {
     timelineModalContent = (
       <div id="timelineViewer">
         <div id="timelineImageContainer">
-          <a href={timelineModalSelection.mediaImage.url} target="_blank" rel="noopener noreferrer">
-            <img id="timelineImage" src={timelineModalSelection.mediaImage.url} alt={timelineModalSelection.label} />
+          <a href={timelineModalSelection.url} target="_blank" rel="noopener noreferrer">
+            <img id="timelineImage" src={timelineModalSelection.url} alt={timelineModalSelection.label} />
           </a>
         </div>
         <div id="timelineImageMetadataContainer">
@@ -248,3 +250,5 @@ export default (props) => {
     </>
   );
 };
+
+export default Timeline;

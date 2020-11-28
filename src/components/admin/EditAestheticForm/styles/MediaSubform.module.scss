@@ -1,0 +1,53 @@
+.creatorNameSuggest {
+    max-height: 300px;
+    overflow: auto;
+}
+
+.dataListNoIndent {
+    display: grid;
+    grid-template-columns: min-content auto;
+    row-gap: 8px;
+
+    & > dd {
+        margin-inline-start: 1em;
+    }
+}
+
+.mediaPreview {
+    align-items: center;
+    display: flex;
+
+    & > * {
+        margin: 0 4px;
+    }
+}
+
+.mediaPreviewButtons {
+    float: right;
+}
+
+.modal {
+    background-color: white;
+    border: 1px black solid;
+    border-radius: 6px;
+    left: 50%;
+    padding: 4px 24px 16px 24px;
+    position: absolute;
+    right: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 950px;
+}
+
+.modalOverlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+.tooltipText {
+    font-size: 10pt;
+}
