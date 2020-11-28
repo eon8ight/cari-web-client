@@ -120,10 +120,12 @@ const Team = (props) => {
     ));
 
     return (
-        <section id="teamContainer">
-            <h2 id="teamLabel">our team</h2>
-            <div>{teamDataElem}</div>
-        </section>
+        <>
+            <h1 className={styles.teamLabel}>our team</h1>
+            <section className={styles.teamContainer}>
+                <div>{teamDataElem}</div>
+            </section>
+        </>
     );
 };
 

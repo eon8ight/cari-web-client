@@ -19,6 +19,9 @@ const App = (props) => (
       <Route path="/" exact>
         <Home />
       </Route>
+      <Route path="/about">
+        <Home />
+      </Route>
       <Route path="/team">
         <Team />
       </Route>

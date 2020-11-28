@@ -1,7 +1,5 @@
 import React from 'react';
 
-import './Styles.scss';
-
 export default (props) => (
     <>
         <h1>Frequently Asked Questions</h1>
