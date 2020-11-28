@@ -20,7 +20,7 @@ export default (props) => {
   const [asc, setAsc] = useState(null);
   const [keyword, setKeyword] = useState(null);
   const [startYear, setStartYear] = useState(null);
-  const [peakYear, setPeakYear] = useState(null);
+  const [endYear, setEndYear] = useState(null);
 
   const callApi = (params) => {
     if (!requestMade) {
@@ -50,8 +50,8 @@ export default (props) => {
         params.startYear = startYear;
       }
 
-      if (peakYear && !valueExists(params, 'peakYear')) {
-        params.peakYear = peakYear;
+      if (endYear && !valueExists(params, 'endYear')) {
+        params.endYear = endYear;
       }
 
       axios.get(`${process.env.REACT_APP_API_URL}/aesthetic/findForList`, { params })
@@ -83,7 +83,7 @@ export default (props) => {
 
   const handleKeywordChange = event => setKeyword(event.target.value);
   const handleStartYearChange = event => setStartYear(event.target.value);
-  const handlePeakYearChange = event => setPeakYear(event.target.value);
+  const handleEndYearChange = event => setEndYear(event.target.value);
 
   const handleSubmit = event => {
     event.preventDefault();
@@ -109,9 +109,9 @@ export default (props) => {
             &nbsp;
             <input type="number" id="startYear" className={styles.yearInput} value={startYear || ''} onChange={handleStartYearChange} />
             &nbsp;
-            <label htmlFor="peakYear">and</label>
+            <label htmlFor="endYear">and</label>
             &nbsp;
-            <input type="number" id="peakYear" className={styles.yearInput} value={peakYear || ''} onChange={handlePeakYearChange} />
+            <input type="number" id="endYear" className={styles.yearInput} value={endYear || ''} onChange={handleEndYearChange} />
           </div>
           <input type="submit" value="Search" />
           <Paginator pageCount={totalPages} onPageChange={handlePageChange} />

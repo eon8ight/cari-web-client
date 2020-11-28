@@ -5,7 +5,7 @@ import styles from './styles/AestheticsList.module.scss';
 
 const SORT_FIELD_NAME = 'name';
 const SORT_FIELD_START_YEAR = 'startYear';
-const SORT_FIELD_PEAK_YEAR = 'peakYear';
+const SORT_FIELD_END_YEAR = 'endYear';
 
 const CHAR_CODE_DOWN_TRIANGLE = 9660;
 const CHAR_CODE_UP_TRIANGLE = 9652;
@@ -15,7 +15,7 @@ export default (props) => {
     <tr key={a.aesthetic}>
       <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
       <td>{a.startYear || '?'}</td>
-      <td>{a.peakYear || '?'}</td>
+      <td>{a.endYear || '?'}</td>
     </tr>
   ));
 
@@ -52,8 +52,8 @@ export default (props) => {
           <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_START_YEAR)}>
             First Known Example {getSortSymbol(SORT_FIELD_START_YEAR)}
           </th>
-          <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_PEAK_YEAR)}>
-            Peak {getSortSymbol(SORT_FIELD_PEAK_YEAR)}
+          <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_END_YEAR)}>
+            End of Popularity {getSortSymbol(SORT_FIELD_END_YEAR)}
           </th>
         </tr>
       </thead>

@@ -48,8 +48,6 @@ export default (props) => {
         if(description.length > MAX_DESCRIPTION_LENGTH) {
           description = description.substring(0, MAX_DESCRIPTION_LENGTH) + '...';
         }
-      } else {
-        description = '(no description)';
       }
 
       accumulator.push({
@@ -114,10 +112,12 @@ export default (props) => {
       .classed(styles.tooltip, true)
       .style('visibility', 'hidden');
 
-    nodeCircle.on('mouseover', d => (
-      tooltip.text(d.description)
-        .style('visibility', 'visible')
-    ))
+    nodeCircle.on('mouseover', d => {
+      if(d.description) {
+        tooltip.text(d.description)
+          .style('visibility', 'visible')
+      }
+    })
       .on('mousemove', d => (
         tooltip.style('top', `${event.pageY - 16}px`)
           .style('left', `${event.pageX + 16}px`)
