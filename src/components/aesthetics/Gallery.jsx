@@ -21,18 +21,18 @@ const Gallery = (props) => {
       .then(res => setGalleryData(res.data.contents));
   };
 
-  let galleryContent = <Spinner size={Spinner.SIZE_LARGE} />;
-
-  if (galleryData) {
-    galleryContent = galleryData.filter(block => block.image !== null).map(block => {
-      return (
-        <div className={styles.image} key={block.id}>
-          <img src={block.image.thumb.url} alt={block.description}
-            onClick={() => setGalleryModalBlock(block)} />
-        </div>
-      );
-    });
+  if(!galleryData) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
   }
+
+  const galleryContent = galleryData.filter(block => block.image !== null).map(block => {
+    return (
+      <div className={styles.image} key={block.id}>
+        <img src={block.image.thumb.url} alt={block.description}
+          onClick={() => setGalleryModalBlock(block)} />
+      </div>
+    );
+  });
 
   let galleryModalContent = null;
 
