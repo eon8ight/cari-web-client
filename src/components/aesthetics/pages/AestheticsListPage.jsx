@@ -96,8 +96,8 @@ const AestheticsListPage = (props) => {
   }
 
   const handleKeywordChange = event => setKeyword(event.target.value);
-  const handleStartYearChange = event => setStartYear(event.target.value);
-  const handleEndYearChange = event => setEndYear(event.target.value);
+  const handleStartYearChange = value => setStartYear(value);
+  const handleEndYearChange = value => setEndYear(value);
 
   const handleSubmit = event => {
     event.preventDefault();
@@ -112,9 +112,12 @@ const AestheticsListPage = (props) => {
       <form onSubmit={handleSubmit}>
         <FormGroup label="Search and filter by...">
           <ControlGroup>
-            <InputGroup fill={true} onChange={handleKeywordChange} placeholder="Keyword" value={keyword || ''} />
-            <NumericInput onChange={handleStartYearChange} placeholder="Year First Observed" value={startYear || ''} />
-            <NumericInput onChange={handleEndYearChange} placeholder="End Year" value={endYear || ''} />
+            <InputGroup fill={true} onChange={handleKeywordChange} placeholder="Keyword"
+              value={keyword || ''} />
+            <NumericInput onValueChange={handleStartYearChange}
+              placeholder="Year of First Known Example" value={startYear || ''} />
+            <NumericInput onValueChange={handleEndYearChange}
+              placeholder="Year of End of Popularity" value={endYear || ''} />
             <Button icon="search" type="submit">Search</Button>
           </ControlGroup>
         </FormGroup>
