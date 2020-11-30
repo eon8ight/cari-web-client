@@ -31,11 +31,9 @@ const App = (props) => (
       <Route path="/aesthetics">
         <AestheticsRouter />
       </Route>
-      {/*
       <Route path="/admin">
         <AdminRouter />
       </Route>
-      */}
       <Route component={NotFoundPage} />
     </Switch>
     <Footer />

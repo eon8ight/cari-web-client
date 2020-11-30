@@ -53,10 +53,10 @@ const Gallery = (props) => {
 
   return (
     <>
-      <div id="galleryContainer">
+      <div className={styles.content}>
         {galleryContent}
       </div>
-      {totalPages > 0 && <Paginator currentPage={currentPage} id="galleryPaginator"
+      {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
         pageCount={totalPages} onPageChange={handlePageChange} />}
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
         isOpen={galleryModalBlock !== null}

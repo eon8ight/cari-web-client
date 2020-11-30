@@ -1,3 +1,5 @@
+@use '../../../assets/scss/mixins';
+
 .sectionHeader {
     & > *:not(:first-child) {
         margin-top: 0;
@@ -9,13 +11,10 @@
 }
 
 .sectionHeaderLine {
-    align-items: baseline;
-    display: flex;
-    margin-bottom: 0;
+    @include mixins.flex-two-items-with-spacer(8px);
 
-    & > *:first-child {
-        margin-right: 8px;
-    }
+    align-items: baseline;
+    margin-bottom: 0;
 
     & > * {
         margin-bottom: 0;

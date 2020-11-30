@@ -1,0 +1,35 @@
+@mixin flex-two-items-with-spacer($distance) {
+    display: flex;
+
+    & > *:first-child {
+        margin-right: $distance;
+    }
+}
+
+@mixin modal($marginRight, $width) {
+    background-color: white;
+    border: 1px black solid;
+    border-radius: 6px;
+    left: 50%;
+    margin-right: $marginRight;
+    padding: 4px 24px 16px 24px;
+    position: absolute;
+    right: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: $width;
+}
+
+@mixin modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
+@mixin paginator-centered($verticalMargin) {
+    margin: $verticalMargin auto 0;
+    width: fit-content;
+}

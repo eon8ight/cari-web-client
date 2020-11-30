@@ -13,7 +13,6 @@
     "d3": "^5.16.0",
     "html-react-parser": "^0.13.0",
     "lodash": "^4.17.20",
-    "node-sass": "^4.14.1",
     "qs": "^6.9.4",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -21,7 +20,8 @@
     "react-modal": "^3.11.2",
     "react-paginate": "^6.4.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.0"
+    "react-scripts": "^4.0.0",
+    "sass": "^1.29.0"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,3 +1,24 @@
+.aestheticCircle {
+    &:hover {
+        fill: red;
+    }
+}
+
+.aestheticName {
+    font-size: 0.5em;
+}
+
+.canvas {
+    border: 1px dashed black;
+    display: block;
+    margin: 0 auto 24px;
+    width: 70%;
+}
+
+.scrollMessage {
+    margin-top: 0;
+}
+
 .tooltip {
     background-color: white;
     border: dotted 1px black;

@@ -73,7 +73,7 @@ const Timeline = (props) => {
     yMax = Math.ceil(yMax / subdivisions);
 
     if (subdivisions > 1) {
-      select('#timelineCanvasContainer')
+      select('#canvasContainer')
         .insert('span', ':first-child')
         .text('Scroll to zoom in. Click and drag to pan.');
     }
@@ -168,13 +168,14 @@ const Timeline = (props) => {
         .on('zoom', zoomed));
     };
 
-    const svg = select('#timelineCanvas')
+    const svg = select('#canvas')
       .call(scrollZoom);
 
     const image = svg.selectAll('.images')
       .data(data)
       .enter()
       .insert('image')
+      .attr('class', styles.image)
       .attr('href', d => d.previewImageUrl)
       .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
       .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
@@ -207,14 +208,14 @@ const Timeline = (props) => {
 
   if (timelineModalSelection) {
     timelineModalContent = (
-      <div id="timelineViewer">
-        <div id="timelineImageContainer">
+      <div className={styles.viewer}>
+        <div className={styles.selectedImageContainer}>
           <a href={timelineModalSelection.url} target="_blank" rel="noopener noreferrer">
-            <img id="timelineImage" src={timelineModalSelection.url} alt={timelineModalSelection.label} />
+            <img className={styles.selectedImage} src={timelineModalSelection.url} alt={timelineModalSelection.label} />
           </a>
         </div>
-        <div id="timelineImageMetadataContainer">
-          <dl id="timelineImageMetadata">
+        <div className={styles.selectedImageMetadataContainer}>
+          <dl className={styles.selectedImageMetadata}>
             <dt>
               <h3>Title</h3>
             </dt>
@@ -239,8 +240,8 @@ const Timeline = (props) => {
 
   return (
     <>
-      <div id="timelineCanvasContainer">
-        <svg id="timelineCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
+      <div id="canvasContainer">
+        <svg id="canvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       </div>
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
         isOpen={timelineModalSelection !== null}

@@ -102,6 +102,7 @@ const SimilarityWeb = (props) => {
     nodeGroup = centerNode.merge(relatedNode);
 
     const nodeCircle = nodeGroup.insert('circle')
+      .attr('class', styles.aestheticCircle)
       .attr('stroke', '#fff')
       .attr('stroke-width', 1.5)
       .attr('r', 5)
@@ -127,6 +128,7 @@ const SimilarityWeb = (props) => {
       ));
 
     nodeGroup.append('text')
+      .attr('class', styles.aestheticName)
       .attr('dx', 8)
       .attr('dy', '0.35em')
       .text(d => d.id);
@@ -172,8 +174,8 @@ const SimilarityWeb = (props) => {
 
   return (
     <>
-      <p id="similarityWebScrollMessage">Scroll to zoom in. Click and drag to pan.</p>
-      <svg id="similarityWebCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
+      <p className={styles.similarityWebScrollMessage}>Scroll to zoom in. Click and drag to pan.</p>
+      <svg className={styles.canvas} id="similarityWebCanvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
     </>
   );
 };

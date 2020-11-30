@@ -19,6 +19,8 @@ import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/Constants'
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
+import styles from './styles/AestheticsListPage.module.scss';
+
 const valueExists = (arr, key) => (typeof arr[key] !== 'undefined') && arr[key] !== null;
 
 const AestheticsListPage = (props) => {
@@ -95,7 +97,7 @@ const AestheticsListPage = (props) => {
       <>
         <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
           asc={asc} setAsc={setAsc} callApi={callApi} />
-        {totalPages > 0 && <Paginator currentPage={currentPage} id="aestheticFiltersPaginator"
+        {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
           pageCount={totalPages} onPageChange={handlePageChange} />}
       </>
     );

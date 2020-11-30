@@ -8,8 +8,8 @@
         flex-direction: row;
         font-size: 1vw;
 
-        & > :not(:last-child) {
-            margin-right: 24px;
+        & > :not(:first-child) {
+            margin-left: 24px;
         }
     }
 

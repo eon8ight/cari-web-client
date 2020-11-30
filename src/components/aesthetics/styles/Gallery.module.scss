@@ -1,26 +1,25 @@
+@use '../../../assets/scss/mixins';
+
+.content {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
 .image {
     cursor: pointer;
     margin: 8px 0;
 }
 
 .modal {
-    background-color: white;
-    border: 1px black solid;
-    border-radius: 6px;
-    left: 50%;
-    padding: 4px 24px 16px 24px;
-    position: absolute;
-    right: auto;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: min-content;
+    @include mixins.modal(auto, min-content);
 }
 
 .modalOverlay {
-    background-color: rgba(0, 0, 0, 0.5);
-    bottom: 0;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
+    @include mixins.modal-overlay;
+}
+
+.paginator {
+    @include mixins.paginator-centered(32px);
 }

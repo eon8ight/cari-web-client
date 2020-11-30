@@ -25,30 +25,6 @@ body {
     max-width: 1024px;
 }
 
-form {
-    font-size: initial;
-}
-
-footer {
-    margin: 24px auto;
-    width: fit-content;
-}
-
-header {
-    margin-bottom: 24px;
-}
-
-nav {
-    align-items: flex-end;
-    display: flex;
-    justify-content: space-between;
-    padding: 5px;
-
-    & > * {
-        margin: 5px;
-    }
-}
-
 p {
     @media only screen and (min-width: 400px) {
         font-size: 4vw;
@@ -61,6 +37,8 @@ p {
     @media only screen and (min-width: 768px) {
         font-size: inherit;
     }
+
+    line-height: 2;
 }
 
 table {

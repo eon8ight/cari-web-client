@@ -1,3 +1,18 @@
+.commonHeader {
+    margin-bottom: 24px;
+}
+
+.headerLinks {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+
+    & > * {
+        margin: 5px;
+    }
+}
+
 .link {
     border-bottom: 2px solid black;
     text-decoration: none !important;

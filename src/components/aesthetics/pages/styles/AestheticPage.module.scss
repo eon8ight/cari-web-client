@@ -1,8 +1,7 @@
-.sectionHeaderLineButton {
-    align-items: center;
-    display: flex;
+@use '../../../../assets/scss/mixins';
 
-    & > *:first-child {
-        margin-right: 8px;
-    }
+.sectionHeaderLineButton {
+    @include mixins.flex-two-items-with-spacer(8px);
+
+    align-items: center;
 }

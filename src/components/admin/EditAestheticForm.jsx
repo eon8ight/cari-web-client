@@ -26,6 +26,8 @@ import {
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
+import styles from './styles/EditAestheticForm.module.scss';
+
 const POST_AESTHETIC_EDIT_OPTS = {
   headers: { 'Content-Type': 'application/json' },
 };
@@ -261,7 +263,7 @@ const EditAestheticForm = (props) => {
   };
 
   return (
-    <form>
+    <form className={styles.editAestheticForm}>
       <Card>
         <h2>Basic Information</h2>
         <FormGroup helperText={nameHelperText} intent={nameIntent} label="Name"
