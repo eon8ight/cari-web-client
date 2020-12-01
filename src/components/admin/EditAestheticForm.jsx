@@ -136,13 +136,18 @@ const EditAestheticForm = (props) => {
   const validateEndYear = () => {
     let hasError = false;
 
-    if (endYear < startYear) {
-      setEndYearIntent(Intent.DANGER);
-      setEndYearHelperText('End year cannot be before first year observed.');
-      hasError = true;
-    } else {
-      setEndYearHelperText('');
-      setEndYearIntent(Intent.NONE);
+    if(endYear && startYear) {
+      const endYearInt = endYear.replace(/\D/g, '');
+      const startYearInt = startYear.replace(/\D/g, '');
+
+      if (endYearInt && startYearInt && parseInt(endYearInt) < parseInt(startYearInt)) {
+        setEndYearIntent(Intent.DANGER);
+        setEndYearHelperText('End year cannot be before first year observed.');
+        hasError = true;
+      } else {
+        setEndYearHelperText('');
+        setEndYearIntent(Intent.NONE);
+      }
     }
 
     return hasError;
@@ -256,7 +261,7 @@ const EditAestheticForm = (props) => {
       media: mediaState[0],
     };
 
-    axios.post(API_ROUTE_AESTHETIC_EDIT, newAesthetic, POST_AESTHETIC_EDIT_OPTS)
+    axios.put(API_ROUTE_AESTHETIC_EDIT, newAesthetic, POST_AESTHETIC_EDIT_OPTS)
       .then(res => {
         // TODO
       });
@@ -278,11 +283,11 @@ const EditAestheticForm = (props) => {
         </FormGroup>
         <FormGroup helperText={startYearHelperText} intent={startYearIntent}
           label="Year First Observed" labelInfo="(required)">
-          <NumericInput intent={startYearIntent} onValueChange={value => setStartYear(value)}
+          <InputGroup intent={startYearIntent} onChange={event => setStartYear(event.target.value)}
             value={startYear || ''} />
         </FormGroup>
         <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End Year">
-          <NumericInput intent={endYearIntent} onValueChange={value => setEndYear(value)}
+          <InputGroup intent={endYearIntent} onChange={event => setEndYear(event.target.value)}
             value={endYear || ''} />
         </FormGroup>
         <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}

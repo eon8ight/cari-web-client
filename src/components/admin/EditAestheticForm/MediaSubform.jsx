@@ -271,18 +271,20 @@ const MediaSubform = (props) => {
   let mediaModalContent = null;
 
   if (swapSpace) {
+    console.log(swapSpace);
+
     mediaModalContent = (
       <form>
         <h2>{swapSpace.title}</h2>
         <FormGroup helperText={urlHelperText} intent={urlIntent} label="URL"
           labelInfo="(required)">
-          <InputGroup intent={urlIntent} onChange={event => handleChange('url', event)}
+          <InputGroup intent={urlIntent} onChange={event => handleChange('url', event.target.value)}
             value={swapSpace.url} />
         </FormGroup>
         <FormGroup helperText={previewImageUrlHelperText} intent={previewImageUrlIntent}
           label="Preview Image URL" labelInfo="(required)">
           <InputGroup intent={previewImageUrlIntent}
-            onChange={event => handleChange('previewImageUrl', event)}
+            onChange={event => handleChange('previewImageUrl', event.target.value)}
             value={swapSpace.previewImageUrl} />
         </FormGroup>
         <FormGroup helperText={labelHelperText} intent={labelIntent} label="Label"
