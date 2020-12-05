@@ -32,6 +32,7 @@ const App = props => {
   const [checkedSession, setCheckedSession] = useState(false);
 
   useEffect(() => {
+    TOASTER.clear();
     props.messages.forEach(msg => TOASTER.show(msg.props, msg.key));
   }, [props.messages]);
 
