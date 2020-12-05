@@ -68,7 +68,7 @@ const LoginPage = props => {
     }
 
     return hasError;
-  }
+  };
 
   const handleSubmit = event => {
     event.preventDefault();
@@ -81,13 +81,20 @@ const LoginPage = props => {
     }
 
     props.login(username, password, rememberMe, unauthorized => {
-      if (unauthorized.field === 'username') {
-        setUsernameIntent(Intent.DANGER);
-        setUsernameHelperText(unauthorized.message);
-      } else {
-        setPasswordIntent(Intent.DANGER);
-        setPasswordHelperText(unauthorized.message);
-      }
+      unauthorized.fieldErrors.forEach(fieldError => {
+        switch(fieldError.field) {
+          case 'username':
+            setUsernameIntent(Intent.DANGER);
+            setUsernameHelperText(fieldError.message);
+            break;
+          case 'password':
+            setPasswordIntent(Intent.DANGER);
+            setPasswordHelperText(fieldError.message);
+            break;
+          default:
+            props.addMessage(`An error occurred: ${fieldError.message}`);
+        }
+      });
     }, () => props.addMessage("You have successfully logged in."));
   };
 

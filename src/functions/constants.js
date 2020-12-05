@@ -14,6 +14,8 @@ const API_ROUTE_AUTH_LOGOUT = `${API_URL}/auth/logout`;
 
 const API_ROUTE_MEDIA_CREATORS = `${API_URL}/mediaCreators`;
 
+const API_ROUTE_USER_REGISTER = `${API_URL}/user/register`;
+
 const API_ROUTE_WEBSITE_TYPES = `${API_URL}/websiteTypes`;
 
 const ARENA_API_URL = 'https://api.are.na/v2/channels/';
@@ -31,6 +33,7 @@ export {
   API_ROUTE_AUTH_LOGIN,
   API_ROUTE_AUTH_LOGOUT,
   API_ROUTE_MEDIA_CREATORS,
+  API_ROUTE_USER_REGISTER,
   API_ROUTE_WEBSITE_TYPES,
   ARENA_API_URL,
   WEBSITE_TYPE_ARENA,

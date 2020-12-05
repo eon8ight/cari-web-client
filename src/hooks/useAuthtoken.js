@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { API_ROUTE_AUTH_CHECK_TOKEN } from '../constants'
+import { API_ROUTE_AUTH_CHECK_TOKEN } from '../functions/constants'
 
 const useAuthtoken = () => {
   const [token, setToken] = useState(undefined);
