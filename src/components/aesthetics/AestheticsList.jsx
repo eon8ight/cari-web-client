@@ -9,7 +9,7 @@ const SORT_FIELD_NAME = 'name';
 const SORT_FIELD_START_YEAR = 'startYear';
 const SORT_FIELD_END_YEAR = 'endYear';
 
-const AestheticsList = (props) => {
+const AestheticsList = props => {
   let aestheticRows = (
     <tr>
       <td colspan="3" className={styles.fullSpanCell}>No aesthetics match the filter criteria.</td>
@@ -26,7 +26,7 @@ const AestheticsList = (props) => {
     ));
   }
 
-  const handleSortClick = (newSortField) => {
+  const handleSortClick = newSortField => {
     let newAsc;
 
     if (props.sortField === newSortField) {
@@ -40,7 +40,7 @@ const AestheticsList = (props) => {
     props.callApi({ page: 0, sortField: newSortField, asc: newAsc });
   };
 
-  const getSortSymbol = (fieldName) => props.sortField === fieldName
+  const getSortSymbol = fieldName => props.sortField === fieldName
     ? <Icon icon={props.asc ? 'sort-asc' : 'sort-desc'} />
     : null;
 
@@ -53,13 +53,13 @@ const AestheticsList = (props) => {
       </colgroup>
       <thead>
         <tr>
-          <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_NAME)}>
+          <th className={styles.sortable} onClick={() => handleSortClick(SORT_FIELD_NAME)}>
             Name {getSortSymbol(SORT_FIELD_NAME)}
           </th>
-          <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_START_YEAR)}>
+          <th className={styles.sortable} onClick={() => handleSortClick(SORT_FIELD_START_YEAR)}>
             First Known Example {getSortSymbol(SORT_FIELD_START_YEAR)}
           </th>
-          <th className="sortable" onClick={() => handleSortClick(SORT_FIELD_END_YEAR)}>
+          <th className={styles.sortable} onClick={() => handleSortClick(SORT_FIELD_END_YEAR)}>
             End of Popularity {getSortSymbol(SORT_FIELD_END_YEAR)}
           </th>
         </tr>

@@ -21,7 +21,7 @@ import ExpandableSection from './ExpandableSection';
 import {
   ARENA_API_URL,
   WEBSITE_TYPE_ARENA,
-} from '../../../functions/Constants';
+} from '../../../functions/constants';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
@@ -30,7 +30,7 @@ const WEBSITE_TEMPLATE = {
   websiteType: { websiteType: 0 },
 };
 
-const WebsiteSubform = (props) => {
+const WebsiteSubform = props => {
   const [mediaSourceUrl, setMediaSourceUrl] = props.mediaSourceUrl;
   const [websites, setWebsites] = props.websites;
 

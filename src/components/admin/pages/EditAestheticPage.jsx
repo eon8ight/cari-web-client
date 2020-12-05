@@ -7,9 +7,9 @@ import { Spinner } from '@blueprintjs/core';
 
 import EditAestheticForm from '../EditAestheticForm';
 
-import { API_ROUTE_AESTHETIC_FIND_FOR_EDIT } from '../../../functions/Constants';
+import { API_ROUTE_AESTHETIC_FIND_FOR_EDIT } from '../../../functions/constants';
 
-const EditAestheticPage = (props) => {
+const EditAestheticPage = props => {
   const match = useRouteMatch();
 
   const [requestMade, setRequestMade] = useState(false);

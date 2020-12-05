@@ -4,7 +4,7 @@ import parse from 'html-react-parser';
 
 import styles from './styles/AestheticDetails.module.scss';
 
-const AestheticDetails = (props) => {
+const AestheticDetails = props => {
   let websites = null;
 
   if (props.aesthetic.websites && props.aesthetic.websites.length > 0) {

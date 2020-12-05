@@ -31,7 +31,7 @@ const MARGIN = {
   left: 30,
 };
 
-const Timeline = (props) => {
+const Timeline = props => {
   const [timelineModalSelection, setTimelineModalSelection] = useState(null);
 
   const media = props.aesthetic.media;
@@ -145,7 +145,7 @@ const Timeline = (props) => {
       .call(axisLeft(y).ticks(0))
       .call(g => g.select('.domain').remove());
 
-    const scrollZoom = (canvas) => {
+    const scrollZoom = canvas => {
       const extent = [
         [MARGIN.left, MARGIN.top],
         [WIDTH - MARGIN.right, HEIGHT - MARGIN.top],

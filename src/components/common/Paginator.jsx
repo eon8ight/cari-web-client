@@ -10,7 +10,7 @@ const ACTIVE_CLASS_NAME = 'bp3-intent-primary';
 const DISABLED_CLASS_NAME = 'bp3-disabled';
 const LINK_CLASS_NAME = 'bp3-button';
 
-const Paginator = (props) => {
+const Paginator = props => {
   // Hack to set the value of a disabled <li>'s <a> to be disabled
   useEffect(() => {
     document.querySelectorAll(`a.${DISABLED_CLASS_NAME}`)

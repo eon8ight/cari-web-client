@@ -19,7 +19,7 @@ import { Suggest } from '@blueprintjs/select';
 import ConfirmDelete from './ConfirmDelete';
 import ExpandableSection from './ExpandableSection';
 
-import { API_ROUTE_AESTHETIC_NAMES } from '../../../functions/Constants';
+import { API_ROUTE_AESTHETIC_NAMES } from '../../../functions/constants';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
@@ -40,7 +40,7 @@ const AESTHETIC_RELATIONSHIP_TEMPLATE = {
 
 const compareNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aesthetic === aestheticNameB.aesthetic;
 
-const AestheticRelationshipSubform = (props) => {
+const AestheticRelationshipSubform = props => {
   const [similarAesthetics, setSimilarAesthetics] = props.similarAesthetics;
 
   const intent = props.intent;
@@ -147,14 +147,14 @@ const AestheticRelationshipSubform = (props) => {
             label={<>How does <strong>{similarAestheticName}</strong> relate to <strong>{props.aesthetic.name}</strong>?</>}
             labelInfo="(required)">
               <InputGroup intent={intent[idx].description} value={similarAesthetic.description}
-                onChange={(event) => handleChange(event.target.value, 'description', idx)} />
+                onChange={event => handleChange(event.target.value, 'description', idx)} />
           </FormGroup>
           <FormGroup helperText={helperText[idx].reverseDescription}
             intent={intent[idx].reverseDescription}
             label={<>How does <strong>{props.aesthetic.name}</strong> relate to <strong>{similarAestheticName}</strong>?</>}
             labelInfo="(required)">
             <InputGroup intent={intent[idx].reverseDescription} value={similarAesthetic.reverseDescription}
-              onChange={(event) => handleChange(event.target.value, 'reverseDescription', idx)} />
+              onChange={event => handleChange(event.target.value, 'reverseDescription', idx)} />
           </FormGroup>
         </>
       );

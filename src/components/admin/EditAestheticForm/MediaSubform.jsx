@@ -22,7 +22,7 @@ import { Suggest } from '@blueprintjs/select';
 
 import ConfirmDelete from './ConfirmDelete';
 import ExpandableSection from './ExpandableSection';
-import { API_ROUTE_MEDIA_CREATORS } from '../../../functions/Constants';
+import { API_ROUTE_MEDIA_CREATORS } from '../../../functions/constants';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
@@ -57,7 +57,7 @@ const menuItemCreate = (query, active, handleClick) => (
     shouldDismissPopover={false} text={`Create "${query}"`} />
 );
 
-const MediaSubform = (props) => {
+const MediaSubform = props => {
   const [media, setMedia] = props.media;
 
   const [swapSpace, setSwapSpace] = useState(null);
@@ -118,7 +118,7 @@ const MediaSubform = (props) => {
     setEditIndex(typeof idx === 'undefined' ? null : idx);
   };
 
-  const handleModalClose = (didSave) => {
+  const handleModalClose = didSave => {
     if (didSave) {
       const newMedia = cloneDeep(media);
 
@@ -271,8 +271,6 @@ const MediaSubform = (props) => {
   let mediaModalContent = null;
 
   if (swapSpace) {
-    console.log(swapSpace);
-
     mediaModalContent = (
       <form>
         <h2>{swapSpace.title}</h2>

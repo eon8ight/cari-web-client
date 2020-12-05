@@ -4,7 +4,7 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import AestheticPage from './pages/AestheticPage';
 import AestheticsListPage from './pages/AestheticsListPage';
 
-const Router = (props) => {
+const Router = props => {
   const match = useRouteMatch();
 
   return (

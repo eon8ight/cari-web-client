@@ -26,7 +26,7 @@ const MAX_DESCRIPTION_LENGTH = 75;
 
 const color = scaleOrdinal(schemeCategory10);
 
-const SimilarityWeb = (props) => {
+const SimilarityWeb = props => {
   const similarAesthetics = props.aesthetic.similarAesthetics;
 
   useEffect(() => {
@@ -142,7 +142,7 @@ const SimilarityWeb = (props) => {
       nodeGroup.attr('transform', d => `translate(${d.x}, ${d.y})`);
     });
 
-    const scrollZoom = (canvas) => {
+    const scrollZoom = canvas => {
       const extent = [
         [-100, -100],
         [WIDTH - 100, HEIGHT - 100],

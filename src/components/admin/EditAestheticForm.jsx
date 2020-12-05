@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
 
 import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
@@ -10,7 +11,6 @@ import {
   FormGroup,
   InputGroup,
   Intent,
-  NumericInput,
   Spinner,
   TextArea,
 } from '@blueprintjs/core';
@@ -22,7 +22,7 @@ import WebsiteSubform from './EditAestheticForm/WebsiteSubform';
 import {
   API_ROUTE_AESTHETIC_EDIT,
   API_ROUTE_WEBSITE_TYPES,
-} from '../../functions/Constants';
+} from '../../functions/constants';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
@@ -32,7 +32,7 @@ const POST_AESTHETIC_EDIT_OPTS = {
   headers: { 'Content-Type': 'application/json' },
 };
 
-const EditAestheticForm = (props) => {
+const EditAestheticForm = props => {
   const originalWebsites = props.aesthetic.websites;
   const originalSimilarAesthetics = props.aesthetic.similarAesthetics;
 
@@ -235,7 +235,9 @@ const EditAestheticForm = (props) => {
     return hasError;
   }
 
-  const handleSave = () => {
+  const handleSubmit = event => {
+    event.preventDefault();
+
     const hasNameError = validateName();
     const hasStartYearError = validateStartYear();
     const hasEndYearError = validateEndYear();
@@ -268,59 +270,63 @@ const EditAestheticForm = (props) => {
   };
 
   return (
-    <form className={styles.editAestheticForm}>
-      <Card>
-        <h2>Basic Information</h2>
-        <FormGroup helperText={nameHelperText} intent={nameIntent} label="Name"
-          labelInfo="(required)">
-          <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
-            value={name} />
+    <>
+      <Helmet>
+        <title>CARI | Edit Aesthetic | {name}</title>
+      </Helmet>
+      <form className={styles.editAestheticForm} onClick={handleSubmit}>
+        <Card>
+          <h2>Basic Information</h2>
+          <FormGroup helperText={nameHelperText} intent={nameIntent} label="Name"
+            labelInfo="(required)">
+            <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
+              value={name} />
+          </FormGroup>
+          <FormGroup helperText="2-3 letters. Like the Periodic Table, but for aesthetics."
+            label="Symbol">
+            <InputGroup onChange={handleSymbolChange}
+              value={symbol || ''} />
+          </FormGroup>
+          <FormGroup helperText={startYearHelperText} intent={startYearIntent}
+            label="Year First Observed" labelInfo="(required)">
+            <InputGroup intent={startYearIntent} onChange={event => setStartYear(event.target.value)}
+              value={startYear || ''} />
+          </FormGroup>
+          <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End Year">
+            <InputGroup intent={endYearIntent} onChange={event => setEndYear(event.target.value)}
+              value={endYear || ''} />
+          </FormGroup>
+          <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
+            label="Description" labelInfo="(required)">
+            <TextArea intent={descriptionIntent} growVertically={true} fill={true}
+              onChange={event => setDescription(event.target.value)} value={description} />
+          </FormGroup>
+        </Card>
+        <br />
+        <Card>
+          <WebsiteSubform helperText={websiteHelperTexts} intent={websiteIntents}
+            mediaSourceUrl={mediaSourceUrlState} websites={websitesState}
+            websiteTypes={websiteTypes} />
+        </Card>
+        <br />
+        <Card>
+          <AestheticRelationshipSubform aesthetic={props.aesthetic}
+            helperText={similarAestheticHelperTexts} intent={similarAestheticIntents}
+            similarAesthetics={similarAestheticsState} />
+        </Card>
+        <br />
+        <Card>
+          <MediaSubform media={mediaState} />
+        </Card>
+        <br />
+        <FormGroup>
+          <ControlGroup>
+            <Button icon="undo" large={true} onClick={handleCancel}>Cancel</Button>
+            <Button icon="floppy-disk" intent={Intent.SUCCESS} large={true}>Save</Button>
+          </ControlGroup>
         </FormGroup>
-        <FormGroup helperText="2-3 letters. Like the Periodic Table, but for aesthetics."
-          label="Symbol">
-          <InputGroup onChange={handleSymbolChange}
-            value={symbol || ''} />
-        </FormGroup>
-        <FormGroup helperText={startYearHelperText} intent={startYearIntent}
-          label="Year First Observed" labelInfo="(required)">
-          <InputGroup intent={startYearIntent} onChange={event => setStartYear(event.target.value)}
-            value={startYear || ''} />
-        </FormGroup>
-        <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End Year">
-          <InputGroup intent={endYearIntent} onChange={event => setEndYear(event.target.value)}
-            value={endYear || ''} />
-        </FormGroup>
-        <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
-          label="Description" labelInfo="(required)">
-          <TextArea intent={descriptionIntent} growVertically={true} fill={true}
-            onChange={event => setDescription(event.target.value)} value={description} />
-        </FormGroup>
-      </Card>
-      <br />
-      <Card>
-        <WebsiteSubform helperText={websiteHelperTexts} intent={websiteIntents}
-          mediaSourceUrl={mediaSourceUrlState} websites={websitesState}
-          websiteTypes={websiteTypes} />
-      </Card>
-      <br />
-      <Card>
-        <AestheticRelationshipSubform aesthetic={props.aesthetic}
-          helperText={similarAestheticHelperTexts} intent={similarAestheticIntents}
-          similarAesthetics={similarAestheticsState} />
-      </Card>
-      <br />
-      <Card>
-        <MediaSubform media={mediaState} />
-      </Card>
-      <br />
-      <FormGroup>
-        <ControlGroup>
-          <Button icon="undo" large={true} onClick={handleCancel}>Cancel</Button>
-          <Button icon="floppy-disk" intent={Intent.SUCCESS} large={true}
-            onClick={handleSave}>Save</Button>
-        </ControlGroup>
-      </FormGroup>
-    </form>
+      </form>
+    </>
   );
 };
 

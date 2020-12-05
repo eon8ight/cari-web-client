@@ -6,16 +6,16 @@ import { Spinner } from '@blueprintjs/core';
 
 import Paginator from '../common/Paginator';
 
-import { API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT } from '../../functions/Constants';
+import { API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT } from '../../functions/constants';
 
 import styles from './styles/Gallery.module.scss';
 
-const Gallery = (props) => {
+const Gallery = props => {
   const [currentPage, setCurrentPage] = useState(0);
   const [galleryModalBlock, setGalleryModalBlock] = useState(null);
   const [galleryData, setGalleryData] = useState(props.aesthetic.galleryContent.contents);
 
-  const handlePageChange = (data) => {
+  const handlePageChange = data => {
     setCurrentPage(data.selected);
     setGalleryData(null);
 

@@ -5,7 +5,7 @@ import cariLogo from '../../assets/images/cari_logo.png';
 
 import styles from './styles/Header.module.scss';
 
-const Header = (props) => (
+const Header = props => (
   <header className={styles.commonHeader}>
     <nav className={styles.headerLinks}>
       <Link to="/">

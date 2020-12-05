@@ -15,7 +15,7 @@ import {
 import AestheticsList from '../AestheticsList';
 import Paginator from '../../common/Paginator';
 
-import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/Constants';
+import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/constants';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
@@ -23,7 +23,7 @@ import styles from './styles/AestheticsListPage.module.scss';
 
 const valueExists = (arr, key) => (typeof arr[key] !== 'undefined') && arr[key] !== null;
 
-const AestheticsListPage = (props) => {
+const AestheticsListPage = props => {
   const [requestMade, setRequestMade] = useState(false);
   const [aesthetics, setAesthetics] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -35,7 +35,7 @@ const AestheticsListPage = (props) => {
   const [startYear, setStartYear] = useState(null);
   const [endYear, setEndYear] = useState(null);
 
-  const callApi = (params) => {
+  const callApi = params => {
     if (!requestMade) {
       if (typeof params === 'undefined' || params === null) {
         params = {};

@@ -3,7 +3,7 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 
 import EditAestheticPage from './pages/EditAestheticPage';
 
-const Router = (props) => {
+const Router = props => {
   const match = useRouteMatch();
 
   return (
