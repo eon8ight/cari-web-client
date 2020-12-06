@@ -13,7 +13,7 @@ const tokenRequired = Component => (props => {
     return <Spinner size={100} />;
 
   if (!token)
-    return <Redirect to="/oops/401" />;
+    return <Redirect to="/error/401" />;
 
   return <Component authtoken={authtoken} {...props} />;
 });

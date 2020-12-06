@@ -18,7 +18,6 @@ const sessionRequired = (Component, suppressRedirect) => connect(
   }
 
   if(!props.session.isValid && !suppressRedirect) {
-    // This next line causes an error to be logged to the console
     props.addMessage('You must be logged in to view this page', Intent.DANGER);
     return <Redirect to="/auth/login" />;
   }

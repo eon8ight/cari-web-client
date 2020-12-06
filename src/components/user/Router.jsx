@@ -3,6 +3,7 @@ import { Route, Switch, useRouteMatch } from 'react-router-dom';
 
 import anonymousRequired from '../../hocs/anonymousRequired';
 import sessionRequired from '../../hocs/sessionRequired';
+import tokenRequired from '../../hocs/tokenRequired';
 
 import ConfirmPage from './pages/ConfirmPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -13,7 +14,7 @@ import SettingsPage from './pages/SettingsPage';
 const Router = (props) => {
   const match = useRouteMatch();
 
-  const WrappedConfirmPage = anonymousRequired(ConfirmPage);
+  const WrappedConfirmPage = anonymousRequired(tokenRequired(ConfirmPage));
   const WrappedForgotPasswordPage = anonymousRequired(ForgotPasswordPage);
   const WrappedRegisterPage = anonymousRequired(RegisterPage);
   const WrappedResetPasswordPage = anonymousRequired(ResetPasswordPage);

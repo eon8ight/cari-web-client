@@ -11,7 +11,7 @@ const useAuthtoken = () => {
   const loc = useLocation();
 
   useEffect(() => {
-    axios.get(API_ROUTE_AUTH_CHECK_TOKEN)
+    axios.get(`${API_ROUTE_AUTH_CHECK_TOKEN}${loc.search}`)
       .then(res => {
         const queryParams = loc.search
           .replace(/^[?]/, '')
@@ -22,7 +22,7 @@ const useAuthtoken = () => {
             return acc;
           }, {});
 
-        setToken(queryParams.authtoken);
+        setToken(queryParams.token);
         setData(res.data);
       })
       .catch(err => {

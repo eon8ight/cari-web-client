@@ -10,12 +10,13 @@ import {
 import AdminRouter from './components/admin/Router';
 import AuthRouter from './components/auth/Router';
 import AestheticsRouter from './components/aesthetics/Router';
+import ErrorRouter from './components/error/Router';
 import UserRouter from './components/user/Router';
 import Faq from './components/Faq';
 import Footer from './components/common/Footer';
 import Header from './components/common/Header';
 import Home from './components/Home';
-import NotFoundPage from './components/error/NotFoundPage';
+import NotFoundPage from './components/error/pages/NotFoundPage';
 import Team from './components/Team';
 
 import { checkSession } from './redux/actions';
@@ -68,6 +69,9 @@ const App = props => {
         </Route>
         <Route path="/admin">
           <AdminRouter />
+        </Route>
+        <Route path="/error">
+          <ErrorRouter />
         </Route>
         <Route path="/user">
           <UserRouter />
