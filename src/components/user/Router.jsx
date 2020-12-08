@@ -17,7 +17,7 @@ const Router = (props) => {
   const WrappedConfirmPage = anonymousRequired(tokenRequired(ConfirmPage));
   const WrappedForgotPasswordPage = anonymousRequired(ForgotPasswordPage);
   const WrappedRegisterPage = anonymousRequired(RegisterPage);
-  const WrappedResetPasswordPage = anonymousRequired(ResetPasswordPage);
+  const WrappedResetPasswordPage = anonymousRequired(tokenRequired(ResetPasswordPage));
   const WrappedSettingsPage = sessionRequired(SettingsPage);
 
   return (
