@@ -119,11 +119,19 @@ const ProfileForm = (props) => {
       withCredentials: true,
     };
 
-    const putData = {
-      username,
-      emailAddress,
-      password
-    };
+    const putData = {};
+
+    if(username) {
+      putData.username = username;
+    }
+
+    if(emailAddress) {
+      putData.emailAddress = emailAddress;
+    }
+
+    if(password) {
+      putData.password = password;
+    }
 
     axios.put(putRoute, putData, putOpts)
       .then(() => setIsUpdating(false))
