@@ -14,7 +14,7 @@ import {
 } from '@blueprintjs/core';
 
 import { addMessage } from '../../../redux/actions';
-import { API_ROUTE_USER_FORGOT_PASSWORD } from '../../../functions/constants';
+import { API_ROUTE_MAIL_FORGOT_PASSWORD } from '../../../functions/constants';
 
 const ForgotPasswordPage = props => {
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -50,9 +50,16 @@ const ForgotPasswordPage = props => {
     const postBody = { username };
     const postOpts = { headers: { 'Content-Type': 'application/json' } };
 
-    axios.post(API_ROUTE_USER_FORGOT_PASSWORD, postBody, postOpts)
+    axios.post(API_ROUTE_MAIL_FORGOT_PASSWORD, postBody, postOpts)
       .then(res => setResetEmailSent(true))
-      .catch(err => props.addMessage(`An error has occurred: ${err}`, Intent.DANGER));
+      .catch(err => {
+        if (err.response.status === 400) {
+          setUsernameIntent(Intent.DANGER);
+          setUsernameHelperText(err.response.data.message);
+        } else {
+          props.addMessage(`An error occurred: ${err}`, Intent.DANGER)
+        }
+      });
   };
 
   if (resetEmailSent) {

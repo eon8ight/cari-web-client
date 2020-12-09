@@ -1,0 +1,5 @@
+@use '../../../../../assets/scss/mixins';
+
+.paginator {
+    @include mixins.paginator-centered(24px);
+}

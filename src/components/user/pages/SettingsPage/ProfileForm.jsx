@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { Helmet } from 'react-helmet';
-import { Redirect } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+
+import axios from 'axios';
 
 import {
   Button,
   Card,
   FormGroup,
   InputGroup,
-  Intent
+  Intent,
 } from '@blueprintjs/core';
 
-import PasswordInput from '../../common/PasswordInput';
+import PasswordInput from '../../../common/PasswordInput';
 
-import { addMessage } from '../../../redux/actions';
-import { API_ROUTE_USER_REGISTER } from '../../../functions/constants';
+import { API_ROUTE_USER_UPDATE } from '../../../../functions/constants';
+import { addMessage, updateSession } from '../../../../redux/actions';
 
-const RegisterPage = props => {
-  const [registered, setRegistered] = useState(false);
+const ProfileForm = (props) => {
+  const [isUpdating, setIsUpdating] = useState(null);
 
-  const [emailAddress, setEmailAddress] = useState(props.authtoken.claims.emailAddress);
+  const [emailAddress, setEmailAddress] = useState('');
   const [emailAddressIntent, setEmailAddressIntent] = useState(Intent.NONE);
   const [emailAddressHelperText, setEmailAddressHelperText] = useState('');
 
@@ -39,16 +38,20 @@ const RegisterPage = props => {
   const validateEmailAddress = () => {
     let hasError = false;
 
-    if(emailAddress !== props.authtoken.claims.emailAddress) {
+    if (!emailAddress) {
       setEmailAddressIntent(Intent.DANGER);
-      setEmailAddressHelperText('Do not change this field.');
+      setEmailAddressHelperText('Email address is required.');
+      hasError = true;
+    } else if (!/^.+@.+$/.test(emailAddress)) {
+      setEmailAddressIntent(Intent.DANGER);
+      setEmailAddressHelperText('Must be an email address.');
       hasError = true;
     } else {
       setEmailAddressIntent(Intent.NONE);
       setEmailAddressHelperText('');
     }
 
-    return hasError;
+    return hasError
   };
 
   const validateUsername = () => {
@@ -108,63 +111,54 @@ const RegisterPage = props => {
       return;
     }
 
-    const postBody = {
-      emailAddress,
-      username,
-      password,
-      token: props.authtoken.token,
+    setIsUpdating(true);
+
+    const putRoute = `${API_ROUTE_USER_UPDATE}/${props.session.data.sub}`;
+    const putOpts = {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
     };
 
-    const postOpts = { headers: { 'Content-Type': 'application/json' } };
+    const putData = {
+      username,
+      emailAddress,
+      password
+    };
 
-    axios.post(API_ROUTE_USER_REGISTER, postBody, postOpts)
-      .then(res => setRegistered(true))
-      .catch(err => {
-        if (err.response.status === 400) {
-          setUsernameIntent(Intent.DANGER);
-          setUsernameHelperText(err.response.data.message);
-        } else {
-          props.addMessage(`An error occurred: ${err}`, Intent.DANGER)
-        }
-      });
+    axios.put(putRoute, putData, putOpts)
+      .then(() => setIsUpdating(false))
+      .catch(err => props.addMessage(`An error occurred: ${err}`, Intent.DANGER));
   };
 
-  if (registered) {
-    props.addMessage(
-      'You have successfully registered. Please check your inbox for a link to confirm your account.',
-      Intent.SUCCESS
-    );
-
-    return <Redirect to="/auth/login" />;
-  }
+  useEffect(() => {
+    if (isUpdating === false) {
+      props.addMessage('Profile update successful.', Intent.SUCCESS);
+      props.updateSession({ username, emailAddress });
+    }
+  }, [isUpdating, emailAddress, username, props]);
 
   return (
-    <>
-      <Helmet>
-        <title>CARI | Register</title>
-      </Helmet>
-      <Card>
-        <form onSubmit={handleSubmit}>
-          <FormGroup helperText={emailAddressHelperText}>
-            <InputGroup disabled={true} intent={emailAddressIntent} large={true}
-              leftIcon="envelope" onChange={handleEmailAddressChange} placeholder="Email Address"
-              type="text" value={emailAddress} />
-          </FormGroup>
-          <FormGroup helperText={usernameHelperText}>
-            <InputGroup intent={usernameIntent} large={true} leftIcon="user"
-              onChange={handleUsernameChange} placeholder="Username" type="text"
-              value={username} />
-          </FormGroup>
-          <PasswordInput helperText={passwordHelperText} intent={passwordIntent}
-            onChange={handlePasswordChange} />
-          <PasswordInput helperText={confirmPasswordHelperText}
-            onChange={handleConfirmPasswordChange} intent={confirmPasswordIntent}
-            placeholder="Confirm Password" />
-          <Button intent={Intent.PRIMARY} icon="confirm" type="submit">Register</Button>
-        </form>
-      </Card>
-    </>
+    <Card>
+      <form onSubmit={handleSubmit}>
+        <FormGroup helperText={emailAddressHelperText} label="Email Address">
+          <InputGroup intent={emailAddressIntent} onChange={handleEmailAddressChange}
+            placeholder="New Email Address" value={emailAddress} />
+        </FormGroup>
+        <FormGroup helperText={usernameHelperText} label="Username">
+          <InputGroup intent={usernameIntent} onChange={handleUsernameChange}
+            placeholder="New Username" value={username} />
+        </FormGroup>
+        <PasswordInput helperText={passwordHelperText} intent={passwordIntent} large={false}
+          label="Password" onChange={handlePasswordChange} placeholder="New Password" />
+        <PasswordInput helperText={confirmPasswordHelperText} intent={confirmPasswordIntent}
+          large={false} onChange={handleConfirmPasswordChange}placeholder="Confirm New Password" />
+        <Button intent={Intent.PRIMARY} icon="confirm" type="submit">Save</Button>
+      </form>
+    </Card>
   );
 };
 
-export default connect(null, { addMessage })(RegisterPage);
+export default connect(
+  (state) => ({ session: { data: state.session.data } }),
+  { addMessage, updateSession }
+)(ProfileForm);

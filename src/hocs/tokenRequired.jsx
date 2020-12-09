@@ -5,8 +5,8 @@ import { Spinner } from '@blueprintjs/core';
 
 import useAuthtoken from '../hooks/useAuthtoken';
 
-const tokenRequired = Component => (props => {
-  const authtoken = useAuthtoken();
+const tokenRequired = (Component, type) => (props => {
+  const authtoken = useAuthtoken(type);
   const token = authtoken.token;
 
   if (typeof token === 'undefined')

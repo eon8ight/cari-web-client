@@ -11,13 +11,19 @@ import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SettingsPage from './pages/SettingsPage';
 
+import {
+  TOKEN_TYPE_CONFIRM,
+  TOKEN_TYPE_INVITE,
+  TOKEN_TYPE_RESET_PASSWORD,
+} from '../../functions/constants';
+
 const Router = (props) => {
   const match = useRouteMatch();
 
-  const WrappedConfirmPage = anonymousRequired(tokenRequired(ConfirmPage));
+  const WrappedConfirmPage = anonymousRequired(tokenRequired(ConfirmPage, TOKEN_TYPE_CONFIRM));
   const WrappedForgotPasswordPage = anonymousRequired(ForgotPasswordPage);
-  const WrappedRegisterPage = anonymousRequired(RegisterPage);
-  const WrappedResetPasswordPage = anonymousRequired(tokenRequired(ResetPasswordPage));
+  const WrappedRegisterPage = anonymousRequired(tokenRequired(RegisterPage, TOKEN_TYPE_INVITE));
+  const WrappedResetPasswordPage = anonymousRequired(tokenRequired(ResetPasswordPage, TOKEN_TYPE_RESET_PASSWORD));
   const WrappedSettingsPage = sessionRequired(SettingsPage);
 
   return (

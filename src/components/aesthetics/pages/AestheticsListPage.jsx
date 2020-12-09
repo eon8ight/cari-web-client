@@ -16,12 +16,11 @@ import AestheticsList from '../AestheticsList';
 import Paginator from '../../common/Paginator';
 
 import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/constants';
+import { valueExists } from '../../../functions/utils';
 
 import '@blueprintjs/core/lib/css/blueprint.css';
 
 import styles from './styles/AestheticsListPage.module.scss';
-
-const valueExists = (arr, key) => (typeof arr[key] !== 'undefined') && arr[key] !== null;
 
 const AestheticsListPage = props => {
   const [requestMade, setRequestMade] = useState(false);

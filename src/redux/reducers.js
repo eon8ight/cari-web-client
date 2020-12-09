@@ -11,9 +11,12 @@ import {
   UPDATE_SESSION,
 } from './actions';
 
+import { TOKEN_VALIDITY_VALID } from '../functions/constants';
+
 const DEFAULT_SESSION_STATE = {
   isFetching: false,
   isValid: undefined,
+  claims: undefined,
   error: undefined,
 };
 
@@ -40,9 +43,11 @@ const session = (state = DEFAULT_SESSION_STATE, action) => {
 
       if (action.error) {
         newState.isValid = false;
+        newState.claims = null;
         newState.error = action.payload;
       } else {
-        newState.isValid = action.payload;
+        newState.isValid = action.payload.status === TOKEN_VALIDITY_VALID;
+        newState.claims = action.payload.tokenClaims;
         newState.error = null;
       }
 
@@ -54,6 +59,7 @@ const session = (state = DEFAULT_SESSION_STATE, action) => {
         newState.error = action.payload;
       } else {
         newState.isValid = false;
+        newState.claims = null;
         newState.error = null;
       }
 

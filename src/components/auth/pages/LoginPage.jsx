@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
 import {
   AnchorButton,
@@ -18,6 +19,8 @@ import PasswordInput from '../../common/PasswordInput';
 import { addMessage, login } from '../../../redux/actions';
 
 const LoginPage = props => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
   const [username, setUsername] = useState('');
   const [usernameIntent, setUsernameIntent] = useState(Intent.NONE);
   const [usernameHelperText, setUsernameHelperText] = useState('');
@@ -95,8 +98,15 @@ const LoginPage = props => {
             props.addMessage(`An error occurred: ${fieldError.message}`);
         }
       });
-    }, () => props.addMessage("You have successfully logged in."));
+    }, () => {
+      props.addMessage("You have successfully logged in.");
+      setLoggedIn(true);
+    });
   };
+
+  if(loggedIn) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <>
