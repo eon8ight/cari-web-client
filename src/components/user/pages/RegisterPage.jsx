@@ -9,7 +9,8 @@ import {
   Card,
   FormGroup,
   InputGroup,
-  Intent
+  Intent,
+  Spinner,
 } from '@blueprintjs/core';
 
 import PasswordInput from '../../common/PasswordInput';
@@ -35,6 +36,10 @@ const RegisterPage = props => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmPasswordIntent, setConfirmPasswordIntent] = useState(Intent.NONE);
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
+
+  if(!props.authtoken.claims) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
 
   const validateEmailAddress = () => {
     let hasError = false;

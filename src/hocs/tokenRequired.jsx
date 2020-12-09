@@ -7,12 +7,12 @@ import useAuthtoken from '../hooks/useAuthtoken';
 
 const tokenRequired = (Component, type) => (props => {
   const authtoken = useAuthtoken(type);
-  const token = authtoken.token;
+  const claims = authtoken.claims;
 
-  if (typeof token === 'undefined')
+  if (typeof claims === 'undefined')
     return <Spinner size={100} />;
 
-  if (!token)
+  if (!claims)
     return <Redirect to="/error/401" />;
 
   return <Component authtoken={authtoken} {...props} />;
