@@ -33,8 +33,8 @@ const POST_AESTHETIC_EDIT_OPTS = {
 };
 
 const EditAestheticForm = props => {
-  const originalWebsites = props.aesthetic.websites;
-  const originalSimilarAesthetics = props.aesthetic.similarAesthetics;
+  const originalWebsites = props.aesthetic.websites || [];
+  const originalSimilarAesthetics = props.aesthetic.similarAesthetics || [];
 
   const [name, setName] = useState(props.aesthetic.name);
   const [symbol, setSymbol] = useState(props.aesthetic.symbol);
@@ -45,7 +45,7 @@ const EditAestheticForm = props => {
   const mediaSourceUrlState = useState(props.aesthetic.mediaSourceUrl);
   const websitesState = useState(originalWebsites);
   const similarAestheticsState = useState(originalSimilarAesthetics);
-  const mediaState = useState(props.aesthetic.media);
+  const mediaState = useState(props.aesthetic.media || []);
 
   const [nameIntent, setNameIntent] = useState(Intent.NONE);
   const [startYearIntent, setStartYearIntent] = useState(Intent.NONE);
@@ -89,7 +89,7 @@ const EditAestheticForm = props => {
     }
   }, [isLoading, setIsLoading]);
 
-  if (!websiteTypes) {
+  if(!websiteTypes) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
@@ -274,7 +274,7 @@ const EditAestheticForm = props => {
       <Helmet>
         <title>CARI | Edit Aesthetic | {name}</title>
       </Helmet>
-      <form className={styles.editAestheticForm} onClick={handleSubmit}>
+      <form className={styles.editAestheticForm} onSubmit={handleSubmit}>
         <Card>
           <h2>Basic Information</h2>
           <FormGroup helperText={nameHelperText} intent={nameIntent} label="Name"

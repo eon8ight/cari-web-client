@@ -29,15 +29,18 @@ const color = scaleOrdinal(schemeCategory10);
 const SimilarityWeb = props => {
   const similarAesthetics = props.aesthetic.similarAesthetics;
 
+  const name = props.aesthetic.name;
+  const urlSlug = props.aesthetic.urlSlug;
+
   useEffect(() => {
     if (!similarAesthetics) {
       return;
     }
 
     const rootAesthetic = {
-      id: props.aesthetic.name,
+      id: name,
       group: 1,
-      urlSlug: props.aesthetic.urlSlug,
+      urlSlug: urlSlug,
       description: 'You are here',
     };
 
@@ -62,7 +65,7 @@ const SimilarityWeb = props => {
 
     const links = similarAesthetics.reduce((accumulator, similarAesthetic) => {
       accumulator.push({
-        source: props.aesthetic.name,
+        source: name,
         target: similarAesthetic.name,
       });
 
@@ -170,7 +173,7 @@ const SimilarityWeb = props => {
     };
 
     svg.call(scrollZoom);
-  }, [props.aesthetic.name, props.aesthetic.urlSlug, similarAesthetics]);
+  }, [name, urlSlug, similarAesthetics]);
 
   return (
     <>

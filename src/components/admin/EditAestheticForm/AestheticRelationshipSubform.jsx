@@ -51,9 +51,11 @@ const AestheticRelationshipSubform = props => {
   const [namesMap, setNamesMap] = useState([]);
   const [filteredNames, setFilteredNames] = useState([]);
 
+  const aesthetic = props.aesthetic.aesthetic;
+
   const refilter = (fromSimilarAesthetics, fromNames, query) => {
     const alreadySelectedAesthetics = fromSimilarAesthetics.map(aesthetic => aesthetic.aesthetic);
-    alreadySelectedAesthetics.push(props.aesthetic.aesthetic);
+    alreadySelectedAesthetics.push(aesthetic);
 
     let newFilteredNames = fromNames.filter(
       aestheticName => !alreadySelectedAesthetics.includes(aestheticName.aesthetic)
@@ -68,7 +70,7 @@ const AestheticRelationshipSubform = props => {
     setFilteredNames(newFilteredNames);
   };
 
-  const refilterCallback = useCallback(refilter, [props.aesthetic.aesthetic]);
+  const refilterCallback = useCallback(refilter, [aesthetic]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -83,14 +85,14 @@ const AestheticRelationshipSubform = props => {
 
           setNamesMap(newNamesMap);
 
-          const newNames = res.data.filter(aestheticName => aestheticName.aesthetic !== props.aesthetic.aesthetic);
+          const newNames = res.data.filter(aestheticName => aestheticName.aesthetic !== aesthetic);
           newNames.sort((a, b) => newNamesMap[a.aesthetic].localeCompare(newNamesMap[b.aesthetic]))
 
           setNames(newNames);
           refilterCallback(similarAesthetics, newNames);
         });
     }
-  }, [isLoading, setIsLoading, similarAesthetics, refilterCallback, props.aesthetic.aesthetic]);
+  }, [isLoading, setIsLoading, similarAesthetics, refilterCallback, aesthetic]);
 
   if(!names) {
     return <Spinner />;

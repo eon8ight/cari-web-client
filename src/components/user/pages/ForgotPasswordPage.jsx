@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
 import {
   Button,
@@ -10,18 +10,30 @@ import {
   ControlGroup,
   FormGroup,
   InputGroup,
-  Intent
+  Intent,
+  Spinner,
 } from '@blueprintjs/core';
 
 import { addMessage } from '../../../redux/actions';
 import { API_ROUTE_MAIL_FORGOT_PASSWORD } from '../../../functions/constants';
+import useSession from '../../../hooks/useSession';
 
 const ForgotPasswordPage = props => {
+  const session = useSession();
+
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const [username, setUsername] = useState('');
   const [usernameIntent, setUsernameIntent] = useState(Intent.NONE);
   const [usernameHelperText, setUsernameHelperText] = useState('');
+
+  if (session.isValid === null) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
+  if (session.isValid) {
+    return <Redirect to="/" />;
+  }
 
   const validateUsername = () => {
     let hasError = false;
@@ -57,7 +69,7 @@ const ForgotPasswordPage = props => {
           setUsernameIntent(Intent.DANGER);
           setUsernameHelperText(err.response.data.message);
         } else {
-          props.addMessage(`An error occurred: ${err}`, Intent.DANGER)
+          props.addMessage(`An error occurred: ${err}`, Intent.DANGER);
         }
       });
   };
@@ -68,7 +80,7 @@ const ForgotPasswordPage = props => {
       'used to register. Please check your inbox.'
     );
 
-    return <Redirect to="/auth/login" />;
+    return <Redirect to="/user/login" />;
   }
 
   return (

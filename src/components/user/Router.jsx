@@ -1,47 +1,39 @@
 import React from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 
-import anonymousRequired from '../../hocs/anonymousRequired';
-import sessionRequired from '../../hocs/sessionRequired';
-import tokenRequired from '../../hocs/tokenRequired';
-
 import ConfirmPage from './pages/ConfirmPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import LoginPage from '../user/pages/LoginPage';
+import LogoutPage from './pages/LogoutPage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import SettingsPage from './pages/SettingsPage';
 
-import {
-  TOKEN_TYPE_CONFIRM,
-  TOKEN_TYPE_INVITE,
-  TOKEN_TYPE_RESET_PASSWORD,
-} from '../../functions/constants';
-
 const Router = (props) => {
   const match = useRouteMatch();
-
-  const WrappedConfirmPage = anonymousRequired(tokenRequired(ConfirmPage, TOKEN_TYPE_CONFIRM));
-  const WrappedForgotPasswordPage = anonymousRequired(ForgotPasswordPage);
-  const WrappedRegisterPage = anonymousRequired(tokenRequired(RegisterPage, TOKEN_TYPE_INVITE));
-  const WrappedResetPasswordPage = anonymousRequired(tokenRequired(ResetPasswordPage, TOKEN_TYPE_RESET_PASSWORD));
-  const WrappedSettingsPage = sessionRequired(SettingsPage);
 
   return (
     <Switch>
       <Route path={`${match.url}/confirm`}>
-        <WrappedConfirmPage {...props} />
+        <ConfirmPage {...props} />
       </Route>
       <Route exact path={`${match.url}/forgotPassword`}>
-        <WrappedForgotPasswordPage {...props} />
+        <ForgotPasswordPage {...props} />
+      </Route>
+      <Route path={`${match.url}/login`}>
+        <LoginPage {...props} />
+      </Route>
+      <Route path={`${match.url}/logout`}>
+        <LogoutPage {...props} />
       </Route>
       <Route path={`${match.url}/register`}>
-        <WrappedRegisterPage {...props} />
+        <RegisterPage {...props} />
       </Route>
       <Route path={`${match.url}/resetPassword`}>
-        <WrappedResetPasswordPage {...props} />
+        <ResetPasswordPage {...props} />
       </Route>
       <Route exact path={`${match.url}/settings`}>
-        <WrappedSettingsPage {...props} />
+        <SettingsPage {...props} />
       </Route>
     </Switch>
   );

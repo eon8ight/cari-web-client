@@ -28,6 +28,8 @@ import {
 import styles from './styles/InviteForm.module.scss';
 
 const InviteForm = props => {
+  console.log(props.session);
+
   const [listRequestMade, setListRequestMade] = useState(false);
   const [invitedUsers, setInvitedUsers] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -123,7 +125,7 @@ const InviteForm = props => {
     axios.post(API_ROUTE_USER_INVITE, { emailAddress }, postOpts)
       .then(res => {
         props.addMessage('Invitation sent.', Intent.SUCCESS);
-        setInvitedUsers(invitedUsers.concat(res.data));
+        setInvitedUsers(invitedUsers.concat(res.data.entity));
         setEmailAddress('');
       })
       .catch(err => {
@@ -181,6 +183,6 @@ const InviteForm = props => {
 };
 
 export default connect(
-  state => ({ session: { claims: state.session.claims } }),
+  null,
   { addMessage }
 )(InviteForm);

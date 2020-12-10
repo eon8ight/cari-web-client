@@ -16,14 +16,20 @@ import {
 import PasswordInput from '../../common/PasswordInput';
 
 import { addMessage } from '../../../redux/actions';
-import { API_ROUTE_USER_REGISTER } from '../../../functions/constants';
+
+import {
+  API_ROUTE_USER_REGISTER,
+  TOKEN_TYPE_INVITE,
+} from '../../../functions/constants';
+
+import useAuthtoken from '../../../hooks/useAuthtoken';
+import useSession from '../../../hooks/useSession';
 
 const RegisterPage = props => {
-  const [registered, setRegistered] = useState(false);
+  const session = useSession();
+  const authtoken = useAuthtoken(TOKEN_TYPE_INVITE);
 
-  const [emailAddress, setEmailAddress] = useState(props.authtoken.claims.emailAddress);
-  const [emailAddressIntent, setEmailAddressIntent] = useState(Intent.NONE);
-  const [emailAddressHelperText, setEmailAddressHelperText] = useState('');
+  const [registered, setRegistered] = useState(false);
 
   const [username, setUsername] = useState('');
   const [usernameIntent, setUsernameIntent] = useState(Intent.NONE);
@@ -37,24 +43,17 @@ const RegisterPage = props => {
   const [confirmPasswordIntent, setConfirmPasswordIntent] = useState(Intent.NONE);
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
 
-  if(!props.authtoken.claims) {
+  if (session.isValid === null || authtoken.isValid === null) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  const validateEmailAddress = () => {
-    let hasError = false;
+  if (session.isValid) {
+    return <Redirect to="/" />;
+  }
 
-    if(emailAddress !== props.authtoken.claims.emailAddress) {
-      setEmailAddressIntent(Intent.DANGER);
-      setEmailAddressHelperText('Do not change this field.');
-      hasError = true;
-    } else {
-      setEmailAddressIntent(Intent.NONE);
-      setEmailAddressHelperText('');
-    }
-
-    return hasError;
-  };
+  if (!authtoken.isValid) {
+    return <Redirect to="/error/401" />;
+  }
 
   const validateUsername = () => {
     let hasError = false;
@@ -97,7 +96,6 @@ const RegisterPage = props => {
     return hasError;
   };
 
-  const handleEmailAddressChange = event => setEmailAddress(event.target.value);
   const handleUsernameChange = event => setUsername(event.target.value);
   const handlePasswordChange = event => setPassword(event.target.value);
   const handleConfirmPasswordChange = event => setConfirmPassword(event.target.value);
@@ -105,19 +103,18 @@ const RegisterPage = props => {
   const handleSubmit = event => {
     event.preventDefault();
 
-    const hasEmailAddressError = validateEmailAddress();
     const hasUsernameError = validateUsername();
     const hasPasswordError = validatePassword();
 
-    if (hasEmailAddressError || hasUsernameError || hasPasswordError) {
+    if (hasUsernameError || hasPasswordError) {
       return;
     }
 
     const postBody = {
-      emailAddress,
+      emailAddress: authtoken.claims.emailAddress,
       username,
       password,
-      token: props.authtoken.token,
+      token: authtoken.token,
     };
 
     const postOpts = { headers: { 'Content-Type': 'application/json' } };
@@ -140,7 +137,7 @@ const RegisterPage = props => {
       Intent.SUCCESS
     );
 
-    return <Redirect to="/auth/login" />;
+    return <Redirect to="/user/login" />;
   }
 
   return (
@@ -150,10 +147,9 @@ const RegisterPage = props => {
       </Helmet>
       <Card>
         <form onSubmit={handleSubmit}>
-          <FormGroup helperText={emailAddressHelperText}>
-            <InputGroup disabled={true} intent={emailAddressIntent} large={true}
-              leftIcon="envelope" onChange={handleEmailAddressChange} placeholder="Email Address"
-              type="text" value={emailAddress} />
+          <FormGroup>
+            <InputGroup disabled={true} large={true}
+              leftIcon="envelope" placeholder="Email Address" type="text" value={authtoken.claims.emailAddress} />
           </FormGroup>
           <FormGroup helperText={usernameHelperText}>
             <InputGroup intent={usernameIntent} large={true} leftIcon="user"

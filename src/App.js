@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -8,7 +8,6 @@ import {
 } from '@blueprintjs/core';
 
 import AdminRouter from './components/admin/Router';
-import AuthRouter from './components/auth/Router';
 import AestheticsRouter from './components/aesthetics/Router';
 import ErrorRouter from './components/error/Router';
 import UserRouter from './components/user/Router';
@@ -19,8 +18,6 @@ import Home from './components/Home';
 import NotFoundPage from './components/error/pages/NotFoundPage';
 import Team from './components/Team';
 
-import { checkSession } from './redux/actions';
-
 import './Styles.scss';
 
 const TOASTER = Toaster.create({
@@ -30,20 +27,12 @@ const TOASTER = Toaster.create({
 });
 
 const App = props => {
-  const [checkedSession, setCheckedSession] = useState(false);
+  const messages = props.messages;
 
   useEffect(() => {
     TOASTER.clear();
-    props.messages.forEach(msg => TOASTER.show(msg.props, msg.key));
-  }, [props.messages]);
-
-  useEffect(() => {
-    if(!checkedSession) {
-      props.checkSession();
-    }
-
-    return (() => setCheckedSession(true));
-  }, [checkedSession, props]);
+    messages.forEach(msg => TOASTER.show(msg.props, msg.key));
+  }, [messages]);
 
   return (
     <BrowserRouter>
@@ -51,9 +40,6 @@ const App = props => {
       <Switch>
         <Route path="/" exact>
           <Home />
-        </Route>
-        <Route path="/auth">
-          <AuthRouter />
         </Route>
         <Route path="/about">
           <Home />
@@ -83,7 +69,4 @@ const App = props => {
   );
 };
 
-export default connect(
-  state => ({ messages: state.messages }),
-  { checkSession }
-)(App);
+export default connect(state => ({ messages: state.messages }))(App);

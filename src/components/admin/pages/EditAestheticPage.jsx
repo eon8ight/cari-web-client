@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useRouteMatch } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { Redirect, useRouteMatch } from 'react-router-dom';
 
 import axios from 'axios';
-import { Spinner } from '@blueprintjs/core';
+
+import {
+  Intent,
+  Spinner,
+} from '@blueprintjs/core';
 
 import EditAestheticForm from '../EditAestheticForm';
+
+import { addMessage } from '../../../redux/actions';
+import useSession from '../../../hooks/useSession';
 
 import { API_ROUTE_AESTHETIC_FIND_FOR_EDIT } from '../../../functions/constants';
 
 const EditAestheticPage = props => {
+  const session = useSession();
   const match = useRouteMatch();
 
   const [requestMade, setRequestMade] = useState(false);
@@ -32,8 +41,13 @@ const EditAestheticPage = props => {
     }
   }, [match.params.aesthetic, requestMade, setRequestMade]);
 
-  if (!aestheticData) {
+  if (session.isValid === null || !aestheticData) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
+  if (!session.isValid) {
+      props.addMessage('You must be logged in to view this page', Intent.DANGER);
+      return <Redirect to="/user/login" />;
   }
 
   return (
@@ -46,4 +60,4 @@ const EditAestheticPage = props => {
   );
 };
 
-export default EditAestheticPage;
+export default connect(null, { addMessage })(EditAestheticPage);

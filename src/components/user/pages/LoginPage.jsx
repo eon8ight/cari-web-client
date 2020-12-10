@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
+import axios from 'axios';
+
 import {
   AnchorButton,
   Button,
@@ -12,13 +14,19 @@ import {
   FormGroup,
   InputGroup,
   Intent,
+  Spinner,
 } from '@blueprintjs/core';
 
 import PasswordInput from '../../common/PasswordInput';
 
-import { addMessage, login } from '../../../redux/actions';
+import { addMessage } from '../../../redux/actions';
+import useSession from '../../../hooks/useSession'
+
+import { API_ROUTE_AUTH_LOGIN } from '../../../functions/constants';
 
 const LoginPage = props => {
+  const session = useSession();
+
   const [loggedIn, setLoggedIn] = useState(false);
 
   const [username, setUsername] = useState('');
@@ -30,6 +38,18 @@ const LoginPage = props => {
   const [passwordHelperText, setPasswordHelperText] = useState('');
 
   const [rememberMe, setRememberMe] = useState(false);
+
+  if (session.isValid === null) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
+  if (session.isValid) {
+    return <Redirect to="/" />;
+  }
+
+  if(loggedIn) {
+    return <Redirect to="/" />;
+  }
 
   const handleUsernameChange = event => {
     const value = event.target.value;
@@ -83,30 +103,39 @@ const LoginPage = props => {
       return;
     }
 
-    props.login(username, password, rememberMe, unauthorized => {
-      unauthorized.fieldErrors.forEach(fieldError => {
-        switch(fieldError.field) {
-          case 'username':
-            setUsernameIntent(Intent.DANGER);
-            setUsernameHelperText(fieldError.message);
-            break;
-          case 'password':
-            setPasswordIntent(Intent.DANGER);
-            setPasswordHelperText(fieldError.message);
-            break;
-          default:
-            props.addMessage(`An error occurred: ${fieldError.message}`);
-        }
-      });
-    }, () => {
-      props.addMessage("You have successfully logged in.");
-      setLoggedIn(true);
-    });
-  };
+    const postBody = { username, password, rememberMe };
+    const postOpts = {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+      validateStatus: (httpCode => httpCode === 200 || httpCode === 401),
+    };
 
-  if(loggedIn) {
-    return <Redirect to="/" />;
-  }
+    axios.post(API_ROUTE_AUTH_LOGIN, postBody, postOpts)
+      .then(res => {
+        if (res.status === 200) {
+          props.addMessage("You have successfully logged in.");
+          setLoggedIn(true);
+        } else {
+          res.data.fieldErrors.forEach(fieldError => {
+            switch(fieldError.field) {
+              case 'username':
+                setUsernameIntent(Intent.DANGER);
+                setUsernameHelperText(fieldError.message);
+                break;
+              case 'password':
+                setPasswordIntent(Intent.DANGER);
+                setPasswordHelperText(fieldError.message);
+                break;
+              default:
+                props.addMessage(`An error occurred: ${fieldError.message}`);
+            }
+          });
+        }
+      })
+      .catch(err => {
+        props.addMessage(`An error occurred: ${err}`, Intent.DANGER);
+      });
+  };
 
   return (
     <>
@@ -134,4 +163,4 @@ const LoginPage = props => {
   );
 };
 
-export default connect(null, { addMessage, login })(LoginPage);
+export default connect(null, { addMessage })(LoginPage);

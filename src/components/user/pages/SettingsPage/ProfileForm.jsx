@@ -14,7 +14,7 @@ import {
 import PasswordInput from '../../../common/PasswordInput';
 
 import { API_ROUTE_USER_UPDATE } from '../../../../functions/constants';
-import { addMessage, updateSession } from '../../../../redux/actions';
+import { addMessage } from '../../../../redux/actions';
 
 const ProfileForm = (props) => {
   const [isUpdating, setIsUpdating] = useState(null);
@@ -34,6 +34,14 @@ const ProfileForm = (props) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [confirmPasswordIntent, setConfirmPasswordIntent] = useState(Intent.NONE);
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
+
+  const addMessage = props.addMessage;
+
+  useEffect(() => {
+    if (isUpdating === false) {
+      addMessage('Profile update successful.', Intent.SUCCESS);
+    }
+  }, [isUpdating, emailAddress, username, addMessage]);
 
   const validateEmailAddress = () => {
     let hasError = false;
@@ -113,7 +121,7 @@ const ProfileForm = (props) => {
 
     setIsUpdating(true);
 
-    const putRoute = `${API_ROUTE_USER_UPDATE}/${props.session.data.sub}`;
+    const putRoute = `${API_ROUTE_USER_UPDATE}/${props.session.claims.sub}`;
     const putOpts = {
       headers: { 'Content-Type': 'application/json' },
       withCredentials: true,
@@ -135,15 +143,8 @@ const ProfileForm = (props) => {
 
     axios.put(putRoute, putData, putOpts)
       .then(() => setIsUpdating(false))
-      .catch(err => props.addMessage(`An error occurred: ${err}`, Intent.DANGER));
+      .catch(err => addMessage(`An error occurred: ${err}`, Intent.DANGER));
   };
-
-  useEffect(() => {
-    if (isUpdating === false) {
-      props.addMessage('Profile update successful.', Intent.SUCCESS);
-      props.updateSession({ username, emailAddress });
-    }
-  }, [isUpdating, emailAddress, username, props]);
 
   return (
     <Card>
@@ -167,6 +168,6 @@ const ProfileForm = (props) => {
 };
 
 export default connect(
-  (state) => ({ session: { data: state.session.data } }),
-  { addMessage, updateSession }
+  null,
+  { addMessage }
 )(ProfileForm);

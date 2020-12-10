@@ -7,15 +7,25 @@ import { connect } from 'react-redux';
 import {
   Button,
   Card,
-  Intent
+  Intent,
+  Spinner,
 } from '@blueprintjs/core';
 
 import PasswordInput from '../../common/PasswordInput';
 
-import { API_ROUTE_USER_RESET_PASSWORD } from '../../../functions/constants';
+import {
+  API_ROUTE_USER_RESET_PASSWORD,
+  TOKEN_TYPE_RESET_PASSWORD,
+} from '../../../functions/constants';
+
 import { addMessage } from '../../../redux/actions';
+import useAuthtoken from '../../../hooks/useAuthtoken';
+import useSession from '../../../hooks/useSession';
 
 const ResetPasswordPage = props => {
+  const session = useSession();
+  const authtoken = useAuthtoken(TOKEN_TYPE_RESET_PASSWORD);
+
   const [passwordReset, setPasswordReset] = useState(false);
 
   const [password, setPassword] = useState('');
@@ -27,6 +37,18 @@ const ResetPasswordPage = props => {
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
 
   const token = props.authtoken.token;
+
+  if (session.isValid === null || authtoken.isValid === null) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
+  if (session.isValid) {
+    return <Redirect to="/" />;
+  }
+
+  if (!authtoken.isValid) {
+    return <Redirect to="/error/401" />;
+  }
 
   const validatePassword = () => {
     let hasError = false;
@@ -78,7 +100,7 @@ const ResetPasswordPage = props => {
       Intent.SUCCESS
     );
 
-    return <Redirect to="/auth/login" />;
+    return <Redirect to="/user/login" />;
   }
 
   return (
