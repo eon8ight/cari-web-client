@@ -18,8 +18,6 @@ import Paginator from '../../common/Paginator';
 import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/constants';
 import { valueExists } from '../../../functions/utils';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-
 import styles from './styles/AestheticsListPage.module.scss';
 
 const AestheticsListPage = props => {

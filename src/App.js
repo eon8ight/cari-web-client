@@ -18,6 +18,8 @@ import Home from './components/Home';
 import NotFoundPage from './components/error/pages/NotFoundPage';
 import Team from './components/Team';
 
+import '@blueprintjs/core/lib/css/blueprint.css';
+
 import './Styles.scss';
 
 const TOASTER = Toaster.create({

@@ -24,8 +24,6 @@ import ConfirmDelete from './ConfirmDelete';
 import ExpandableSection from './ExpandableSection';
 import { API_ROUTE_MEDIA_CREATORS } from '../../../functions/constants';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-
 import styles from './styles/MediaSubform.module.scss';
 
 Modal.setAppElement('#root');

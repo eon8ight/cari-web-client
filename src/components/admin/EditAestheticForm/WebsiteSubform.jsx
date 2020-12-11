@@ -23,8 +23,6 @@ import {
   WEBSITE_TYPE_ARENA,
 } from '../../../functions/constants';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-
 const WEBSITE_TEMPLATE = {
   url: '',
   websiteType: { websiteType: 0 },

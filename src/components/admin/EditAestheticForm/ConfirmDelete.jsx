@@ -11,8 +11,6 @@ import {
 
 import styles from './styles/ConfirmDelete.module.scss';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-
 const ConfirmDelete = props => (
   <Popover position={props.position || Position.RIGHT}>
     <Button className={Classes.FIXED} icon="trash" intent={Intent.DANGER}>Delete</Button>

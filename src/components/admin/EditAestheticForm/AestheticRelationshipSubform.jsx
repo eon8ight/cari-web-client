@@ -21,8 +21,6 @@ import ExpandableSection from './ExpandableSection';
 
 import { API_ROUTE_AESTHETIC_NAMES } from '../../../functions/constants';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-
 import styles from './styles/AestheticRelationshipSubform.module.scss';
 
 const MENU_ITEM_NO_RESULTS = <MenuItem className={styles.tooltipText} disabled={true} key={0} text="No results." />;

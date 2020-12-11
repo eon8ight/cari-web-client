@@ -24,8 +24,6 @@ import {
   API_ROUTE_WEBSITE_TYPES,
 } from '../../functions/constants';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-
 import styles from './styles/EditAestheticForm.module.scss';
 
 const POST_AESTHETIC_EDIT_OPTS = {

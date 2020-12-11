@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 
 import { Button } from '@blueprintjs/core';
 
-import '@blueprintjs/core/lib/css/blueprint.css';
-
 import styles from './styles/ExpandableSection.module.scss';
 
 const ExpandableSection = props => {

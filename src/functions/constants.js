@@ -17,11 +17,12 @@ const API_ROUTE_MAIL_FORGOT_PASSWORD = `${API_URL}/mail/forgotPassword`;
 const API_ROUTE_MEDIA_CREATORS = `${API_URL}/mediaCreators`;
 
 const API_ROUTE_USER_CONFIRM = `${API_URL}/user/confirm`;
+const API_ROUTE_USER_FIND_FOR_EDIT = `${API_URL}/user/findForEdit`;
 const API_ROUTE_USER_FIND_FOR_LIST = `${API_URL}/user/findForList`;
 const API_ROUTE_USER_INVITE = `${API_URL}/user/invite`;
 const API_ROUTE_USER_REGISTER = `${API_URL}/user/register`;
 const API_ROUTE_USER_RESET_PASSWORD = `${API_URL}/user/resetPassword`;
-const API_ROUTE_USER_UPDATE = `${API_URL}/user`;
+const API_ROUTE_USER_UPDATE = `${API_URL}/user/edit`;
 
 const API_ROUTE_WEBSITE_TYPES = `${API_URL}/websiteTypes`;
 
@@ -51,6 +52,7 @@ export {
   API_ROUTE_MAIL_FORGOT_PASSWORD,
   API_ROUTE_MEDIA_CREATORS,
   API_ROUTE_USER_CONFIRM,
+  API_ROUTE_USER_FIND_FOR_EDIT,
   API_ROUTE_USER_FIND_FOR_LIST,
   API_ROUTE_USER_INVITE,
   API_ROUTE_USER_REGISTER,
