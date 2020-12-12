@@ -28,8 +28,6 @@ import {
 import styles from './styles/InviteForm.module.scss';
 
 const InviteForm = props => {
-  console.log(props.session);
-
   const [listRequestMade, setListRequestMade] = useState(false);
   const [invitedUsers, setInvitedUsers] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);

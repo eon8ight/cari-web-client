@@ -253,9 +253,15 @@ const ProfileForm = (props) => {
     axios.post(API_ROUTE_USER_UPDATE, formData, { withCredentials: true })
       .then(res => {
         setIsUpdating(false);
-        setProfileImageUrl(res.data.updatedData.profileImageUrl);
+
         setPassword('');
         setConfirmPassword('');
+        setProfileImage(null);
+
+        if(res.data.updatedData.profileImageUrl) {
+          setProfileImageUrl(res.data.updatedData.profileImageUrl);
+        }
+
         props.addMessage('Profile update successful.', Intent.SUCCESS);
       })
       .catch(err => {
@@ -328,10 +334,11 @@ const ProfileForm = (props) => {
           <InputGroup intent={usernameIntent} onChange={handleUsernameChange}
             placeholder="New Username" value={username} />
         </FormGroup>
-        <PasswordInput helperText={passwordHelperText} intent={passwordIntent} large={false}
-          label="Password" onChange={handlePasswordChange} placeholder="New Password" />
-        <PasswordInput helperText={confirmPasswordHelperText} intent={confirmPasswordIntent}
-          large={false} onChange={handleConfirmPasswordChange}
+        <PasswordInput autoComplete="off" helperText={passwordHelperText} intent={passwordIntent}
+          large={false} label="Password" onChange={handlePasswordChange}
+          placeholder="New Password" />
+        <PasswordInput autoComplete="off" helperText={confirmPasswordHelperText}
+          intent={confirmPasswordIntent} large={false} onChange={handleConfirmPasswordChange}
           placeholder="Confirm New Password" />
         <FormGroup label="Name">
           <ControlGroup>

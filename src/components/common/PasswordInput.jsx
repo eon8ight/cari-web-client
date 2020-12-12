@@ -32,10 +32,10 @@ const PasswordInput = props => {
 
   return (
     <FormGroup label={props.label} helperText={props.helperText}>
-      <InputGroup large={props.large ?? true} placeholder={props.placeholder || 'Password'}
-                  leftIcon="key" rightElement={showPasswordButton} type={inputType}
-                  onChange={props.onChange} intent={props.intent}
-                  className={props.inputClassName} />
+      <InputGroup autoComplete={props.autoComplete} large={props.large ?? true}
+                  placeholder={props.placeholder || 'Password'} leftIcon="key"
+                  rightElement={showPasswordButton} type={inputType} onChange={props.onChange}
+                  intent={props.intent} className={props.inputClassName} />
     </FormGroup>
   );
 };
