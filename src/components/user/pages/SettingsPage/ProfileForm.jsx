@@ -8,25 +8,25 @@ import {
   Button,
   Card,
   ControlGroup,
+  FileInput,
   FormGroup,
   InputGroup,
   Intent,
   MenuItem,
   Spinner,
-  TextArea,
+  TextArea
 } from '@blueprintjs/core';
 
 import { Suggest } from '@blueprintjs/select';
 
 import PasswordInput from '../../../common/PasswordInput';
+import { addMessage } from '../../../../redux/actions';
 
 import {
   API_ROUTE_AESTHETIC_NAMES,
   API_ROUTE_USER_FIND_FOR_EDIT,
-  API_ROUTE_USER_UPDATE,
+  API_ROUTE_USER_UPDATE
 } from '../../../../functions/constants';
-
-import { addMessage } from '../../../../redux/actions';
 
 import styles from './styles/ProfileForm.module.scss';
 
@@ -68,8 +68,10 @@ const ProfileForm = (props) => {
   const [lastName, setLastName] = useState('');
   const [biography, setBiography] = useState('');
   const [title, setTitle] = useState('');
-  const [profileImageUrl, setProfileImageUrl] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
   const [favoriteAesthetic, setFavoriteAesthetic] = useState(null);
+
+  const [profileImageUrl, setProfileImageUrl] = useState(null);
 
   useEffect(() => {
     if (!isLoadingNames) {
@@ -110,13 +112,16 @@ const ProfileForm = (props) => {
           setLastName(entity.lastName);
           setBiography(entity.biography);
           setTitle(entity.title);
-          setProfileImageUrl(entity.profileImageUrl);
           setFavoriteAesthetic(entity.favoriteAesthetic);
+
+          if (entity.profileImage) {
+            setProfileImageUrl(entity.profileImage.url);
+          }
         });
     }
   }, [isLoadingEntity]);
 
-  if(!names || !username) {
+  if (!names || !username) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
@@ -180,12 +185,12 @@ const ProfileForm = (props) => {
   const handleLastNameChange = event => setLastName(event.target.value);
   const handleBiographyChange = event => setBiography(event.target.value);
   const handleTitleChange = event => setTitle(event.target.value);
-  const handleProfileImageUrlChange = event => setProfileImageUrl(event.target.value);
+  const handleProfileImageChange = event => setProfileImage(event.target.files[0]);
 
   const refilter = query => {
     let newFilteredNames = cloneDeep(names);
 
-    if(query) {
+    if (query) {
       newFilteredNames = newFilteredNames.filter(
         aestheticName => aestheticName.name.toLowerCase().includes(query.toLowerCase())
       );
@@ -207,27 +212,32 @@ const ProfileForm = (props) => {
 
     setIsUpdating(true);
 
-    const putRoute = `${API_ROUTE_USER_UPDATE}`;
-    const putOpts = {
-      headers: { 'Content-Type': 'application/json' },
-      withCredentials: true,
-    };
+    const formData = new FormData();
 
-    const putData = {
-      username,
-      emailAddress,
-      password,
-      firstName,
-      lastName,
-      title,
-      biography,
-      profileImageUrl,
-      favoriteAesthetic,
-    };
+    formData.append('username', username);
+    formData.append('emailAddress', emailAddress);
 
-    axios.put(putRoute, putData, putOpts)
-      .then(() => {
+    if (password) {
+      formData.append('password', password);
+    }
+
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('title', title);
+    formData.append('biography', biography);
+
+    if (profileImage) {
+      formData.append('profileImage', profileImage, profileImage.name);
+    }
+
+    formData.append('favoriteAesthetic', favoriteAesthetic);
+
+    axios.post(API_ROUTE_USER_UPDATE, formData, { withCredentials: true })
+      .then(res => {
         setIsUpdating(false);
+        setProfileImageUrl(res.data.updatedData.profileImageUrl);
+        setPassword('');
+        setConfirmPassword('');
         props.addMessage('Profile update successful.', Intent.SUCCESS);
       })
       .catch(err => {
@@ -255,7 +265,7 @@ const ProfileForm = (props) => {
   };
 
   const nameRenderer = (aestheticName, { modifiers, handleClick }) => {
-    if(!modifiers.matchesPredicate) {
+    if (!modifiers.matchesPredicate) {
       return null;
     }
 
@@ -274,9 +284,24 @@ const ProfileForm = (props) => {
     name: namesMap[favoriteAesthetic],
   };
 
+  const profileImageText = profileImage ? profileImage.name : 'Choose file...';
+
+  let profileImageElem = null;
+
+  if (profileImageUrl) {
+    profileImageElem = <img src={profileImageUrl} width="150px" alt="User avatar" />;
+  } else {
+    profileImageElem = (
+      <svg height="150" width="150">
+        <rect height="150" style={{ fill: 'rgba(133, 185, 243, 0.85)' }} width="150" />
+        <text x="22" y="75">No image</text>
+      </svg>
+    );
+  }
+
   return (
     <Card>
-      <form onSubmit={handleSubmit}>
+      <form autoComplete={false} onSubmit={handleSubmit}>
         <FormGroup helperText={emailAddressHelperText} label="Email Address">
           <InputGroup intent={emailAddressIntent} onChange={handleEmailAddressChange}
             placeholder="New Email Address" value={emailAddress} />
@@ -306,8 +331,12 @@ const ProfileForm = (props) => {
             value={biography} />
         </FormGroup>
         <FormGroup label="Profile Image URL">
-          <InputGroup onChange={handleProfileImageUrlChange} placeholder="New Profile Image URL"
-            value={profileImageUrl} />
+          <div className={styles.profileImage}>
+            {profileImageElem}
+            <FileInput fill={true} hasSelection={profileImage != null}
+              inputProps={{ multiple: false }} onChange={handleProfileImageChange}
+              text={profileImageText} />
+          </div>
         </FormGroup>
         <FormGroup label="Favorite Aesthetic">
           <Suggest fill={true} inputValueRenderer={nameInputValueRenderer}

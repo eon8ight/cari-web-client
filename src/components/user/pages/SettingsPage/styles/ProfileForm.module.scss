@@ -1,6 +1,15 @@
+@use '../../../../../assets/scss/mixins';
+
 .aestheticNameSuggest {
     max-height: 300px;
     overflow: auto;
+}
+
+.profileImage {
+    @include mixins.flex-two-items-with-spacer(8px);
+
+    display: flex;
+    align-items: flex-end;
 }
 
 .tooltipText {
