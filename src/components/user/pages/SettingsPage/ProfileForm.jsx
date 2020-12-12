@@ -214,23 +214,41 @@ const ProfileForm = (props) => {
 
     const formData = new FormData();
 
-    formData.append('username', username);
-    formData.append('emailAddress', emailAddress);
+    if (username) {
+      formData.append('username', username);
+    }
+
+    if (emailAddress) {
+      formData.append('emailAddress', emailAddress);
+    }
 
     if (password) {
       formData.append('password', password);
     }
 
-    formData.append('firstName', firstName);
-    formData.append('lastName', lastName);
-    formData.append('title', title);
-    formData.append('biography', biography);
+    if (firstName) {
+      formData.append('firstName', firstName);
+    }
+
+    if (lastName) {
+      formData.append('lastName', lastName);
+    }
+
+    if (title) {
+      formData.append('title', title);
+    }
+
+    if (biography) {
+      formData.append('biography', biography);
+    }
 
     if (profileImage) {
       formData.append('profileImage', profileImage, profileImage.name);
     }
 
-    formData.append('favoriteAesthetic', favoriteAesthetic);
+    if (favoriteAesthetic) {
+      formData.append('favoriteAesthetic', favoriteAesthetic);
+    }
 
     axios.post(API_ROUTE_USER_UPDATE, formData, { withCredentials: true })
       .then(res => {
