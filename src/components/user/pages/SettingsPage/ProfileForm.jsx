@@ -64,11 +64,14 @@ const ProfileForm = (props) => {
   const [confirmPasswordIntent, setConfirmPasswordIntent] = useState(Intent.NONE);
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
 
+  const [profileImage, setProfileImage] = useState(null);
+  const [profileImageIntent, setProfileImageIntent] = useState(Intent.NONE);
+  const [profileImageHelperText, setProfileImageHelperText] = useState('');
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [biography, setBiography] = useState('');
   const [title, setTitle] = useState('');
-  const [profileImage, setProfileImage] = useState(null);
   const [favoriteAesthetic, setFavoriteAesthetic] = useState(null);
 
   const [profileImageUrl, setProfileImageUrl] = useState(null);
@@ -278,6 +281,10 @@ const ProfileForm = (props) => {
                 setUsernameIntent(Intent.DANGER);
                 setUsernameHelperText(fieldError.message);
                 break;
+              case 'profileImage':
+                setProfileImageIntent(Intent.DANGER);
+                setProfileImageHelperText(fieldError.message);
+                break;
               default:
                 props.addMessage(fieldError.message, Intent.DANGER);
             }
@@ -325,7 +332,7 @@ const ProfileForm = (props) => {
 
   return (
     <Card>
-      <form autoComplete={false} onSubmit={handleSubmit}>
+      <form autoComplete="off" onSubmit={handleSubmit}>
         <FormGroup helperText={emailAddressHelperText} label="Email Address">
           <InputGroup intent={emailAddressIntent} onChange={handleEmailAddressChange}
             placeholder="New Email Address" value={emailAddress} />
@@ -334,10 +341,10 @@ const ProfileForm = (props) => {
           <InputGroup intent={usernameIntent} onChange={handleUsernameChange}
             placeholder="New Username" value={username} />
         </FormGroup>
-        <PasswordInput autoComplete="off" helperText={passwordHelperText} intent={passwordIntent}
+        <PasswordInput autoComplete="new-password" helperText={passwordHelperText} intent={passwordIntent}
           large={false} label="Password" onChange={handlePasswordChange}
           placeholder="New Password" />
-        <PasswordInput autoComplete="off" helperText={confirmPasswordHelperText}
+        <PasswordInput autoComplete="new-password" helperText={confirmPasswordHelperText}
           intent={confirmPasswordIntent} large={false} onChange={handleConfirmPasswordChange}
           placeholder="Confirm New Password" />
         <FormGroup label="Name">
@@ -355,7 +362,7 @@ const ProfileForm = (props) => {
           <TextArea growVertically={true} fill={true} onChange={handleBiographyChange}
             value={biography} />
         </FormGroup>
-        <FormGroup label="Profile Image URL">
+        <FormGroup helperText={profileImageHelperText} intent={profileImageIntent} label="Profile Image">
           <div className={styles.profileImage}>
             {profileImageElem}
             <FileInput fill={true} hasSelection={profileImage != null}
