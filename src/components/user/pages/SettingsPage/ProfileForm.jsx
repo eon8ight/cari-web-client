@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
+import { Editor } from '@tinymce/tinymce-react';
 
 import {
   Button,
@@ -14,7 +15,6 @@ import {
   Intent,
   MenuItem,
   Spinner,
-  TextArea
 } from '@blueprintjs/core';
 
 import { Suggest } from '@blueprintjs/select';
@@ -29,6 +29,16 @@ import {
 } from '../../../../functions/constants';
 
 import styles from './styles/ProfileForm.module.scss';
+
+const BIOGRAPHY_EDITOR_SETTINGS = {
+  height: 300,
+  menubar: false,
+  plugins: 'code link lists searchreplace',
+  toolbar: `
+undo redo | copy cut paste | styleselect | bold italic underline strikethrough subscript
+superscript blockquote code | bullist numlist | link unlink | searchreplace |  removeformat remove
+`
+};
 
 const MENU_ITEM_NO_RESULTS = <MenuItem className={styles.tooltipText} disabled={true} key={0} text="No results." />;
 
@@ -186,7 +196,7 @@ const ProfileForm = (props) => {
   const handleConfirmPasswordChange = event => setConfirmPassword(event.target.value);
   const handleFirstNameChange = event => setFirstName(event.target.value);
   const handleLastNameChange = event => setLastName(event.target.value);
-  const handleBiographyChange = event => setBiography(event.target.value);
+  const handleBiographyChange = (content, editor) => setBiography(content);
   const handleTitleChange = event => setTitle(event.target.value);
   const handleProfileImageChange = event => setProfileImage(event.target.files[0]);
 
@@ -359,8 +369,8 @@ const ProfileForm = (props) => {
           <InputGroup onChange={handleTitleChange} placeholder="New Title" value={title} />
         </FormGroup>
         <FormGroup label="Biography">
-          <TextArea growVertically={true} fill={true} onChange={handleBiographyChange}
-            value={biography} />
+          <Editor apiKey={process.env.REACT_APP_TINYMCE_API_KEY} init={BIOGRAPHY_EDITOR_SETTINGS}
+            initialValue={biography} onEditorChange={handleBiographyChange} />
         </FormGroup>
         <FormGroup helperText={profileImageHelperText} intent={profileImageIntent} label="Profile Image">
           <div className={styles.profileImage}>

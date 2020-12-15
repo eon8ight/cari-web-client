@@ -10,7 +10,7 @@ const AestheticDetails = props => {
   if (props.aesthetic.websites && props.aesthetic.websites.length > 0) {
     const websitesLis = props.aesthetic.websites.map(w => (
       <li key={w.website}>
-        <a href={w.url} target="_blank" rel="noopener noreferrer">{w.websiteType.label} - {w.url}</a>
+        <a href={w.url} target="_blank" rel="noopener noreferrer">{w.type.label} - {w.url}</a>
       </li>
     ));
 
