@@ -1,4 +1,4 @@
-@use '../../../../assets/scss/mixins';
+@use '../../../assets/scss/mixins';
 
 .creatorNameSuggest {
     max-height: 300px;
@@ -43,6 +43,13 @@
 
 .modalOverlay {
     @include mixins.modal-overlay;
+}
+
+.modalPreviewImage {
+    @include mixins.flex-two-items-with-spacer(8px);
+
+    display: flex;
+    align-items: flex-end;
 }
 
 .tooltipText {

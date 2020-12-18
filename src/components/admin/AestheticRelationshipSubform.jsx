@@ -19,7 +19,7 @@ import { Suggest } from '@blueprintjs/select';
 import ConfirmDelete from './ConfirmDelete';
 import ExpandableSection from './ExpandableSection';
 
-import { API_ROUTE_AESTHETIC_NAMES } from '../../../functions/constants';
+import { API_ROUTE_AESTHETIC_NAMES } from '../../functions/constants';
 
 import styles from './styles/AestheticRelationshipSubform.module.scss';
 
@@ -31,7 +31,7 @@ const SUGGEST_POPOVER_PROPS = {
 };
 
 const AESTHETIC_RELATIONSHIP_TEMPLATE = {
-  aesthetic: null,
+  aesthetic: 0,
   description: '',
   reverseDescription: '',
 };

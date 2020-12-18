@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet';
 
 import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
+import { serialize } from 'object-to-formdata';
+import { Editor } from '@tinymce/tinymce-react';
 
 import {
   Button,
@@ -12,12 +14,11 @@ import {
   InputGroup,
   Intent,
   Spinner,
-  TextArea,
 } from '@blueprintjs/core';
 
-import AestheticRelationshipSubform from './EditAestheticForm/AestheticRelationshipSubform';
-import MediaSubform from './EditAestheticForm/MediaSubform';
-import WebsiteSubform from './EditAestheticForm/WebsiteSubform';
+import AestheticRelationshipSubform from './AestheticRelationshipSubform';
+import MediaSubform from './MediaSubform';
+import WebsiteSubform from './WebsiteSubform';
 
 import {
   API_ROUTE_AESTHETIC_EDIT,
@@ -26,13 +27,21 @@ import {
 
 import styles from './styles/EditAestheticForm.module.scss';
 
-const POST_AESTHETIC_EDIT_OPTS = {
-  headers: { 'Content-Type': 'application/json' },
+const DESCRIPTION_EDITOR_SETTINGS = {
+  selector: '#aestheticDescription',
+  height: 300,
+  menubar: false,
+  plugins: 'code link lists searchreplace',
+  toolbar: `
+undo redo | copy cut paste | styleselect | bold italic underline strikethrough subscript
+superscript blockquote code | bullist numlist | link unlink | searchreplace |  removeformat remove
+`
 };
 
 const EditAestheticForm = props => {
   const originalWebsites = props.aesthetic.websites || [];
   const originalSimilarAesthetics = props.aesthetic.similarAesthetics || [];
+  const originalMedia = props.aesthetic.media || [];
 
   const [name, setName] = useState(props.aesthetic.name);
   const [symbol, setSymbol] = useState(props.aesthetic.symbol);
@@ -43,7 +52,7 @@ const EditAestheticForm = props => {
   const mediaSourceUrlState = useState(props.aesthetic.mediaSourceUrl);
   const websitesState = useState(originalWebsites);
   const similarAestheticsState = useState(originalSimilarAesthetics);
-  const mediaState = useState(props.aesthetic.media || []);
+  const mediaState = useState(originalMedia);
 
   const [nameIntent, setNameIntent] = useState(Intent.NONE);
   const [startYearIntent, setStartYearIntent] = useState(Intent.NONE);
@@ -87,7 +96,7 @@ const EditAestheticForm = props => {
     }
   }, [isLoading, setIsLoading]);
 
-  if(!websiteTypes) {
+  if (!websiteTypes) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
@@ -134,7 +143,7 @@ const EditAestheticForm = props => {
   const validateEndYear = () => {
     let hasError = false;
 
-    if(endYear && startYear) {
+    if (endYear && startYear) {
       const endYearInt = endYear.replace(/\D/g, '');
       const startYearInt = startYear.replace(/\D/g, '');
 
@@ -173,7 +182,7 @@ const EditAestheticForm = props => {
 
     websitesState[0].forEach((website, idx) => {
       let websiteHasError = false;
-      const websiteType = website.websiteType.websiteType;
+      const websiteType = website.websiteType;
 
       if (!websiteType) {
         newWebsiteHelperTexts[idx] = 'Website type is required.';
@@ -248,6 +257,34 @@ const EditAestheticForm = props => {
       return;
     }
 
+    const websitesToSend = cloneDeep(websitesState[0]);
+
+    websitesToSend.forEach(website => {
+      delete website.aestheticWebsite;
+    });
+
+    const mediaToSend = cloneDeep(mediaState[0]);
+
+    mediaToSend.forEach(media => {
+      delete media.previewFileBlob;
+      delete media.previewFileUrl;
+      delete media.fileUrl;
+
+      const mediaCreator = media.mediaCreator;
+
+      if (typeof mediaCreator === 'string' && mediaCreator.startsWith('temp_')) {
+        delete media.mediaCreator;
+      } else {
+        delete media.mediaCreatorName;
+      }
+
+      if(media.fileObject) {
+        delete media.file;
+      } else {
+        delete media.fileObject;
+      }
+    });
+
     const newAesthetic = {
       aesthetic: props.aesthetic.aesthetic,
       name,
@@ -256,12 +293,17 @@ const EditAestheticForm = props => {
       startYear,
       description,
       mediaSourceUrl: mediaSourceUrlState[0],
-      websites: websitesState[0],
+      websites: websitesToSend,
       similarAesthetics: similarAestheticsState[0],
-      media: mediaState[0],
+      media: mediaToSend,
     };
 
-    axios.put(API_ROUTE_AESTHETIC_EDIT, newAesthetic, POST_AESTHETIC_EDIT_OPTS)
+    const formData = serialize(
+      newAesthetic,
+      { indices: true }
+    );
+
+    axios.post(API_ROUTE_AESTHETIC_EDIT, formData)
       .then(res => {
         // TODO
       });
@@ -280,7 +322,7 @@ const EditAestheticForm = props => {
             <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
               value={name} />
           </FormGroup>
-          <FormGroup helperText="2-3 letters. Like the Periodic Table, but for aesthetics."
+          <FormGroup helperText="1-3 letters. Like the Periodic Table, but for aesthetics."
             label="Symbol">
             <InputGroup onChange={handleSymbolChange}
               value={symbol || ''} />
@@ -296,8 +338,9 @@ const EditAestheticForm = props => {
           </FormGroup>
           <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
             label="Description" labelInfo="(required)">
-            <TextArea intent={descriptionIntent} growVertically={true} fill={true}
-              onChange={event => setDescription(event.target.value)} value={description} />
+            <Editor apiKey={process.env.REACT_APP_TINYMCE_API_KEY} id="aestheticDescription"
+              init={DESCRIPTION_EDITOR_SETTINGS}
+              initialValue={description} onEditorChange={(content, editor) => setDescription(content)} />
           </FormGroup>
         </Card>
         <br />
@@ -320,7 +363,9 @@ const EditAestheticForm = props => {
         <FormGroup>
           <ControlGroup>
             <Button icon="undo" large={true} onClick={handleCancel}>Cancel</Button>
-            <Button icon="floppy-disk" intent={Intent.SUCCESS} large={true}>Save</Button>
+            <Button icon="floppy-disk" intent={Intent.SUCCESS} large={true} type="submit">
+              Save
+            </Button>
           </ControlGroup>
         </FormGroup>
       </form>

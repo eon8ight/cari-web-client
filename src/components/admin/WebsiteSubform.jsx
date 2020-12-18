@@ -21,11 +21,11 @@ import ExpandableSection from './ExpandableSection';
 import {
   ARENA_API_URL,
   WEBSITE_TYPE_ARENA,
-} from '../../../functions/constants';
+} from '../../functions/constants';
 
 const WEBSITE_TEMPLATE = {
   url: '',
-  websiteType: { websiteType: 0 },
+  websiteType: 0,
 };
 
 const WebsiteSubform = props => {
@@ -56,7 +56,7 @@ const WebsiteSubform = props => {
 
   const handleWebsiteTypeChange = (websiteType, idx) => {
     const newWebsites = cloneDeep(websites);
-    newWebsites[idx].websiteType.websiteType = parseInt(websiteType);
+    newWebsites[idx].websiteType = parseInt(websiteType);
     setWebsites(newWebsites);
   }
 
@@ -69,12 +69,12 @@ const WebsiteSubform = props => {
   const elems = websites.map((website, idx) => {
     let mediaSourceCheckbox = null;
 
-    if (website.websiteType.websiteType === WEBSITE_TYPE_ARENA) {
+    if (website.websiteType === WEBSITE_TYPE_ARENA) {
       const mediaSource = mediaSourceUrl.split('/').pop();
       const arenaWebsiteSlug = website.url.split('/').pop();
 
       const hasMultipleArenaWebsites = websites
-        .filter(website => website.websiteType.websiteType === WEBSITE_TYPE_ARENA)
+        .filter(website => website.websiteType === WEBSITE_TYPE_ARENA)
         .length > 1;
 
       mediaSourceCheckbox = (
@@ -90,7 +90,7 @@ const WebsiteSubform = props => {
           <ControlGroup fill={true}>
             <HTMLSelect className={Classes.FIXED} intent={intent[idx]}
               onChange={event => handleWebsiteTypeChange(event.target.value, idx)}
-              options={websiteTypeOptions} value={website.websiteType.websiteType} />
+              options={websiteTypeOptions} value={website.websiteType} />
             <InputGroup intent={intent[idx]}
               onChange={event => handleWebsiteChange(event.target.value, idx)}
               placeholder={website.websiteType.url} value={website.url} />

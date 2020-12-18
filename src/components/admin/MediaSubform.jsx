@@ -2,11 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 
 import axios from 'axios';
+import parse from 'html-react-parser';
 import { cloneDeep } from 'lodash/lang';
+import { uniqueId } from 'lodash/util';
+import { Editor } from '@tinymce/tinymce-react';
 
 import {
   Button,
   ControlGroup,
+  FileInput,
   FormGroup,
   InputGroup,
   Intent,
@@ -15,28 +19,39 @@ import {
   OL,
   Position,
   Spinner,
-  TextArea,
 } from '@blueprintjs/core';
 
 import { Suggest } from '@blueprintjs/select';
 
 import ConfirmDelete from './ConfirmDelete';
 import ExpandableSection from './ExpandableSection';
-import { API_ROUTE_MEDIA_CREATORS } from '../../../functions/constants';
+import { API_ROUTE_MEDIA_CREATORS } from '../../functions/constants';
 
 import styles from './styles/MediaSubform.module.scss';
 
 Modal.setAppElement('#root');
 
+const DESCRIPTION_EDITOR_SETTINGS = {
+  selector: '#mediaDescription',
+  height: 300,
+  menubar: false,
+  plugins: 'code link lists searchreplace',
+  toolbar: `
+undo redo | copy cut paste | styleselect | bold italic underline strikethrough subscript
+superscript blockquote code | bullist numlist | link unlink | searchreplace |  removeformat remove
+`
+};
+
 const MEDIA_TEMPLATE = {
+  file: null,
+  fileUrl: null,
+  fileObject: null,
+  previewFileUrl: '',
+  previewFileBlob: '',
   description: '',
   label: '',
-  name: '',
-  mediaCreator: {
-    name: '',
-  },
-  previewImageUrl: '',
-  url: '',
+  mediaCreator: 0,
+  mediaCreatorName: '',
   year: '',
 };
 
@@ -47,7 +62,6 @@ const SUGGEST_POPOVER_PROPS = {
   popoverClassName: styles.creatorNameSuggest
 };
 
-const ellipsize = string => string.length > 50 ? string.substring(0, 50) + '...' : string;
 const compareNames = (creatorNameA, creatorNameB) => creatorNameA.mediaCreator === creatorNameB.mediaCreator;
 
 const menuItemCreate = (query, active, handleClick) => (
@@ -61,14 +75,12 @@ const MediaSubform = props => {
   const [swapSpace, setSwapSpace] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
 
-  const [urlIntent, setUrlIntent] = useState(Intent.NONE);
-  const [previewImageUrlIntent, setPreviewImageUrlIntent] = useState(Intent.NONE);
+  const [fileIntent, setFileIntent] = useState(Intent.NONE);
   const [labelIntent, setLabelIntent] = useState(Intent.NONE);
   const [descriptionIntent, setDescriptionIntent] = useState(Intent.NONE);
   const [yearIntent, setYearIntent] = useState(Intent.NONE);
 
-  const [urlHelperText, setUrlHelperText] = useState('');
-  const [previewImageUrlHelperText, setPreviewImageUrlHelperText] = useState('');
+  const [fileHelperText, setFileHelperText] = useState('');
   const [labelHelperText, setLabelHelperText] = useState('');
   const [descriptionHelperText, setDescriptionHelperText] = useState('');
   const [yearHelperText, setYearHelperText] = useState('');
@@ -99,8 +111,10 @@ const MediaSubform = props => {
   }, [isLoading, setIsLoading]);
 
   if (!creatorNames) {
-    return <Spinner />;
+    return <Spinner size={Spinner.SIZE_LARGE} />;
   }
+
+  const previewFileReader = new FileReader();
 
   const refilter = query => {
     const newFilteredCreatorNames = cloneDeep(creatorNames);
@@ -135,7 +149,6 @@ const MediaSubform = props => {
   const handleDelete = idx => {
     const newMedia = cloneDeep(media);
     newMedia.splice(idx, 1);
-    setMedia(newMedia);
   };
 
   const handleChange = (property, value) => {
@@ -144,38 +157,62 @@ const MediaSubform = props => {
     setSwapSpace(newSwapSpace);
   };
 
+  const handleFileChange = event => {
+    const imageFile = event.target.files[0];
+
+    if (imageFile) {
+      previewFileReader.onload = event => {
+        const newSwapSpace = cloneDeep(swapSpace);
+        newSwapSpace.fileObject = imageFile;
+        newSwapSpace.previewFileBlob = event.target.result;
+        setSwapSpace(newSwapSpace);
+      };
+
+      previewFileReader.readAsDataURL(imageFile);
+    } else {
+      const newSwapSpace = cloneDeep(swapSpace);
+      newSwapSpace.fileObject = null;
+      newSwapSpace.previewFileBlob = null;
+      setSwapSpace(newSwapSpace);
+    }
+  };
+
   const handleCreatorChange = creatorName => {
     const newSwapSpace = cloneDeep(swapSpace);
-    newSwapSpace.mediaCreator = creatorName;
+    newSwapSpace.mediaCreator = creatorName.mediaCreator;
+    newSwapSpace.mediaCreatorName = creatorName.name;
     setSwapSpace(newSwapSpace);
-    setFilteredCreatorNames(creatorNames);
-  };
 
-  const validateUrl = () => {
-    let hasError = false;
+    const mediaCreator = creatorName.mediaCreator;
+    const name = creatorName.name;
 
-    if (!swapSpace.url) {
-      setUrlIntent(Intent.DANGER);
-      setUrlHelperText('URL is required.');
-      hasError = true;
-    } else {
-      setUrlIntent(Intent.NONE);
-      setUrlHelperText('');
+    if(!(mediaCreator in creatorNamesMap)) {
+      const newCreatorNamesMap = cloneDeep(creatorNamesMap);
+      newCreatorNamesMap[mediaCreator] = name;
+      setCreatorNamesMap(newCreatorNamesMap);
     }
 
-    return hasError;
+    const newCreatorNames = cloneDeep(creatorNames);
+
+    if(creatorNames.filter(n => n.mediaCreator === mediaCreator).length === 0) {
+      const newCreatorNames = cloneDeep(creatorNames);
+      newCreatorNames.push(creatorName);
+      setCreatorNames(newCreatorNames);
+    }
+
+    setFilteredCreatorNames(newCreatorNames);
   };
 
-  const validatePreviewImageUrl = () => {
+  const validateFile = () => {
     let hasError = false;
 
-    if (!swapSpace.previewImageUrl) {
-      setPreviewImageUrlIntent(Intent.DANGER);
-      setPreviewImageUrlHelperText('Preview image URL is required.');
+    if (!swapSpace.fileUrl && !swapSpace.fileObject) {
+      setFileIntent(Intent.DANGER);
+      setFileHelperText('File is required.');
       hasError = true;
     } else {
-      setPreviewImageUrlIntent(Intent.NONE);
-      setPreviewImageUrlHelperText('');
+      setFileIntent(Intent.NONE);
+      setFileHelperText('');
     }
 
     return hasError;
@@ -227,30 +264,22 @@ const MediaSubform = props => {
   };
 
   const handleSave = () => {
-    const hasUrlError = validateUrl();
-    const hasPreviewImageUrlError = validatePreviewImageUrl();
+    const hasFileError = validateFile();
     const hasLabelError = validateLabel();
     const hasDescriptionError = validateDescription();
     const hasYearError = validateYear();
 
-    if (hasUrlError || hasPreviewImageUrlError || hasLabelError || hasDescriptionError
-      || hasYearError) {
+    if (hasFileError || hasLabelError || hasDescriptionError || hasYearError) {
       return;
     }
 
     handleModalClose(true);
   }
 
-  const createNewMediaCreatorFromQuery = query => {
-    const newCreatorNamesMap = cloneDeep(creatorNamesMap);
-    newCreatorNamesMap[null] = query;
-    setCreatorNamesMap(newCreatorNamesMap);
-
-    return {
-      mediaCreator: null,
-      name: query,
-    };
-  };
+  const createNewMediaCreatorFromQuery = query => ({
+    mediaCreator: uniqueId('temp_'),
+    name: query,
+  });
 
   const creatorNameInputValueRenderer = creatorName => creatorNamesMap[creatorName.mediaCreator];
 
@@ -268,20 +297,43 @@ const MediaSubform = props => {
 
   let mediaModalContent = null;
 
+  const aestheticDescriptionEditorHeader = document.querySelector(
+    '#aestheticDescription + .tox-tinymce > .tox-editor-container > .tox-editor-header'
+  );
+
+  let fileImageElem = null;
+
   if (swapSpace) {
+    const previewSrc = swapSpace.previewFileUrl || swapSpace.previewFileBlob;
+
+    if (previewSrc) {
+      fileImageElem = <img src={previewSrc} width="150" alt="Media file" />;
+    } else {
+      fileImageElem = (
+        <svg height="150" width="150">
+          <rect height="150" style={{ fill: 'rgba(133, 185, 243, 0.85)' }} width="150" />
+          <text x="22" y="75">No image</text>
+        </svg>
+      );
+    }
+
+    if (aestheticDescriptionEditorHeader !== null) {
+      // Hack to prevent aesthetic description editor's toolbar from appearing over the modal
+      aestheticDescriptionEditorHeader.style['z-index'] = 'initial';
+    }
+
+    const fileValue = swapSpace.fileObject?.name || swapSpace.fileUrl;
+
     mediaModalContent = (
       <form>
         <h2>{swapSpace.title}</h2>
-        <FormGroup helperText={urlHelperText} intent={urlIntent} label="URL"
+        <FormGroup helperText={fileHelperText} intent={fileIntent} label="File"
           labelInfo="(required)">
-          <InputGroup intent={urlIntent} onChange={event => handleChange('url', event.target.value)}
-            value={swapSpace.url} />
-        </FormGroup>
-        <FormGroup helperText={previewImageUrlHelperText} intent={previewImageUrlIntent}
-          label="Preview Image URL" labelInfo="(required)">
-          <InputGroup intent={previewImageUrlIntent}
-            onChange={event => handleChange('previewImageUrl', event.target.value)}
-            value={swapSpace.previewImageUrl} />
+          <div className={styles.modalPreviewImage}>
+            {fileImageElem}
+            <FileInput fill={true} hasSelection={fileValue !== null}
+              inputProps={{ multiple: false }} onChange={handleFileChange} text={fileValue} />
+          </div>
         </FormGroup>
         <FormGroup helperText={labelHelperText} intent={labelIntent} label="Label"
           labelInfo="(required)">
@@ -291,10 +343,8 @@ const MediaSubform = props => {
         </FormGroup>
         <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
           label="Description" labelInfo="(required)">
-          <TextArea growVertically={true} fill={true}
-            intent={descriptionIntent}
-            onChange={event => handleChange('description', event.target.value)}
-            value={swapSpace.description} />
+          <Editor apiKey={process.env.REACT_APP_TINYMCE_API_KEY} id="mediaDescription" init={DESCRIPTION_EDITOR_SETTINGS}
+            initialValue={swapSpace.description} onEditorChange={(content, editor) => handleChange('description', content)} />
         </FormGroup>
         <FormGroup label="Creator">
           <ControlGroup>
@@ -305,8 +355,8 @@ const MediaSubform = props => {
               itemsEqual={compareNames} noResults={MENU_ITEM_NO_RESULTS}
               onItemSelect={handleCreatorChange} onQueryChange={refilter}
               popoverProps={SUGGEST_POPOVER_PROPS}
-              query={creatorNamesMap[swapSpace.mediaCreator.mediaCreator]} resetOnClose={true}
-              selectedItem={swapSpace.mediaCreator} />
+              query={creatorNamesMap[swapSpace.mediaCreator]} resetOnClose={true}
+              selectedItem={swapSpace.creator} />
           </ControlGroup>
         </FormGroup>
         <FormGroup helperText={yearHelperText} intent={yearIntent} label="Year"
@@ -321,35 +371,51 @@ const MediaSubform = props => {
         </ControlGroup>
       </form>
     );
-  };
+  } else if (aestheticDescriptionEditorHeader !== null) {
+    // Hack to undo the above hack
+    aestheticDescriptionEditorHeader.style['z-index'] = 1;
+  }
 
-  const mediaElems = media.map((medium, idx) => (
-    <li key={medium.aestheticMedia}>
-      <FormGroup>
-        <ControlGroup className={styles.mediaPreviewButtons}>
-          <Button icon="edit" onClick={() => handleModalOpen(medium, idx)}>Edit</Button>
-          <ConfirmDelete onClick={() => handleDelete(idx)} position={Position.BOTTOM_RIGHT} />
-        </ControlGroup>
-        <div className={styles.mediaPreview}>
-          <a href={medium.url} target="_blank" rel="noopener noreferrer">
-            <img src={medium.previewImageUrl} alt={medium.label} />
-          </a>
-          <div>
-            <dl className={styles.dataListNoIndent}>
-              <dt><strong>Label:</strong></dt>
-              <dd>{medium.label}</dd>
-              <dt><strong>Description:</strong></dt>
-              <dd>{ellipsize(medium.description)}</dd>
-              <dt><strong>Creator:</strong></dt>
-              <dd>{medium.mediaCreator.name || '(none)'}</dd>
-              <dt><strong>Year:</strong></dt>
-              <dd>{medium.year}</dd>
-            </dl>
+  const mediaElems = media.map((medium, idx) => {
+    let previewImageElem = (
+      <img alt={medium.label} src={medium.previewFileUrl || medium.previewFileBlob}
+        width="250" />
+    );
+
+    if(medium.fileUrl) {
+      previewImageElem = (
+        <a href={medium.fileUrl} target="_blank" rel="noopener noreferrer">
+          {previewImageElem}
+        </a>
+      );
+    }
+
+    return (
+      <li key={medium.aestheticMedia}>
+        <FormGroup>
+          <ControlGroup className={styles.mediaPreviewButtons}>
+            <Button icon="edit" onClick={() => handleModalOpen(medium, idx)}>Edit</Button>
+            <ConfirmDelete onClick={() => handleDelete(idx)} position={Position.BOTTOM_RIGHT} />
+          </ControlGroup>
+          <div className={styles.mediaPreview}>
+            {previewImageElem}
+            <div>
+              <dl className={styles.dataListNoIndent}>
+                <dt><strong>Label:</strong></dt>
+                <dd>{medium.label}</dd>
+                <dt><strong>Description:</strong></dt>
+                <dd>{parse(medium.description)}</dd>
+                <dt><strong>Creator:</strong></dt>
+                <dd>{medium.mediaCreatorName || '(none)'}</dd>
+                <dt><strong>Year:</strong></dt>
+                <dd>{medium.year}</dd>
+              </dl>
+            </div>
           </div>
-        </div>
-      </FormGroup>
-    </li>
-  ));
+        </FormGroup>
+      </li>
+    );
+  });
 
   const mediaContent = (
     <>

@@ -28,16 +28,8 @@ const EditAestheticPage = props => {
     if(!requestMade) {
       setRequestMade(true);
 
-      axios.get(
-        `${API_ROUTE_AESTHETIC_FIND_FOR_EDIT}/${match.params.aesthetic}`,
-        {
-          params: {
-            includeSimilarAesthetics: true,
-            includeMedia: true,
-            includeGalleryContent: true,
-          }
-        }
-      ).then(res => setAestheticData(res.data));
+      axios.get(`${API_ROUTE_AESTHETIC_FIND_FOR_EDIT}/${match.params.aesthetic}`)
+        .then(res => setAestheticData(res.data));
     }
   }, [match.params.aesthetic, requestMade, setRequestMade]);
 

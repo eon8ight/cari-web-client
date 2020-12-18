@@ -256,7 +256,7 @@ const ProfileForm = (props) => {
     }
 
     if (profileImage) {
-      formData.append('profileImage', profileImage, profileImage.name);
+      formData.append('profileImage', profileImage);
     }
 
     if (favoriteAesthetic) {
@@ -325,12 +325,10 @@ const ProfileForm = (props) => {
     name: namesMap[favoriteAesthetic],
   };
 
-  const profileImageText = profileImage ? profileImage.name : 'Choose file...';
-
   let profileImageElem = null;
 
   if (profileImageUrl) {
-    profileImageElem = <img src={profileImageUrl} width="150px" alt="User avatar" />;
+    profileImageElem = <img src={profileImageUrl} width="150" alt="User avatar" />;
   } else {
     profileImageElem = (
       <svg height="150" width="150">
@@ -377,7 +375,7 @@ const ProfileForm = (props) => {
             {profileImageElem}
             <FileInput fill={true} hasSelection={profileImage != null}
               inputProps={{ multiple: false }} onChange={handleProfileImageChange}
-              text={profileImageText} />
+              text={profileImage?.name} />
           </div>
         </FormGroup>
         <FormGroup label="Favorite Aesthetic">

@@ -6,7 +6,7 @@ const ADD_MESSAGE = 'ADD_MESSAGE';
 
 const addMessage = (message, intent = Intent.PRIMARY) => ({
   type: ADD_MESSAGE,
-  payload: { props: { message, intent }, key: `message_${uniqueId()}` },
+  payload: { props: { message, intent }, key: uniqueId('message_') },
 });
 
 export {
