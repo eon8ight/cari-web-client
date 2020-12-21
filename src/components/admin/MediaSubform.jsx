@@ -9,6 +9,7 @@ import { Editor } from '@tinymce/tinymce-react';
 
 import {
   Button,
+  Callout,
   ControlGroup,
   FileInput,
   FormGroup,
@@ -89,6 +90,9 @@ const MediaSubform = props => {
   const [creatorNames, setCreatorNames] = useState([]);
   const [creatorNamesMap, setCreatorNamesMap] = useState([]);
   const [filteredCreatorNames, setFilteredCreatorNames] = useState([]);
+
+  const intent = props.intent;
+  const helperText = props.helperText;
 
   useEffect(() => {
     if (!isLoading) {
@@ -390,6 +394,19 @@ const MediaSubform = props => {
       );
     }
 
+    let helperCallout = null;
+
+    if(helperText[idx]) {
+      helperCallout = (
+        <>
+          <br />
+          <Callout icon="warning-sign" intent={intent[idx]} title="Error">
+            {helperText[idx]}
+          </Callout>
+        </>
+      );
+    }
+
     return (
       <li key={medium.aestheticMedia}>
         <FormGroup>
@@ -412,6 +429,7 @@ const MediaSubform = props => {
               </dl>
             </div>
           </div>
+          {helperCallout}
         </FormGroup>
       </li>
     );
@@ -430,7 +448,8 @@ const MediaSubform = props => {
 
   return (
     <>
-      <ExpandableSection content={mediaContent} header="Media" />
+      <ExpandableSection content={mediaContent} header="Media" icon={props.icon}
+        show={props.show} />
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
         isOpen={swapSpace !== null} onRequestClose={() => handleModalClose(false)}>
         {mediaModalContent}

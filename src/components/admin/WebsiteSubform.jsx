@@ -117,7 +117,8 @@ const WebsiteSubform = props => {
     </>
   );
 
-  return <ExpandableSection content={websiteContent} header="Websites" />;
+  return <ExpandableSection content={websiteContent} header="Websites" icon={props.icon}
+    show={props.show} />;
 };
 
 export default WebsiteSubform;

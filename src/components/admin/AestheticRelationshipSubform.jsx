@@ -140,20 +140,20 @@ const AestheticRelationshipSubform = props => {
 
     let inputs = null;
 
-    if(similarAesthetics[idx].aesthetic) {
+    if(similarAesthetic.aesthetic) {
       inputs = (
         <>
           <FormGroup helperText={helperText[idx].description} intent={intent[idx].description}
             label={<>How does <strong>{similarAestheticName}</strong> relate to <strong>{props.aesthetic.name}</strong>?</>}
             labelInfo="(required)">
-              <InputGroup intent={intent[idx].description} value={similarAesthetic.description}
+              <InputGroup intent={intent[idx].description} value={similarAesthetic.description || ''}
                 onChange={event => handleChange(event.target.value, 'description', idx)} />
           </FormGroup>
           <FormGroup helperText={helperText[idx].reverseDescription}
             intent={intent[idx].reverseDescription}
             label={<>How does <strong>{props.aesthetic.name}</strong> relate to <strong>{similarAestheticName}</strong>?</>}
             labelInfo="(required)">
-            <InputGroup intent={intent[idx].reverseDescription} value={similarAesthetic.reverseDescription}
+            <InputGroup intent={intent[idx].reverseDescription} value={similarAesthetic.reverseDescription || ''}
               onChange={event => handleChange(event.target.value, 'reverseDescription', idx)} />
           </FormGroup>
         </>
@@ -190,7 +190,8 @@ const AestheticRelationshipSubform = props => {
     </>
   );
 
-  return <ExpandableSection content={relationshipContent} header="Related Aesthetics" />;
+  return <ExpandableSection content={relationshipContent} header="Related Aesthetics"
+    icon={props.icon} show={props.show} />;
 };
 
 export default AestheticRelationshipSubform;

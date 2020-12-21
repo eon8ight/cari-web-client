@@ -15,6 +15,8 @@ import { scaleLinear } from 'd3-scale';
 import { event, select } from 'd3-selection';
 import { zoom } from 'd3-zoom';
 
+import parse from 'html-react-parser';
+
 import styles from './styles/Timeline.module.scss';
 
 Modal.setAppElement('#root');
@@ -176,7 +178,7 @@ const Timeline = props => {
       .enter()
       .insert('image')
       .attr('class', styles.image)
-      .attr('href', d => d.previewImageUrl)
+      .attr('href', d => d.thumbnailFile.url)
       .attr('width', d => (x(d.xPosition + 1) - x(d.xPosition)) / subdivisions)
       .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
       .attr('x', d => x(d.xPosition))
@@ -210,8 +212,8 @@ const Timeline = props => {
     timelineModalContent = (
       <div className={styles.viewer}>
         <div className={styles.selectedImageContainer}>
-          <a href={timelineModalSelection.url} target="_blank" rel="noopener noreferrer">
-            <img className={styles.selectedImage} src={timelineModalSelection.url} alt={timelineModalSelection.label} />
+          <a href={timelineModalSelection.originalFile.url} target="_blank" rel="noopener noreferrer">
+            <img className={styles.selectedImage} src={timelineModalSelection.previewFile.url} alt={timelineModalSelection.label} />
           </a>
         </div>
         <div className={styles.selectedImageMetadataContainer}>
@@ -231,7 +233,7 @@ const Timeline = props => {
             <dt>
               <h3>Description</h3>
             </dt>
-            <dd>{timelineModalSelection.description}</dd>
+            <dd>{parse(timelineModalSelection.description)}</dd>
           </dl>
         </div>
       </div>

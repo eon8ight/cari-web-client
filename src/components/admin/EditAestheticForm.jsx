@@ -11,6 +11,7 @@ import {
   Card,
   ControlGroup,
   FormGroup,
+  Icon,
   InputGroup,
   Intent,
   Spinner,
@@ -55,9 +56,11 @@ const EditAestheticForm = props => {
   const mediaState = useState(originalMedia);
 
   const [nameIntent, setNameIntent] = useState(Intent.NONE);
+  const [symbolIntent, setSymbolIntent] = useState(Intent.NONE);
   const [startYearIntent, setStartYearIntent] = useState(Intent.NONE);
   const [endYearIntent, setEndYearIntent] = useState(Intent.NONE);
   const [descriptionIntent, setDescriptionIntent] = useState(Intent.NONE);
+  const [mediaIntents, setMediaIntents] = useState(originalMedia.map(() => Intent.NONE));
   const [websiteIntents, setWebsiteIntents] = useState(originalWebsites.map(() => Intent.NONE));
   const [similarAestheticIntents, setSimilarAestheticIntents] = useState(originalSimilarAesthetics.map(() => ({
     description: Intent.NONE,
@@ -65,14 +68,24 @@ const EditAestheticForm = props => {
   })));
 
   const [nameHelperText, setNameHelperText] = useState('');
+  const [symbolHelperText, setSymbolHelperText] = useState('');
   const [startYearHelperText, setStartYearHelperText] = useState('');
   const [endYearHelperText, setEndYearHelperText] = useState('');
   const [descriptionHelperText, setDescriptionHelperText] = useState('');
+  const [mediaHelperTexts, setMediaHelperTexts] = useState(originalMedia.map(() => ''));
   const [websiteHelperTexts, setWebsiteHelperTexts] = useState(originalWebsites.map(() => ''));
   const [similarAestheticHelperTexts, setSimilarAestheticHelperTexts] = useState(originalSimilarAesthetics.map(() => ({
     description: '',
     reverseDescription: '',
   })));
+
+  const [showMediaSubform, setShowMediaSubform] = useState(false);
+  const [showWebsiteSubform, setShowWebsiteSubform] = useState(false);
+  const [showAestheticRelationshipSubform, setShowAestheticRelationshipSubform] = useState(false);
+
+  const [mediaSubformIcon, setMediaSubformIcon] = useState(null);
+  const [websiteSubformIcon, setWebsiteSubformIcon] = useState(null);
+  const [aestheticRelationshipSubformIcon, setAestheticRelationshipSubformIcon] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [websiteTypes, setWebsiteTypes] = useState([]);
@@ -198,9 +211,12 @@ const EditAestheticForm = props => {
       if (websiteHasError) {
         newWebsiteIntents[idx] = Intent.DANGER;
         hasError = true;
+        setShowWebsiteSubform(true);
+        setWebsiteSubformIcon(<Icon icon="warning-sign" intent={Intent.WARNING} />);
       } else {
         newWebsiteIntents[idx] = Intent.NONE;
         newWebsiteHelperTexts[idx] = '';
+        setWebsiteSubformIcon(null);
       }
     });
 
@@ -239,11 +255,20 @@ const EditAestheticForm = props => {
     setSimilarAestheticIntents(newSimilarAestheticIntents);
     setSimilarAestheticHelperTexts(newSimilarAestheticHelperTexts);
 
+    if(hasError) {
+      setShowAestheticRelationshipSubform(true);
+      setAestheticRelationshipSubformIcon(<Icon icon="warning-sign" intent={Intent.WARNING} />);
+    } else {
+      setAestheticRelationshipSubformIcon(null);
+    }
+
     return hasError;
   }
 
   const handleSubmit = event => {
     event.preventDefault();
+
+    setMediaSubformIcon(null);
 
     const hasNameError = validateName();
     const hasStartYearError = validateStartYear();
@@ -306,6 +331,39 @@ const EditAestheticForm = props => {
     axios.post(API_ROUTE_AESTHETIC_EDIT, formData)
       .then(res => {
         // TODO
+      })
+      .catch(err => {
+        if (err.response.status === 400) {
+          err.response.data.fieldErrors.forEach(fieldError => {
+            switch (fieldError.field) {
+              case 'name':
+                setNameIntent(Intent.DANGER);
+                setNameHelperText(fieldError.message);
+                break;
+              case 'symbol':
+                setSymbolIntent(Intent.DANGER);
+                setSymbolHelperText(fieldError.message);
+                break;
+              case 'media':
+                const newMediaIntents = cloneDeep(mediaIntents);
+                const newMediaHelperTexts = cloneDeep(mediaHelperTexts);
+
+                newMediaIntents[fieldError.index] = Intent.DANGER;
+                newMediaHelperTexts[fieldError.index] = fieldError.message;
+
+                setMediaIntents(newMediaIntents);
+                setMediaHelperTexts(newMediaHelperTexts);
+                setShowMediaSubform(true);
+                setMediaSubformIcon(<Icon icon="warning-sign" intent={Intent.WARNING} />);
+
+                break;
+              default:
+                props.addMessage(fieldError.message, Intent.DANGER);
+            }
+          });
+        } else {
+          props.addMessage(`An error occurred: ${err}`, Intent.DANGER)
+        }
       });
   };
 
@@ -322,10 +380,9 @@ const EditAestheticForm = props => {
             <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
               value={name} />
           </FormGroup>
-          <FormGroup helperText="1-3 letters. Like the Periodic Table, but for aesthetics."
-            label="Symbol">
-            <InputGroup onChange={handleSymbolChange}
-              value={symbol || ''} />
+          <FormGroup helperText={symbolHelperText || "1-3 letters. Like the Periodic Table, but for aesthetics."}
+            intent={symbolIntent} label="Symbol">
+            <InputGroup intent={symbolIntent} onChange={handleSymbolChange} value={symbol || ''} />
           </FormGroup>
           <FormGroup helperText={startYearHelperText} intent={startYearIntent}
             label="Year First Observed" labelInfo="(required)">
@@ -345,19 +402,23 @@ const EditAestheticForm = props => {
         </Card>
         <br />
         <Card>
-          <WebsiteSubform helperText={websiteHelperTexts} intent={websiteIntents}
-            mediaSourceUrl={mediaSourceUrlState} websites={websitesState}
+          <WebsiteSubform helperText={websiteHelperTexts} icon={websiteSubformIcon}
+            intent={websiteIntents} mediaSourceUrl={mediaSourceUrlState}
+            show={[showWebsiteSubform, setShowWebsiteSubform]} websites={websitesState}
             websiteTypes={websiteTypes} />
         </Card>
         <br />
         <Card>
           <AestheticRelationshipSubform aesthetic={props.aesthetic}
-            helperText={similarAestheticHelperTexts} intent={similarAestheticIntents}
+            helperText={similarAestheticHelperTexts} icon={aestheticRelationshipSubformIcon}
+            intent={similarAestheticIntents}
+            show={[showAestheticRelationshipSubform, setShowAestheticRelationshipSubform]}
             similarAesthetics={similarAestheticsState} />
         </Card>
         <br />
         <Card>
-          <MediaSubform media={mediaState} />
+          <MediaSubform helperText={mediaHelperTexts} icon={mediaSubformIcon}
+            intent={mediaIntents} media={mediaState} show={[showMediaSubform, setShowMediaSubform]} />
         </Card>
         <br />
         <FormGroup>
