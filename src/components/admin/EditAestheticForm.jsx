@@ -11,6 +11,7 @@ import {
   Card,
   ControlGroup,
   FormGroup,
+  HTMLSelect,
   Icon,
   InputGroup,
   Intent,
@@ -23,6 +24,7 @@ import WebsiteSubform from './WebsiteSubform';
 
 import {
   API_ROUTE_AESTHETIC_EDIT,
+  API_ROUTE_ERAS,
   API_ROUTE_WEBSITE_TYPES,
 } from '../../functions/constants';
 
@@ -46,14 +48,19 @@ const EditAestheticForm = props => {
 
   const [name, setName] = useState(props.aesthetic.name);
   const [symbol, setSymbol] = useState(props.aesthetic.symbol);
-  const [startYear, setStartYear] = useState(props.aesthetic.startYear);
-  const [endYear, setEndYear] = useState(props.aesthetic.setEndYear);
+  const [startEra, setStartEra] = useState(props.aesthetic.startEra);
+  const [endEra, setEndEra] = useState(props.aesthetic.endEra);
   const [description, setDescription] = useState(props.aesthetic.description);
 
   const mediaSourceUrlState = useState(props.aesthetic.mediaSourceUrl);
   const websitesState = useState(originalWebsites);
   const similarAestheticsState = useState(originalSimilarAesthetics);
   const mediaState = useState(originalMedia);
+
+  const [startEraSpecifier, setStartEraSpecifier] = useState(null);
+  const [endEraSpecifier, setEndEraSpecifier] = useState(null);
+  const [startYear, setStartYear] = useState(null);
+  const [endYear, setEndYear] = useState(null);
 
   const [nameIntent, setNameIntent] = useState(Intent.NONE);
   const [symbolIntent, setSymbolIntent] = useState(Intent.NONE);
@@ -88,7 +95,8 @@ const EditAestheticForm = props => {
   const [aestheticRelationshipSubformIcon, setAestheticRelationshipSubformIcon] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [websiteTypes, setWebsiteTypes] = useState([]);
+  const [eras, setEras] = useState(null);
+  const [websiteTypes, setWebsiteTypes] = useState(null);
 
   useEffect(() => {
     if (!isLoading) {
@@ -106,10 +114,36 @@ const EditAestheticForm = props => {
             return map;
           }, {}));
         });
-    }
-  }, [isLoading, setIsLoading]);
 
-  if (!websiteTypes) {
+      axios.get(API_ROUTE_ERAS)
+        .then(res => {
+          setEras(res.data.reduce((map, era) => {
+            if(!(era.eraSpecifier in map)) {
+              map[era.eraSpecifier] = {
+                label: era.specifier.label,
+                years: {},
+              };
+            }
+
+            map[era.eraSpecifier].years[era.year] = era.era;
+
+            if(startEra === era.era) {
+              setStartEraSpecifier(era.eraSpecifier);
+              setStartYear(era.year);
+            }
+
+            if(endEra === era.era) {
+              setEndEraSpecifier(era.eraSpecifier);
+              setEndYear(era.year);
+            }
+
+            return map;
+          }, {}));
+        });
+    }
+  }, [isLoading, setIsLoading, startEra, endEra]);
+
+  if (!(eras && websiteTypes)) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
@@ -117,6 +151,18 @@ const EditAestheticForm = props => {
     let newSymbol = event.target.value.replace(/[^a-z]/gi, '');
     newSymbol = newSymbol.substring(0, 1).toUpperCase() + newSymbol.substring(1, 3).toLowerCase();
     setSymbol(newSymbol);
+  };
+
+  const handleStartYearChange = event => {
+    const year = event.target.value;
+    setStartYear(year);
+    setStartEra(eras[startEraSpecifier].years[year]);
+  };
+
+  const handleEndYearChange = event => {
+    const year = event.target.value;
+    setEndYear(year);
+    setEndEra(eras[endEraSpecifier].years[year]);
   };
 
   const handleCancel = () => {
@@ -138,10 +184,10 @@ const EditAestheticForm = props => {
     return hasError;
   };
 
-  const validateStartYear = () => {
+  const validateStartEra = () => {
     let hasError = false;
 
-    if (!startYear) {
+    if (!startEra) {
       setStartYearIntent(Intent.DANGER);
       setStartYearHelperText('Start year is required.');
       hasError = true;
@@ -153,14 +199,11 @@ const EditAestheticForm = props => {
     return hasError;
   };
 
-  const validateEndYear = () => {
+  const validateEndEra = () => {
     let hasError = false;
 
-    if (endYear && startYear) {
-      const endYearInt = endYear.replace(/\D/g, '');
-      const startYearInt = startYear.replace(/\D/g, '');
-
-      if (endYearInt && startYearInt && parseInt(endYearInt) < parseInt(startYearInt)) {
+    if (endEra) {
+      if(startYear > endYear || (startYear === endYear && startEraSpecifier > endEraSpecifier)) {
         setEndYearIntent(Intent.DANGER);
         setEndYearHelperText('End year cannot be before first year observed.');
         hasError = true;
@@ -271,13 +314,13 @@ const EditAestheticForm = props => {
     setMediaSubformIcon(null);
 
     const hasNameError = validateName();
-    const hasStartYearError = validateStartYear();
-    const hasEndYearError = validateEndYear();
+    const hasStartEraError = validateStartEra();
+    const hasEndEraError = validateEndEra();
     const hasDescriptionError = validateDescription();
     const hasWebsiteError = validateWebsites();
     const hasSimilarAestheticError = validateSimilarAesthetics();
 
-    if (hasNameError || hasStartYearError || hasEndYearError || hasDescriptionError
+    if (hasNameError || hasStartEraError || hasEndEraError || hasDescriptionError
       || hasWebsiteError || hasSimilarAestheticError) {
       return;
     }
@@ -314,8 +357,8 @@ const EditAestheticForm = props => {
       aesthetic: props.aesthetic.aesthetic,
       name,
       symbol,
-      endYear,
-      startYear,
+      endEra,
+      startEra,
       description,
       mediaSourceUrl: mediaSourceUrlState[0],
       websites: websitesToSend,
@@ -367,6 +410,16 @@ const EditAestheticForm = props => {
       });
   };
 
+  const eraSpecifierOptions = Object.keys(eras).sort().map(eraSpecifier => ({
+    label: eras[eraSpecifier].label,
+    value: eraSpecifier,
+  }));
+
+  const yearSpecifierOptions = Object.keys(eras[1].years).sort().map(year => ({
+    label: `${year}s`,
+    value: year,
+  }));
+
   return (
     <>
       <Helmet>
@@ -380,18 +433,29 @@ const EditAestheticForm = props => {
             <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
               value={name} />
           </FormGroup>
-          <FormGroup helperText={symbolHelperText || "1-3 letters. Like the Periodic Table, but for aesthetics."}
+          <FormGroup
+            helperText={symbolHelperText || "1-3 letters. Like the Periodic Table, but for aesthetics."}
             intent={symbolIntent} label="Symbol">
             <InputGroup intent={symbolIntent} onChange={handleSymbolChange} value={symbol || ''} />
           </FormGroup>
           <FormGroup helperText={startYearHelperText} intent={startYearIntent}
             label="Year First Observed" labelInfo="(required)">
-            <InputGroup intent={startYearIntent} onChange={event => setStartYear(event.target.value)}
-              value={startYear || ''} />
+            <ControlGroup>
+              <HTMLSelect options={eraSpecifierOptions}
+                onChange={event => setStartEraSpecifier(event.target.value)}
+                value={startEraSpecifier} />
+              <HTMLSelect options={yearSpecifierOptions} onChange={handleStartYearChange}
+                value={startYear} />
+            </ControlGroup>
           </FormGroup>
-          <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End Year">
-            <InputGroup intent={endYearIntent} onChange={event => setEndYear(event.target.value)}
-              value={endYear || ''} />
+          <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End of Popularity">
+            <ControlGroup>
+              <HTMLSelect options={eraSpecifierOptions}
+                onChange={event => setEndEraSpecifier(event.target.value)}
+                value={endEraSpecifier} />
+              <HTMLSelect options={yearSpecifierOptions} onChange={handleEndYearChange}
+                value={endYear} />
+            </ControlGroup>
           </FormGroup>
           <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
             label="Description" labelInfo="(required)">

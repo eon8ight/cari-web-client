@@ -360,7 +360,7 @@ const MediaSubform = props => {
               onItemSelect={handleCreatorChange} onQueryChange={refilter}
               popoverProps={SUGGEST_POPOVER_PROPS}
               query={creatorNamesMap[swapSpace.mediaCreator]} resetOnClose={true}
-              selectedItem={swapSpace.creator} />
+              selectedItem={{mediaCreator: swapSpace.mediaCreator, name: swapSpace.mediaCreatorName}} />
           </ControlGroup>
         </FormGroup>
         <FormGroup helperText={yearHelperText} intent={yearIntent} label="Year"
@@ -423,7 +423,7 @@ const MediaSubform = props => {
                 <dt><strong>Description:</strong></dt>
                 <dd>{parse(medium.description)}</dd>
                 <dt><strong>Creator:</strong></dt>
-                <dd>{medium.mediaCreatorName || '(none)'}</dd>
+                <dd>{creatorNamesMap[medium.mediaCreator] || '(none)'}</dd>
                 <dt><strong>Year:</strong></dt>
                 <dd>{medium.year}</dd>
               </dl>
