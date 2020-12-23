@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
 import axios from 'axios';
@@ -10,18 +9,15 @@ import {
   Spinner
 } from '@blueprintjs/core';
 
-import { addMessage } from '../../../redux/actions';
-import useSession from '../../../hooks/useSession';
-
 import { API_ROUTE_AUTH_LOGOUT } from '../../../functions/constants';
 
 const LogoutPage = props => {
-  const session = useSession();
+  const addMessage = props.addMessage;
+  const session = props.session;
+  const setSession = props.setSession;
 
   const [calledLogout, setCalledLogout] = useState(false);
   const [loggedOut, setLoggedOut] = useState(false);
-
-  const addMessage = props.addMessage;
 
   useEffect(() => {
     if(session.isValid && !calledLogout) {
@@ -31,10 +27,11 @@ const LogoutPage = props => {
       .then(res => {
         addMessage('You have successfully logged out.');
         setLoggedOut(true);
+        setSession({ isValid: false });
       })
       .catch(err => addMessage(`An error occurred: ${err}`, Intent.DANGER));
     }
-  }, [session.isValid, addMessage, calledLogout]);
+  }, [session.isValid, addMessage, calledLogout, setSession]);
 
   if (session.isValid === null) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
@@ -54,7 +51,4 @@ const LogoutPage = props => {
   );
 };
 
-export default connect(
-  null,
-  { addMessage }
-)(LogoutPage);
+export default LogoutPage;

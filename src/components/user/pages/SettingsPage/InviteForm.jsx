@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { connect } from 'react-redux';
 
 import axios from 'axios';
 
@@ -18,7 +17,6 @@ import InvitedUsersList from './InvitedUsersList';
 import Paginator from '../../../common/Paginator';
 
 import { valueExists } from '../../../../functions/utils';
-import { addMessage } from '../../../../redux/actions';
 
 import {
   API_ROUTE_USER_FIND_FOR_LIST,
@@ -180,7 +178,4 @@ const InviteForm = props => {
   );
 };
 
-export default connect(
-  null,
-  { addMessage }
-)(InviteForm);
+export default InviteForm;

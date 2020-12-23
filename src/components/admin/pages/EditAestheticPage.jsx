@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { connect } from 'react-redux';
 import { Redirect, useRouteMatch } from 'react-router-dom';
 
 import axios from 'axios';
@@ -12,13 +11,10 @@ import {
 
 import EditAestheticForm from '../EditAestheticForm';
 
-import { addMessage } from '../../../redux/actions';
-import useSession from '../../../hooks/useSession';
-
 import { API_ROUTE_AESTHETIC_FIND_FOR_EDIT } from '../../../functions/constants';
 
 const EditAestheticPage = props => {
-  const session = useSession();
+  const session = props.session;
   const match = useRouteMatch();
 
   const [requestMade, setRequestMade] = useState(false);
@@ -52,4 +48,4 @@ const EditAestheticPage = props => {
   );
 };
 
-export default connect(null, { addMessage })(EditAestheticPage);
+export default EditAestheticPage;

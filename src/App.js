@@ -1,10 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { connect } from 'react-redux';
+
+import axios from 'axios';
+import { cloneDeep } from 'lodash/lang';
+import { uniqueId } from 'lodash/util';
 
 import {
+  Intent,
   Position,
-  Toaster
+  Spinner,
+  Toaster,
 } from '@blueprintjs/core';
 
 import AdminRouter from './components/admin/Router';
@@ -18,6 +23,11 @@ import Home from './components/Home';
 import NotFoundPage from './components/error/pages/NotFoundPage';
 import Team from './components/Team';
 
+import {
+  API_ROUTE_AUTH_CHECK_SESSION,
+  TOKEN_VALIDITY_VALID,
+} from './functions/constants';
+
 import '@blueprintjs/core/lib/css/blueprint.css';
 
 import './Styles.scss';
@@ -25,20 +35,56 @@ import './Styles.scss';
 const TOASTER = Toaster.create({
   autoFocus: true,
   canEscapeKeyClear: true,
+  maxToasts: 1,
   position: Position.TOP,
 });
 
 const App = props => {
-  const messages = props.messages;
+  const [session, setSession] = useState(null);
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    if(session === null) {
+      const getOpts = {
+        withCredentials: true,
+        validateStatus: (httpCode => httpCode === 200 || httpCode === 401),
+      };
+
+      axios.get(API_ROUTE_AUTH_CHECK_SESSION, getOpts)
+        .then(res => setSession({
+          isValid: res.data.status === TOKEN_VALIDITY_VALID,
+          claims: res.data.tokenClaims
+        }))
+        .catch(err => setSession({ isValid: false }));
+    }
+  }, [session]);
 
   useEffect(() => {
     TOASTER.clear();
     messages.forEach(msg => TOASTER.show(msg.props, msg.key));
   }, [messages]);
 
+  const addMessage = useCallback((message, intent) => {
+    const messageObject = {
+      props: {
+        message,
+        intent: intent || Intent.PRIMARY,
+      },
+      key: uniqueId('message_'),
+    };
+
+    const newMessages = cloneDeep(messages);
+    newMessages.push(messageObject);
+    setMessages(newMessages);
+  }, [messages]);
+
+  if (session === null) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
   return (
     <BrowserRouter>
-      <Header />
+      <Header session={session} />
       <Switch>
         <Route path="/" exact>
           <Home />
@@ -53,16 +99,16 @@ const App = props => {
           <Faq />
         </Route>
         <Route path="/aesthetics">
-          <AestheticsRouter />
+          <AestheticsRouter session={session} />
         </Route>
         <Route path="/admin">
-          <AdminRouter />
+          <AdminRouter addMessage={addMessage} session={session} />
         </Route>
         <Route path="/error">
           <ErrorRouter />
         </Route>
         <Route path="/user">
-          <UserRouter />
+          <UserRouter addMessage={addMessage} session={session} setSession={setSession} />
         </Route>
         <Route component={NotFoundPage} />
       </Switch>
@@ -71,4 +117,4 @@ const App = props => {
   );
 };
 
-export default connect(state => ({ messages: state.messages }))(App);
+export default App;

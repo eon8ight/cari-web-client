@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Helmet } from 'react-helmet';
 import { Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
 
 import {
   Button,
@@ -15,18 +14,15 @@ import {
 
 import PasswordInput from '../../common/PasswordInput';
 
-import { addMessage } from '../../../redux/actions';
-
 import {
   API_ROUTE_USER_REGISTER,
   TOKEN_TYPE_INVITE,
 } from '../../../functions/constants';
 
 import useAuthtoken from '../../../hooks/useAuthtoken';
-import useSession from '../../../hooks/useSession';
 
 const RegisterPage = props => {
-  const session = useSession();
+  const session = props.session;
   const authtoken = useAuthtoken(TOKEN_TYPE_INVITE);
 
   const [registered, setRegistered] = useState(false);
@@ -168,4 +164,4 @@ const RegisterPage = props => {
   );
 };
 
-export default connect(null, { addMessage })(RegisterPage);
+export default RegisterPage;

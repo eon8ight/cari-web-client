@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
 import axios from 'axios';
@@ -19,13 +18,10 @@ import {
 
 import PasswordInput from '../../common/PasswordInput';
 
-import { addMessage } from '../../../redux/actions';
-import useSession from '../../../hooks/useSession'
-
 import { API_ROUTE_AUTH_LOGIN } from '../../../functions/constants';
 
 const LoginPage = props => {
-  const session = useSession();
+  const session = props.session;
 
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -43,11 +39,7 @@ const LoginPage = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if (session.isValid) {
-    return <Redirect to="/" />;
-  }
-
-  if(loggedIn) {
+  if (session.isValid || loggedIn) {
     return <Redirect to="/" />;
   }
 
@@ -115,6 +107,7 @@ const LoginPage = props => {
         if (res.status === 200) {
           props.addMessage("You have successfully logged in.");
           setLoggedIn(true);
+          props.setSession({ isValid: true, claims: res.data.updatedData.token });
         } else {
           res.data.fieldErrors.forEach(fieldError => {
             switch(fieldError.field) {
@@ -163,4 +156,4 @@ const LoginPage = props => {
   );
 };
 
-export default connect(null, { addMessage })(LoginPage);
+export default LoginPage;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
 
 import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
@@ -20,7 +19,6 @@ import {
 import { Suggest } from '@blueprintjs/select';
 
 import PasswordInput from '../../../common/PasswordInput';
-import { addMessage } from '../../../../redux/actions';
 
 import {
   API_ROUTE_AESTHETIC_NAMES,
@@ -393,7 +391,4 @@ const ProfileForm = (props) => {
   );
 };
 
-export default connect(
-  null,
-  { addMessage }
-)(ProfileForm);
+export default ProfileForm;

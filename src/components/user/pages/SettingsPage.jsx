@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { connect } from 'react-redux';
 import { Redirect, useHistory, useLocation } from 'react-router-dom';
 
 import {
@@ -14,16 +13,13 @@ import {
 import InviteForm from './SettingsPage/InviteForm';
 import ProfileForm from './SettingsPage/ProfileForm';
 
-import { addMessage } from '../../../redux/actions';
-import useSession from '../../../hooks/useSession';
-
 const ID_INVITE = 'invite';
 const ID_PROFILE = 'profile';
 
 const titleize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 const SettingsPage = props => {
-  const session = useSession();
+  const session = props.session;
   const loc = useLocation();
   const history = useHistory();
 
@@ -59,4 +55,4 @@ const SettingsPage = props => {
   );
 };
 
-export default connect(null, { addMessage })(SettingsPage);
+export default SettingsPage;

@@ -2,21 +2,18 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
 
 import { Intent, Spinner } from '@blueprintjs/core';
 
-import { addMessage } from '../../../redux/actions';
 import useAuthtoken from '../../../hooks/useAuthtoken';
-import useSession from '../../../hooks/useSession';
 
 import {
   API_ROUTE_USER_CONFIRM,
   TOKEN_TYPE_CONFIRM,
 } from '../../../functions/constants';
 
-const ConfirmPage = (props) => {
-  const session = useSession();
+const ConfirmPage = props => {
+  const session = props.session;
   const authtoken = useAuthtoken(TOKEN_TYPE_CONFIRM);
 
   const [calledApi, setCalledApi] = useState(false);
@@ -68,4 +65,4 @@ const ConfirmPage = (props) => {
   );
 };
 
-export default connect(null, { addMessage })(ConfirmPage);
+export default ConfirmPage;

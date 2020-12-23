@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 
 import {
@@ -14,12 +13,10 @@ import {
   Spinner,
 } from '@blueprintjs/core';
 
-import { addMessage } from '../../../redux/actions';
 import { API_ROUTE_MAIL_FORGOT_PASSWORD } from '../../../functions/constants';
-import useSession from '../../../hooks/useSession';
 
 const ForgotPasswordPage = props => {
-  const session = useSession();
+  const session = props.session;
 
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
@@ -111,4 +108,4 @@ const ForgotPasswordPage = props => {
   );
 };
 
-export default connect(null, { addMessage })(ForgotPasswordPage);
+export default ForgotPasswordPage;

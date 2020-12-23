@@ -92,7 +92,7 @@ const AestheticPage = props => {
       <Helmet>
         <title>CARI | Aesthetic | {aestheticData.name}</title>
       </Helmet>
-      <AestheticDetails aesthetic={aestheticData} />
+      <AestheticDetails aesthetic={aestheticData} session={props.session} />
       {timeline}
       {gallery}
       {similarityWeb}

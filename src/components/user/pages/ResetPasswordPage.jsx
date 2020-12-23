@@ -2,7 +2,6 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
 
 import {
   Button,
@@ -18,12 +17,10 @@ import {
   TOKEN_TYPE_RESET_PASSWORD,
 } from '../../../functions/constants';
 
-import { addMessage } from '../../../redux/actions';
 import useAuthtoken from '../../../hooks/useAuthtoken';
-import useSession from '../../../hooks/useSession';
 
 const ResetPasswordPage = props => {
-  const session = useSession();
+  const session = props.session;
   const authtoken = useAuthtoken(TOKEN_TYPE_RESET_PASSWORD);
 
   const [passwordReset, setPasswordReset] = useState(false);
@@ -122,4 +119,4 @@ const ResetPasswordPage = props => {
   );
 };
 
-export default connect(null, { addMessage })(ResetPasswordPage);
+export default ResetPasswordPage;
