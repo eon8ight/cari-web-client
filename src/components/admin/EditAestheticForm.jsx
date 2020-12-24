@@ -512,7 +512,7 @@ const EditAestheticForm = props => {
         </Card>
         <br />
         <Card>
-          <AestheticRelationshipSubform aesthetic={props.aesthetic}
+          <AestheticRelationshipSubform addMessage={addMessage} aesthetic={props.aesthetic}
             helperText={[similarAestheticHelperTexts, setSimilarAestheticHelperTexts]}
             icon={aestheticRelationshipSubformIcon}
             intent={[similarAestheticIntents, setSimilarAestheticIntents]}

@@ -39,6 +39,8 @@ const AESTHETIC_RELATIONSHIP_TEMPLATE = {
 const compareNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aesthetic === aestheticNameB.aesthetic;
 
 const AestheticRelationshipSubform = props => {
+  const addMessage = props.addMessage;
+
   const [similarAesthetics, setSimilarAesthetics] = props.similarAesthetics;
 
   const [intent, setIntent] = props.intent;
@@ -89,9 +91,9 @@ const AestheticRelationshipSubform = props => {
           setNames(newNames);
           refilterCallback(similarAesthetics, newNames);
         })
-        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));;
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
-  }, [isLoading, setIsLoading, similarAesthetics, refilterCallback, aesthetic]);
+  }, [addMessage, isLoading, setIsLoading, similarAesthetics, refilterCallback, aesthetic]);
 
   if(!names) {
     return <Spinner />;

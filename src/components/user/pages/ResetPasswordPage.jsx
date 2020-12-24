@@ -88,7 +88,7 @@ const ResetPasswordPage = props => {
 
     axios.post(postUrl, postBody, postOpts)
       .then(res => setPasswordReset(true))
-      .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
+      .catch(err => props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
   };
 
   if (passwordReset) {

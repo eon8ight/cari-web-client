@@ -93,13 +93,13 @@ const App = props => {
           <Home />
         </Route>
         <Route path="/team">
-          <Team />
+          <Team addMessage={addMessage} />
         </Route>
         <Route path="/faq">
           <Faq />
         </Route>
         <Route path="/aesthetics">
-          <AestheticsRouter session={session} />
+          <AestheticsRouter addMessage={addMessage} session={session} />
         </Route>
         <Route path="/admin">
           <AdminRouter addMessage={addMessage} session={session} />

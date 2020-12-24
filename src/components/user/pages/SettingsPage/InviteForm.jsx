@@ -26,6 +26,8 @@ import {
 import styles from './styles/InviteForm.module.scss';
 
 const InviteForm = props => {
+  const addMessage = props.addMessage;
+
   const [listRequestMade, setListRequestMade] = useState(false);
   const [invitedUsers, setInvitedUsers] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -77,7 +79,7 @@ const InviteForm = props => {
 
   const callApiRouteInvitedUsersListCallback = useCallback(
     callApiRouteInvitedUsersList,
-    [asc, listRequestMade, props, sortField]
+    [addMessage, asc, listRequestMade, props, sortField]
   );
 
   useEffect(() => {
@@ -120,7 +122,7 @@ const InviteForm = props => {
 
     axios.post(API_ROUTE_USER_INVITE, { emailAddress }, postOpts)
       .then(res => {
-        props.addMessage('Invitation sent.', Intent.SUCCESS);
+        addMessage('Invitation sent.', Intent.SUCCESS);
         setInvitedUsers(invitedUsers.concat(res.data.entity));
         setEmailAddress('');
       })
@@ -129,7 +131,7 @@ const InviteForm = props => {
           setEmailAddressIntent(Intent.DANGER);
           setEmailAddressHelperText(err.response.data.message);
         } else {
-          props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
+          addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
       });
   };

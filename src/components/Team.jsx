@@ -4,13 +4,17 @@ import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import parse from 'html-react-parser';
 
-import { Spinner } from '@blueprintjs/core';
+import {
+  Intent,
+  Spinner,
+} from '@blueprintjs/core';
 
 import { API_ROUTE_USER_FIND_FOR_LIST } from '../functions/constants';
 
 import styles from './styles/Team.module.scss';
 
 const Team = props => {
+  const addMessage = props.addMessage;
   const [userList, setUserList] = useState(null);
 
   useEffect(() => {
@@ -24,7 +28,7 @@ const Team = props => {
     axios.get(API_ROUTE_USER_FIND_FOR_LIST, { params })
       .then(res => setUserList(res.data.content))
       .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
-  }, [setUserList]);
+  }, [addMessage, setUserList]);
 
   if(!userList) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
