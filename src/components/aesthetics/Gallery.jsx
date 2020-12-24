@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import Modal from 'react-modal';
 
 import axios from 'axios';
-import { Spinner } from '@blueprintjs/core';
+import {
+  Intent,
+  Spinner,
+} from '@blueprintjs/core';
 
 import Paginator from '../common/Paginator';
 
@@ -20,7 +23,8 @@ const Gallery = props => {
     setGalleryData(null);
 
     axios.get(`${API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT}/${props.aesthetic.aesthetic}?page=${data.selected + 1}`)
-      .then(res => setGalleryData(res.data.contents));
+      .then(res => setGalleryData(res.data.contents))
+      .catch(err => props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
   };
 
   if(!galleryData) {

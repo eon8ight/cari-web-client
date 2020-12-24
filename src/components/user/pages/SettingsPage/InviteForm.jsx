@@ -71,7 +71,7 @@ const InviteForm = props => {
           setTotalPages(res.data.totalPages);
           setListRequestMade(false);
         })
-        .catch(err => props.addMessage(`An error occurred: ${err}`, Intent.DANGER));
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
   };
 
@@ -129,7 +129,7 @@ const InviteForm = props => {
           setEmailAddressIntent(Intent.DANGER);
           setEmailAddressHelperText(err.response.data.message);
         } else {
-          props.addMessage(`An error occurred: ${err}`, Intent.DANGER)
+          props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
       });
   };

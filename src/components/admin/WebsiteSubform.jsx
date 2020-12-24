@@ -32,8 +32,8 @@ const WebsiteSubform = props => {
   const [mediaSourceUrl, setMediaSourceUrl] = props.mediaSourceUrl;
   const [websites, setWebsites] = props.websites;
 
-  const intent = props.intent;
-  const helperText = props.helperText;
+  const [intent, setIntent] = props.intent;
+  const [helperText, setHelperText] = props.helperText;
 
   const websiteTypeOptions = Object.keys(props.websiteTypes).map(websiteType => ({
     label: props.websiteTypes[websiteType].label,
@@ -46,6 +46,14 @@ const WebsiteSubform = props => {
     const newWebsites = cloneDeep(websites);
     newWebsites.push(cloneDeep(WEBSITE_TEMPLATE));
     setWebsites(newWebsites);
+
+    const newIntent = cloneDeep(intent);
+    newIntent.push(Intent.NONE);
+    setIntent(newIntent);
+
+    const newHelperText = cloneDeep(helperText);
+    newHelperText.push('');
+    setHelperText(newHelperText);
   };
 
   const handleWebsiteChange = (url, idx) => {
@@ -70,7 +78,7 @@ const WebsiteSubform = props => {
     let mediaSourceCheckbox = null;
 
     if (website.websiteType === WEBSITE_TYPE_ARENA) {
-      const mediaSource = mediaSourceUrl.split('/').pop();
+      const mediaSource = mediaSourceUrl?.split('/').pop();
       const arenaWebsiteSlug = website.url.split('/').pop();
 
       const hasMultipleArenaWebsites = websites

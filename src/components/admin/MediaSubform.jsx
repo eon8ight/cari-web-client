@@ -44,7 +44,6 @@ superscript blockquote code | bullist numlist | link unlink | searchreplace |  r
 };
 
 const MEDIA_TEMPLATE = {
-  file: null,
   fileUrl: null,
   fileObject: null,
   previewFileUrl: '',
@@ -53,6 +52,7 @@ const MEDIA_TEMPLATE = {
   label: '',
   mediaCreator: 0,
   mediaCreatorName: '',
+  mediaFile: null,
   year: '',
 };
 
@@ -71,6 +71,8 @@ const menuItemCreate = (query, active, handleClick) => (
 );
 
 const MediaSubform = props => {
+  const addMessage = props.addMessage;
+
   const [media, setMedia] = props.media;
 
   const [swapSpace, setSwapSpace] = useState(null);
@@ -91,8 +93,8 @@ const MediaSubform = props => {
   const [creatorNamesMap, setCreatorNamesMap] = useState([]);
   const [filteredCreatorNames, setFilteredCreatorNames] = useState([]);
 
-  const intent = props.intent;
-  const helperText = props.helperText;
+  const [intent, setIntent] = props.intent;
+  const [helperText, setHelperText] = props.helperText;
 
   useEffect(() => {
     if (!isLoading) {
@@ -104,15 +106,16 @@ const MediaSubform = props => {
 
           const newCreatorNamesMap = newCreatorNames.reduce((map, creatorName) => {
             map[creatorName.mediaCreator] = creatorName.name;
-            return map
+            return map;
           }, {});
 
           setCreatorNames(newCreatorNames);
           setCreatorNamesMap(newCreatorNamesMap);
           setFilteredCreatorNames(newCreatorNames);
-        });
+        })
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
-  }, [isLoading, setIsLoading]);
+  }, [addMessage, isLoading, setIsLoading]);
 
   if (!creatorNames) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
@@ -140,6 +143,14 @@ const MediaSubform = props => {
 
       if (editIndex === null) {
         newMedia.push(swapSpace);
+
+        const newIntent = cloneDeep(intent);
+        newIntent.push(Intent.NONE);
+        setIntent(newIntent);
+
+        const newHelperText = cloneDeep(helperText);
+        helperText.push('');
+        setHelperText(newHelperText);
       } else {
         newMedia[editIndex] = swapSpace;
       }
@@ -153,6 +164,14 @@ const MediaSubform = props => {
   const handleDelete = idx => {
     const newMedia = cloneDeep(media);
     newMedia.splice(idx, 1);
+
+    const newIntent = cloneDeep(intent);
+    newIntent.splice(idx, 1);
+    setIntent(newIntent);
+
+    const newHelperText = cloneDeep(helperText);
+    newHelperText.splice(idx, 1);
+    setHelperText(newHelperText);
   };
 
   const handleChange = (property, value) => {
@@ -408,7 +427,7 @@ const MediaSubform = props => {
     }
 
     return (
-      <li key={medium.aestheticMedia}>
+      <li key={medium.aestheticMedia || uniqueId('media_')}>
         <FormGroup>
           <ControlGroup className={styles.mediaPreviewButtons}>
             <Button icon="edit" onClick={() => handleModalOpen(medium, idx)}>Edit</Button>

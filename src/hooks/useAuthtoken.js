@@ -37,9 +37,7 @@ const useAuthtoken = tokenType => {
           setClaims(res.data.tokenClaims);
           setIsValid(res.data.status === TOKEN_VALIDITY_VALID);
         })
-        .catch(err => {
-          setIsValid(false);
-        });
+        .catch(err => setIsValid(false));
     }
   }, [calledCheck, token, tokenType]);
 

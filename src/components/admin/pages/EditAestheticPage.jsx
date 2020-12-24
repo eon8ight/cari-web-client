@@ -14,6 +14,7 @@ import EditAestheticForm from '../EditAestheticForm';
 import { API_ROUTE_AESTHETIC_FIND_FOR_EDIT } from '../../../functions/constants';
 
 const EditAestheticPage = props => {
+  const addMessage = props.addMessage;
   const session = props.session;
   const match = useRouteMatch();
 
@@ -25,9 +26,10 @@ const EditAestheticPage = props => {
       setRequestMade(true);
 
       axios.get(`${API_ROUTE_AESTHETIC_FIND_FOR_EDIT}/${match.params.aesthetic}`)
-        .then(res => setAestheticData(res.data));
+        .then(res => setAestheticData(res.data))
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));;
     }
-  }, [match.params.aesthetic, requestMade, setRequestMade]);
+  }, [addMessage, match.params.aesthetic, requestMade, setRequestMade]);
 
   if (session.isValid === null || !aestheticData) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
@@ -43,7 +45,7 @@ const EditAestheticPage = props => {
       <Helmet>
         <title>CARI | Admin | Edit {aestheticData.name}</title>
       </Helmet>
-      <EditAestheticForm aesthetic={aestheticData} />
+      <EditAestheticForm addMessage={props.addMessage} aesthetic={aestheticData} />
     </>
   );
 };

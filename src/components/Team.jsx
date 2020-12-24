@@ -22,32 +22,55 @@ const Team = props => {
     };
 
     axios.get(API_ROUTE_USER_FIND_FOR_LIST, { params })
-      .then(res => setUserList(res.data.content));
+      .then(res => setUserList(res.data.content))
+      .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
   }, [setUserList]);
 
   if(!userList) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  const teamDataElem = userList.map(user => (
-    <article class={styles.teamArticle}>
-      <img alt="Consumer Aesthetics Research Institute" src={user.profileImage.url}
-        class={styles.profileImage} width="100" />
-      <div>
-        <h3>{user.firstName} {user.lastName} - {user.title}</h3>
-        <p>
-          {parse(user.biography)}
-          <br />
-          <em>
-            Favorite Aesthetic:&nbsp;
-            <a href={`/aesthetics/${user.favoriteAestheticData.urlSlug}`}>
-              {user.favoriteAestheticData.name}
-            </a>
-          </em>
-        </p>
-      </div>
-    </article>
-  ));
+  const teamDataElem = userList.map(user => {
+    const firstName = user.firstName;
+    const lastName = user.lastName;
+    const title = user.title;
+    const biography = user.biography;
+    const profileImage = user.profileImage;
+    const favoriteAestheticData = user.favoriteAestheticData;
+
+    let displayName = user.username;
+
+    if(firstName) {
+      displayName = firstName;
+
+      if(lastName) {
+        displayName = `${displayName} ${lastName}`;
+      }
+
+      if(title) {
+        displayName = `${displayName} - ${title}`;
+      }
+    }
+
+    return (
+      <article class={styles.teamArticle}>
+        {profileImage && <img alt="Consumer Aesthetics Research Institute" src={profileImage.url}
+          class={styles.profileImage} width="100" />}
+        <div>
+          <h3>{displayName}</h3>
+          <p>
+            {biography && parse(biography)}
+            {favoriteAestheticData && <em>
+              Favorite Aesthetic:&nbsp;
+              <a href={`/aesthetics/${favoriteAestheticData.urlSlug}`}>
+                {favoriteAestheticData.name}
+              </a>
+            </em>}
+          </p>
+        </div>
+      </article>
+    );
+  });
 
   return (
     <>

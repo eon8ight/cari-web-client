@@ -32,7 +32,10 @@ const AestheticDetails = props => {
   let editButton = null;
 
   if(props.session.isValid) {
-    editButton = <AnchorButton href={`/admin/edit/${props.aesthetic.aesthetic}`} icon="edit" intent={Intent.PRIMARY} large={true} text="Edit" />;
+    editButton = (
+      <AnchorButton href={`/admin/edit/${props.aesthetic.aesthetic}`} icon="edit"
+        intent={Intent.PRIMARY} large={true} text="Edit" />
+    );
   }
 
   return (
@@ -46,7 +49,7 @@ const AestheticDetails = props => {
         <div className={styles.sectionHeaderLine}>
           <h3>circa</h3>
           <h2>
-            {props.aesthetic.startYear || '?'} - {props.aesthetic.endYear || '?'}
+            {props.aesthetic.startYear || '?'} - {props.aesthetic.endYear || 'Present'}
           </h2>
         </div>
       </div>

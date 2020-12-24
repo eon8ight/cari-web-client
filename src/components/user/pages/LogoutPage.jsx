@@ -29,7 +29,7 @@ const LogoutPage = props => {
         setLoggedOut(true);
         setSession({ isValid: false });
       })
-      .catch(err => addMessage(`An error occurred: ${err}`, Intent.DANGER));
+      .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
   }, [session.isValid, addMessage, calledLogout, setSession]);
 

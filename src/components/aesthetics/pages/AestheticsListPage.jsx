@@ -8,6 +8,7 @@ import {
   ControlGroup,
   FormGroup,
   InputGroup,
+  Intent,
   NumericInput,
   Spinner,
 } from '@blueprintjs/core';
@@ -21,6 +22,8 @@ import { valueExists } from '../../../functions/utils';
 import styles from './styles/AestheticsListPage.module.scss';
 
 const AestheticsListPage = props => {
+  const addMessage = props.addMessage;
+
   const [requestMade, setRequestMade] = useState(false);
   const [aesthetics, setAesthetics] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -69,11 +72,12 @@ const AestheticsListPage = props => {
           setAesthetics(res.data.content);
           setTotalPages(res.data.totalPages);
           setRequestMade(false);
-        });
+        })
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));;
     }
   };
 
-  const callApiCallback = useCallback(callApi, [asc, keyword, endYear, requestMade, sortField, startYear]);
+  const callApiCallback = useCallback(callApi, [addMessage, asc, keyword, endYear, requestMade, sortField, startYear]);
 
   useEffect(() => {
     if (!aesthetics)

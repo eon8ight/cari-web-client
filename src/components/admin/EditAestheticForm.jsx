@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { Redirect } from 'react-router-dom';
 
 import axios from 'axios';
 import { cloneDeep } from 'lodash/lang';
@@ -42,6 +43,8 @@ superscript blockquote code | bullist numlist | link unlink | searchreplace |  r
 };
 
 const EditAestheticForm = props => {
+  const addMessage = props.addMessage;
+
   const originalWebsites = props.aesthetic.websites || [];
   const originalSimilarAesthetics = props.aesthetic.similarAesthetics || [];
   const originalMedia = props.aesthetic.media || [];
@@ -97,6 +100,7 @@ const EditAestheticForm = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [eras, setEras] = useState(null);
   const [websiteTypes, setWebsiteTypes] = useState(null);
+  const [edited, setEdited] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -113,7 +117,8 @@ const EditAestheticForm = props => {
 
             return map;
           }, {}));
-        });
+        })
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
 
       axios.get(API_ROUTE_ERAS)
         .then(res => {
@@ -139,12 +144,17 @@ const EditAestheticForm = props => {
 
             return map;
           }, {}));
-        });
+        })
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
-  }, [isLoading, setIsLoading, startEra, endEra]);
+  }, [addMessage, isLoading, setIsLoading, startEra, endEra]);
 
   if (!(eras && websiteTypes)) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
+  if(edited) {
+    return <Redirect to={`/aesthetics/${props.aesthetic.urlSlug}`} />
   }
 
   const handleSymbolChange = event => {
@@ -153,10 +163,30 @@ const EditAestheticForm = props => {
     setSymbol(newSymbol);
   };
 
+  const handleStartEraSpecifierChange = event => {
+    const value = event.target.value;
+    setStartEraSpecifier(value);
+
+    if(value === '--') {
+      setStartYear('--');
+      setStartEra(null);
+    }
+  };
+
   const handleStartYearChange = event => {
     const year = event.target.value;
     setStartYear(year);
     setStartEra(eras[startEraSpecifier].years[year]);
+  };
+
+  const handleEndEraSpecifierChange = event => {
+    const value = event.target.value;
+    setEndEraSpecifier(value);
+
+    if(value === '--') {
+      setEndYear('--');
+      setEndEra(null);
+    }
   };
 
   const handleEndYearChange = event => {
@@ -166,7 +196,7 @@ const EditAestheticForm = props => {
   };
 
   const handleCancel = () => {
-    // TODO
+    setEdited(true);
   };
 
   const validateName = () => {
@@ -189,7 +219,7 @@ const EditAestheticForm = props => {
 
     if (!startEra) {
       setStartYearIntent(Intent.DANGER);
-      setStartYearHelperText('Start year is required.');
+      setStartYearHelperText('Year first observed is required.');
       hasError = true;
     } else {
       setStartYearIntent(Intent.NONE);
@@ -203,9 +233,12 @@ const EditAestheticForm = props => {
     let hasError = false;
 
     if (endEra) {
-      if(startYear > endYear || (startYear === endYear && startEraSpecifier > endEraSpecifier)) {
+      const intStartYear = parseInt(startYear);
+      const intEndYear = parseInt(endYear);
+
+      if(intStartYear > intEndYear || (intStartYear === intEndYear && startEraSpecifier > endEraSpecifier)) {
         setEndYearIntent(Intent.DANGER);
-        setEndYearHelperText('End year cannot be before first year observed.');
+        setEndYearHelperText('End of popularity cannot be before year first observed.');
         hasError = true;
       } else {
         setEndYearHelperText('');
@@ -371,9 +404,12 @@ const EditAestheticForm = props => {
       { indices: true }
     );
 
-    axios.post(API_ROUTE_AESTHETIC_EDIT, formData)
+    const postOpts = { withCredentials: true };
+
+    axios.post(API_ROUTE_AESTHETIC_EDIT, formData, postOpts)
       .then(res => {
-        // TODO
+        addMessage("Successfully updated.");
+        setEdited(true);
       })
       .catch(err => {
         if (err.response.status === 400) {
@@ -401,11 +437,11 @@ const EditAestheticForm = props => {
 
                 break;
               default:
-                props.addMessage(fieldError.message, Intent.DANGER);
+                addMessage(`An error occurred: ${fieldError.message}`, Intent.DANGER);
             }
           });
         } else {
-          props.addMessage(`An error occurred: ${err}`, Intent.DANGER)
+          addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
       });
   };
@@ -415,10 +451,14 @@ const EditAestheticForm = props => {
     value: eraSpecifier,
   }));
 
+  eraSpecifierOptions.unshift({ label: '--', value: null });
+
   const yearSpecifierOptions = Object.keys(eras[1].years).sort().map(year => ({
     label: `${year}s`,
     value: year,
   }));
+
+  yearSpecifierOptions.unshift({ label: '--', value: null });
 
   return (
     <>
@@ -442,47 +482,49 @@ const EditAestheticForm = props => {
             label="Year First Observed" labelInfo="(required)">
             <ControlGroup>
               <HTMLSelect options={eraSpecifierOptions}
-                onChange={event => setStartEraSpecifier(event.target.value)}
-                value={startEraSpecifier} />
-              <HTMLSelect options={yearSpecifierOptions} onChange={handleStartYearChange}
-                value={startYear} />
+                onChange={handleStartEraSpecifierChange} value={startEraSpecifier} />
+              <HTMLSelect disabled={startEraSpecifier === '--'} options={yearSpecifierOptions}
+                onChange={handleStartYearChange} value={startYear} />
             </ControlGroup>
           </FormGroup>
           <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End of Popularity">
             <ControlGroup>
               <HTMLSelect options={eraSpecifierOptions}
-                onChange={event => setEndEraSpecifier(event.target.value)}
-                value={endEraSpecifier} />
-              <HTMLSelect options={yearSpecifierOptions} onChange={handleEndYearChange}
-                value={endYear} />
+                onChange={handleEndEraSpecifierChange} value={endEraSpecifier} />
+              <HTMLSelect disabled={endEraSpecifier === '--'} options={yearSpecifierOptions}
+                onChange={handleEndYearChange} value={endYear} />
             </ControlGroup>
           </FormGroup>
           <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
             label="Description" labelInfo="(required)">
             <Editor apiKey={process.env.REACT_APP_TINYMCE_API_KEY} id="aestheticDescription"
               init={DESCRIPTION_EDITOR_SETTINGS}
-              initialValue={description} onEditorChange={(content, editor) => setDescription(content)} />
+              initialValue={description}
+              onEditorChange={(content, editor) => setDescription(content)} />
           </FormGroup>
         </Card>
         <br />
         <Card>
-          <WebsiteSubform helperText={websiteHelperTexts} icon={websiteSubformIcon}
-            intent={websiteIntents} mediaSourceUrl={mediaSourceUrlState}
-            show={[showWebsiteSubform, setShowWebsiteSubform]} websites={websitesState}
-            websiteTypes={websiteTypes} />
+          <WebsiteSubform helperText={[websiteHelperTexts, setWebsiteHelperTexts]}
+            icon={websiteSubformIcon} intent={[websiteIntents, setWebsiteIntents]}
+            mediaSourceUrl={mediaSourceUrlState} show={[showWebsiteSubform, setShowWebsiteSubform]}
+            websites={websitesState} websiteTypes={websiteTypes} />
         </Card>
         <br />
         <Card>
           <AestheticRelationshipSubform aesthetic={props.aesthetic}
-            helperText={similarAestheticHelperTexts} icon={aestheticRelationshipSubformIcon}
-            intent={similarAestheticIntents}
+            helperText={[similarAestheticHelperTexts, setSimilarAestheticHelperTexts]}
+            icon={aestheticRelationshipSubformIcon}
+            intent={[similarAestheticIntents, setSimilarAestheticIntents]}
             show={[showAestheticRelationshipSubform, setShowAestheticRelationshipSubform]}
             similarAesthetics={similarAestheticsState} />
         </Card>
         <br />
         <Card>
-          <MediaSubform helperText={mediaHelperTexts} icon={mediaSubformIcon}
-            intent={mediaIntents} media={mediaState} show={[showMediaSubform, setShowMediaSubform]} />
+          <MediaSubform addMessage={addMessage}
+            helperText={[mediaHelperTexts, setMediaHelperTexts]} icon={mediaSubformIcon}
+            intent={[mediaIntents, setMediaIntents]} media={mediaState}
+            show={[showMediaSubform, setShowMediaSubform]} />
         </Card>
         <br />
         <FormGroup>

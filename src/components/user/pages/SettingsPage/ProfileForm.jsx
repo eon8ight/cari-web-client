@@ -48,6 +48,8 @@ const SUGGEST_POPOVER_PROPS = {
 const compareNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aesthetic === aestheticNameB.aesthetic;
 
 const ProfileForm = (props) => {
+  const addMessage = props.addMessage;
+
   const [isLoadingNames, setIsLoadingNames] = useState(false);
   const [isLoadingEntity, setIsLoadingEntity] = useState(false);
   const [isUpdating, setIsUpdating] = useState(null);
@@ -128,9 +130,10 @@ const ProfileForm = (props) => {
           if (entity.profileImage) {
             setProfileImageUrl(entity.profileImage.url);
           }
-        });
+        })
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));;
     }
-  }, [isLoadingEntity]);
+  }, [addMessage, isLoadingEntity]);
 
   if (!names || !username) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
@@ -294,11 +297,11 @@ const ProfileForm = (props) => {
                 setProfileImageHelperText(fieldError.message);
                 break;
               default:
-                props.addMessage(fieldError.message, Intent.DANGER);
+                props.addMessage(`An error occurred: ${fieldError.message}`, Intent.DANGER);
             }
           });
         } else {
-          props.addMessage(`An error occurred: ${err}`, Intent.DANGER)
+          props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
       });
   };

@@ -41,8 +41,8 @@ const compareNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aestheti
 const AestheticRelationshipSubform = props => {
   const [similarAesthetics, setSimilarAesthetics] = props.similarAesthetics;
 
-  const intent = props.intent;
-  const helperText = props.helperText;
+  const [intent, setIntent] = props.intent;
+  const [helperText, setHelperText] = props.helperText;
 
   const [isLoading, setIsLoading] = useState(false);
   const [names, setNames] = useState([]);
@@ -88,7 +88,8 @@ const AestheticRelationshipSubform = props => {
 
           setNames(newNames);
           refilterCallback(similarAesthetics, newNames);
-        });
+        })
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));;
     }
   }, [isLoading, setIsLoading, similarAesthetics, refilterCallback, aesthetic]);
 
@@ -114,6 +115,24 @@ const AestheticRelationshipSubform = props => {
     const newSimilarAesthetics = cloneDeep(similarAesthetics);
     newSimilarAesthetics.push(cloneDeep(AESTHETIC_RELATIONSHIP_TEMPLATE));
     setSimilarAesthetics(newSimilarAesthetics);
+
+    const newIntent = cloneDeep(intent);
+
+    newIntent.push({
+      description: Intent.NONE,
+      reverseDescription: Intent.NONE,
+    });
+
+    setIntent(newIntent);
+
+    const newHelperText = cloneDeep(helperText);
+
+    newHelperText.push({
+      description: '',
+      reverseDescription: '',
+    });
+
+    setHelperText(newHelperText);
   };
 
   const handleNameSelect = (aestheticName, idx) => {
@@ -133,6 +152,14 @@ const AestheticRelationshipSubform = props => {
     const newSimilarAesthetics = cloneDeep(similarAesthetics);
     newSimilarAesthetics.splice(idx, 1);
     setSimilarAesthetics(newSimilarAesthetics);
+
+    const newIntent = cloneDeep(intent);
+    newIntent.splice(idx, 1);
+    setIntent(newIntent);
+
+    const newHelperText = cloneDeep(helperText);
+    newHelperText.splice(idx, 1);
+    setHelperText(newHelperText);
   };
 
   const elems = similarAesthetics.map((similarAesthetic, idx) => {

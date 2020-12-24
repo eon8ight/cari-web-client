@@ -19,6 +19,7 @@ const ID_PROFILE = 'profile';
 const titleize = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 const SettingsPage = props => {
+  const addMessage = props.addMessage;
   const session = props.session;
   const loc = useLocation();
   const history = useHistory();
@@ -30,11 +31,11 @@ const SettingsPage = props => {
   }
 
   if (!session.isValid) {
-      props.addMessage('You must be logged in to view this page', Intent.DANGER);
+      addMessage('You must be logged in to view this page', Intent.DANGER);
       return <Redirect to="/user/login" />;
   }
 
-  const handleTabChange = (tabId) => {
+  const handleTabChange = tabId => {
     setSelectedTab(tabId);
     history.push(`${loc.pathname}#${tabId}`);
   };
@@ -47,8 +48,10 @@ const SettingsPage = props => {
       <Card>
         <Tabs animate={true} onChange={handleTabChange}
           selectedTabId={selectedTab}>
-          <Tab id={ID_PROFILE} panel={<ProfileForm session={session} />} title="Profile" />
-          <Tab id={ID_INVITE} panel={<InviteForm session={session} />} title="Invite" />
+          <Tab id={ID_PROFILE} panel={<ProfileForm addMessage={addMessage} session={session} />}
+            title="Profile" />
+          <Tab id={ID_INVITE} panel={<InviteForm addMessage={addMessage} session={session} />}
+            title="Invite" />
         </Tabs>
       </Card>
     </>

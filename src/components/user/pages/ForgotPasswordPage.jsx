@@ -66,7 +66,7 @@ const ForgotPasswordPage = props => {
           setUsernameIntent(Intent.DANGER);
           setUsernameHelperText(err.response.data.message);
         } else {
-          props.addMessage(`An error occurred: ${err}`, Intent.DANGER);
+          props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
       });
   };

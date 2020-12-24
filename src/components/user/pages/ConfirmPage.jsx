@@ -30,7 +30,7 @@ const ConfirmPage = props => {
 
       axios.post(API_ROUTE_USER_CONFIRM, postBody, postOpts)
         .then(res => setConfirmed(true))
-        .catch(err => addMessage(`An error has occurred: ${err}`, Intent.DANGER));
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
   }, [addMessage, authtoken.token, calledApi]);
 
