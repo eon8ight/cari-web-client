@@ -60,13 +60,26 @@ const WebsiteSubform = props => {
     const newWebsites = cloneDeep(websites);
     newWebsites[idx].url = url;
     setWebsites(newWebsites);
+
+    const websiteType = websites[idx].websiteType;
+    updateMediaSourceUrl(websiteType, url);
   };
 
   const handleWebsiteTypeChange = (websiteType, idx) => {
     const newWebsites = cloneDeep(websites);
     newWebsites[idx].websiteType = parseInt(websiteType);
     setWebsites(newWebsites);
+
+    const url = websites[idx].url;
+    updateMediaSourceUrl(websiteType, url);
   }
+
+  const updateMediaSourceUrl = (websiteType, url) => {
+    if (websiteType && url && parseInt(websiteType) === WEBSITE_TYPE_ARENA) {
+      const arenaWebsiteSlug = url.split('/').pop();
+      setMediaSourceUrl(ARENA_API_URL + arenaWebsiteSlug);
+    }
+  };
 
   const handleDelete = idx => {
     const newWebsites = cloneDeep(websites);
@@ -79,7 +92,7 @@ const WebsiteSubform = props => {
 
     if (website.websiteType === WEBSITE_TYPE_ARENA) {
       const mediaSource = mediaSourceUrl?.split('/').pop();
-      const arenaWebsiteSlug = website.url.split('/').pop();
+      const arenaWebsiteSlug = website.url?.split('/').pop();
 
       const hasMultipleArenaWebsites = websites
         .filter(website => website.websiteType === WEBSITE_TYPE_ARENA)

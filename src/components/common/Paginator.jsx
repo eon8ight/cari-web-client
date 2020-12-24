@@ -13,10 +13,10 @@ const LINK_CLASS_NAME = 'bp3-button';
 const Paginator = props => {
   // Hack to set the value of a disabled <li>'s <a> to be disabled
   useEffect(() => {
-    document.querySelectorAll(`a.${DISABLED_CLASS_NAME}`)
+    document.querySelectorAll(`.${styles.paginationItem} > a.${DISABLED_CLASS_NAME}`)
       .forEach(item => item.classList.remove(DISABLED_CLASS_NAME));
 
-    document.querySelectorAll(`a.${ACTIVE_CLASS_NAME}, li.paginationDisabled > a`)
+    document.querySelectorAll(`.${styles.paginationItem} >  a.${ACTIVE_CLASS_NAME}, li.paginationDisabled > a`)
       .forEach(item => item.classList.add(DISABLED_CLASS_NAME))
   });
 

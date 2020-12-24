@@ -1,6 +1,7 @@
 import React from 'react';
 
 import parse from 'html-react-parser';
+import { uniqueId } from 'lodash/util';
 
 import {
   AnchorButton,
@@ -14,7 +15,7 @@ const AestheticDetails = props => {
 
   if (props.aesthetic.websites && props.aesthetic.websites.length > 0) {
     const websitesLis = props.aesthetic.websites.map(w => (
-      <li key={w.website}>
+      <li key={w.website || uniqueId('website_')}>
         <a href={w.url} target="_blank" rel="noopener noreferrer">{w.type.label} - {w.url}</a>
       </li>
     ));
@@ -53,7 +54,7 @@ const AestheticDetails = props => {
           </h2>
         </div>
       </div>
-      <p>{props.aesthetic.description ? parse(props.aesthetic.description) : 'No description.'}</p>
+      {props.aesthetic.description ? parse(props.aesthetic.description) : 'No description.'}
       {websites}
     </>
   );
