@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { Redirect } from 'react-router-dom';
 
 import axios from 'axios';
@@ -8,6 +7,7 @@ import { serialize } from 'object-to-formdata';
 import { Editor } from '@tinymce/tinymce-react';
 
 import {
+  Alert,
   Button,
   Card,
   ControlGroup,
@@ -16,6 +16,7 @@ import {
   Icon,
   InputGroup,
   Intent,
+  Overlay,
   Spinner,
 } from '@blueprintjs/core';
 
@@ -42,6 +43,8 @@ superscript blockquote code | bullist numlist | link unlink | searchreplace |  r
 `
 };
 
+const SELECT_NULL_LABEL = '--';
+
 const EditAestheticForm = props => {
   const addMessage = props.addMessage;
 
@@ -50,6 +53,7 @@ const EditAestheticForm = props => {
   const originalMedia = props.aesthetic.media || [];
 
   const [name, setName] = useState(props.aesthetic.name);
+  const [urlSlug, setUrlSlug] = useState(props.aesthetic.urlSlug);
   const [symbol, setSymbol] = useState(props.aesthetic.symbol);
   const [startEra, setStartEra] = useState(props.aesthetic.startEra);
   const [endEra, setEndEra] = useState(props.aesthetic.endEra);
@@ -60,10 +64,10 @@ const EditAestheticForm = props => {
   const similarAestheticsState = useState(originalSimilarAesthetics);
   const mediaState = useState(originalMedia);
 
-  const [startEraSpecifier, setStartEraSpecifier] = useState(null);
-  const [endEraSpecifier, setEndEraSpecifier] = useState(null);
-  const [startYear, setStartYear] = useState(null);
-  const [endYear, setEndYear] = useState(null);
+  const [startEraSpecifier, setStartEraSpecifier] = useState(0);
+  const [endEraSpecifier, setEndEraSpecifier] = useState(0);
+  const [startYear, setStartYear] = useState(0);
+  const [endYear, setEndYear] = useState(0);
 
   const [nameIntent, setNameIntent] = useState(Intent.NONE);
   const [symbolIntent, setSymbolIntent] = useState(Intent.NONE);
@@ -73,6 +77,7 @@ const EditAestheticForm = props => {
   const [mediaIntents, setMediaIntents] = useState(originalMedia.map(() => Intent.NONE));
   const [websiteIntents, setWebsiteIntents] = useState(originalWebsites.map(() => Intent.NONE));
   const [similarAestheticIntents, setSimilarAestheticIntents] = useState(originalSimilarAesthetics.map(() => ({
+    aesthetic: Intent.NONE,
     description: Intent.NONE,
     reverseDescription: Intent.NONE,
   })));
@@ -85,6 +90,7 @@ const EditAestheticForm = props => {
   const [mediaHelperTexts, setMediaHelperTexts] = useState(originalMedia.map(() => ''));
   const [websiteHelperTexts, setWebsiteHelperTexts] = useState(originalWebsites.map(() => ''));
   const [similarAestheticHelperTexts, setSimilarAestheticHelperTexts] = useState(originalSimilarAesthetics.map(() => ({
+    aesthetic: '',
     description: '',
     reverseDescription: '',
   })));
@@ -101,6 +107,8 @@ const EditAestheticForm = props => {
   const [eras, setEras] = useState(null);
   const [websiteTypes, setWebsiteTypes] = useState(null);
   const [edited, setEdited] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -154,7 +162,7 @@ const EditAestheticForm = props => {
   }
 
   if(edited) {
-    return <Redirect to={`/aesthetics/${props.aesthetic.urlSlug}`} />
+    return <Redirect to={urlSlug ? `/aesthetics/${urlSlug}` : '/aesthetics'} />
   }
 
   const handleSymbolChange = event => {
@@ -167,8 +175,8 @@ const EditAestheticForm = props => {
     const value = event.target.value;
     setStartEraSpecifier(value);
 
-    if(value === '--') {
-      setStartYear('--');
+    if(value === SELECT_NULL_LABEL) {
+      setStartYear(SELECT_NULL_LABEL);
       setStartEra(null);
     }
   };
@@ -183,8 +191,8 @@ const EditAestheticForm = props => {
     const value = event.target.value;
     setEndEraSpecifier(value);
 
-    if(value === '--') {
-      setEndYear('--');
+    if(value === SELECT_NULL_LABEL) {
+      setEndYear(SELECT_NULL_LABEL);
       setEndEra(null);
     }
   };
@@ -196,8 +204,12 @@ const EditAestheticForm = props => {
   };
 
   const handleCancel = () => {
-    setEdited(true);
+    setShowCancelConfirmation(true);
   };
+
+  const handleCancelConfirmation = () => {
+    setEdited(true);
+  }
 
   const validateName = () => {
     let hasError = false;
@@ -309,6 +321,15 @@ const EditAestheticForm = props => {
     const newSimilarAestheticHelperTexts = cloneDeep(similarAestheticHelperTexts);
 
     similarAestheticsState[0].forEach((similarAesthetic, idx) => {
+      if(!similarAesthetic.aesthetic) {
+        newSimilarAestheticIntents[idx].aesthetic = Intent.DANGER;
+        newSimilarAestheticHelperTexts[idx].aesthetic = 'Aesthetic is required.';
+        hasError = true;
+      } else {
+        newSimilarAestheticIntents[idx].aesthetic = Intent.NONE;
+        newSimilarAestheticHelperTexts[idx].aesthetic = '';
+      }
+
       if (!similarAesthetic.description) {
         newSimilarAestheticIntents[idx].description = Intent.DANGER;
         newSimilarAestheticHelperTexts[idx].description = 'Description is required.';
@@ -358,6 +379,8 @@ const EditAestheticForm = props => {
       return;
     }
 
+    setIsSaving(true);
+
     const websitesToSend = cloneDeep(websitesState[0]);
 
     websitesToSend.forEach(website => {
@@ -390,14 +413,22 @@ const EditAestheticForm = props => {
       aesthetic: props.aesthetic.aesthetic,
       name,
       symbol,
-      endEra,
       startEra,
       description,
-      mediaSourceUrl: mediaSourceUrlState[0],
       websites: websitesToSend,
       similarAesthetics: similarAestheticsState[0],
       media: mediaToSend,
     };
+
+    if(endEra) {
+      newAesthetic.endEra = endEra;
+    }
+
+    const mediaSourceUrl = mediaSourceUrlState[0];
+
+    if(mediaSourceUrl) {
+      newAesthetic.mediaSourceUrl = mediaSourceUrl;
+    }
 
     const formData = serialize(
       newAesthetic,
@@ -408,6 +439,7 @@ const EditAestheticForm = props => {
 
     axios.post(API_ROUTE_AESTHETIC_EDIT, formData, postOpts)
       .then(res => {
+        setUrlSlug(res.data.updatedData.urlSlug);
         addMessage("Successfully updated.");
         setEdited(true);
       })
@@ -443,6 +475,8 @@ const EditAestheticForm = props => {
         } else {
           addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
+
+        setIsSaving(false);
       });
   };
 
@@ -451,20 +485,28 @@ const EditAestheticForm = props => {
     value: eraSpecifier,
   }));
 
-  eraSpecifierOptions.unshift({ label: '--', value: null });
+  eraSpecifierOptions.unshift({ label: SELECT_NULL_LABEL, value: 0 });
 
   const yearSpecifierOptions = Object.keys(eras[1].years).sort().map(year => ({
     label: `${year}s`,
     value: year,
   }));
 
-  yearSpecifierOptions.unshift({ label: '--', value: null });
+  yearSpecifierOptions.unshift({ label: SELECT_NULL_LABEL, value: 0 });
 
   return (
     <>
-      <Helmet>
-        <title>CARI | Edit Aesthetic | {name}</title>
-      </Helmet>
+      <Overlay canEscapeKeyClose={false} canOutsideClickClose={false} isOpen={isSaving}>
+        <Card className={styles.savingDialog}>
+          <Spinner size={Spinner.SIZE_LARGE} />
+          <br />
+          <p>
+            <strong>Saving...</strong>
+            <br />
+            This may take some time depending on how much media you are uploading.
+          </p>
+        </Card>
+      </Overlay>
       <form className={styles.editAestheticForm} onSubmit={handleSubmit}>
         <Card>
           <h2>Basic Information</h2>
@@ -483,7 +525,7 @@ const EditAestheticForm = props => {
             <ControlGroup>
               <HTMLSelect options={eraSpecifierOptions}
                 onChange={handleStartEraSpecifierChange} value={startEraSpecifier} />
-              <HTMLSelect disabled={startEraSpecifier === '--'} options={yearSpecifierOptions}
+              <HTMLSelect disabled={!startEraSpecifier} options={yearSpecifierOptions}
                 onChange={handleStartYearChange} value={startYear} />
             </ControlGroup>
           </FormGroup>
@@ -491,7 +533,7 @@ const EditAestheticForm = props => {
             <ControlGroup>
               <HTMLSelect options={eraSpecifierOptions}
                 onChange={handleEndEraSpecifierChange} value={endEraSpecifier} />
-              <HTMLSelect disabled={endEraSpecifier === '--'} options={yearSpecifierOptions}
+              <HTMLSelect disabled={!endEraSpecifier} options={yearSpecifierOptions}
                 onChange={handleEndYearChange} value={endYear} />
             </ControlGroup>
           </FormGroup>
@@ -529,12 +571,21 @@ const EditAestheticForm = props => {
         <br />
         <FormGroup>
           <ControlGroup>
-            <Button icon="undo" large={true} onClick={handleCancel}>Cancel</Button>
-            <Button icon="floppy-disk" intent={Intent.SUCCESS} large={true} type="submit">
+            <Button disabled={isSaving} icon="undo" large={true} onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button disabled={isSaving} icon="floppy-disk" intent={Intent.SUCCESS} large={true}
+              type="submit">
               Save
             </Button>
           </ControlGroup>
         </FormGroup>
+        <Alert cancelButtonText="No" canEscapeKeyCancel={true} canOutsideClickCancel={true}
+          confirmButtonText="Yes" icon="warning-sign" intent={Intent.DANGER}
+          isOpen={showCancelConfirmation} onCancel={() => setShowCancelConfirmation(false)}
+          onConfirm={handleCancelConfirmation}>
+          Are you sure you want to cancel? Your changes will not be saved.
+        </Alert>
       </form>
     </>
   );

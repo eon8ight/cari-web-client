@@ -164,6 +164,7 @@ const MediaSubform = props => {
   const handleDelete = idx => {
     const newMedia = cloneDeep(media);
     newMedia.splice(idx, 1);
+    setMedia(newMedia);
 
     const newIntent = cloneDeep(intent);
     newIntent.splice(idx, 1);

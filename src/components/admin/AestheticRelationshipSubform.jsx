@@ -121,6 +121,7 @@ const AestheticRelationshipSubform = props => {
     const newIntent = cloneDeep(intent);
 
     newIntent.push({
+      aesthetic: Intent.NONE,
       description: Intent.NONE,
       reverseDescription: Intent.NONE,
     });
@@ -130,6 +131,7 @@ const AestheticRelationshipSubform = props => {
     const newHelperText = cloneDeep(helperText);
 
     newHelperText.push({
+      aesthetic: '',
       description: '',
       reverseDescription: '',
     });
@@ -191,7 +193,7 @@ const AestheticRelationshipSubform = props => {
 
     return (
       <li key={similarAesthetic.aesthetic}>
-        <FormGroup>
+        <FormGroup helperText={helperText[idx].aesthetic} intent={intent[idx].aesthetic}>
           <ControlGroup>
             <Suggest inputValueRenderer={nameInputValueRenderer}
               itemRenderer={nameRenderer} items={filteredNames}

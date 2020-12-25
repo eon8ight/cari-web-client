@@ -45,7 +45,7 @@ const EditAestheticPage = props => {
       <Helmet>
         <title>CARI | Admin | Edit {aestheticData.name}</title>
       </Helmet>
-      <EditAestheticForm addMessage={props.addMessage} aesthetic={aestheticData} />
+      <EditAestheticForm addMessage={addMessage} aesthetic={aestheticData} />
     </>
   );
 };

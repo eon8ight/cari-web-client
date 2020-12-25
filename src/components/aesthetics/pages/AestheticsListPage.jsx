@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet';
 import axios from 'axios';
 
 import {
+  AnchorButton,
   Button,
   ControlGroup,
   FormGroup,
@@ -120,6 +121,17 @@ const AestheticsListPage = props => {
     setEndYear(0);
   };
 
+  let addButton = null;
+
+  if(props.session.isValid) {
+    addButton = (
+      <FormGroup>
+        <AnchorButton href="/admin/create" icon="add" intent={Intent.PRIMARY}
+          large={true} text="Create" />
+      </FormGroup>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -140,6 +152,7 @@ const AestheticsListPage = props => {
             </Button>
           </ControlGroup>
         </FormGroup>
+        {addButton}
       </form>
       {aestheticsList}
     </>
