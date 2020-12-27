@@ -53,6 +53,8 @@ const MEDIA_TEMPLATE = {
   mediaCreator: 0,
   mediaCreatorName: '',
   mediaFile: null,
+  mediaThumbnailFile: null,
+  mediaPreviewFile: null,
   year: '',
 };
 

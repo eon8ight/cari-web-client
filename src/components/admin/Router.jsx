@@ -1,11 +1,24 @@
 import React from 'react';
-import { Route, Switch, useRouteMatch } from 'react-router-dom';
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
+
+import { Spinner } from '@blueprintjs/core';
+
+import { ROLE_ADMIN } from '../../functions/constants';
 
 import CreateAestheticPage from './pages/CreateAestheticPage';
 import EditAestheticPage from './pages/EditAestheticPage';
 
 const Router = props => {
   const match = useRouteMatch();
+  const session = props.session;
+
+  if (session.isValid === null) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
+  if (!session.claims.roles.includes(ROLE_ADMIN)) {
+      return <Redirect to="/error/403" />;
+  }
 
   return (
     <Switch>

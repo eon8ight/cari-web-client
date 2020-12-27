@@ -166,7 +166,7 @@ const EditAestheticForm = props => {
   }
 
   const handleSymbolChange = event => {
-    let newSymbol = event.target.value.replace(/[^a-z]/gi, '');
+    let newSymbol = event.target.value.replace(/[^a-z0-9]/gi, '');
     newSymbol = newSymbol.substring(0, 1).toUpperCase() + newSymbol.substring(1, 3).toLowerCase();
     setSymbol(newSymbol);
   };
@@ -329,24 +329,6 @@ const EditAestheticForm = props => {
         newSimilarAestheticIntents[idx].aesthetic = Intent.NONE;
         newSimilarAestheticHelperTexts[idx].aesthetic = '';
       }
-
-      if (!similarAesthetic.description) {
-        newSimilarAestheticIntents[idx].description = Intent.DANGER;
-        newSimilarAestheticHelperTexts[idx].description = 'Description is required.';
-        hasError = true;
-      } else {
-        newSimilarAestheticIntents[idx].description = Intent.NONE;
-        newSimilarAestheticHelperTexts[idx].description = '';
-      }
-
-      if (!similarAesthetic.reverseDescription) {
-        newSimilarAestheticIntents[idx].reverseDescription = Intent.DANGER;
-        newSimilarAestheticHelperTexts[idx].reverseDescription = 'Description is required.';
-        hasError = true;
-      } else {
-        newSimilarAestheticIntents[idx].reverseDescription = Intent.NONE;
-        newSimilarAestheticHelperTexts[idx].reverseDescription = '';
-      }
     });
 
     setSimilarAestheticIntents(newSimilarAestheticIntents);
@@ -403,7 +385,9 @@ const EditAestheticForm = props => {
       }
 
       if(media.fileObject) {
-        delete media.file;
+        delete media.mediaFile;
+        delete media.mediaThumbnailFile;
+        delete media.mediaPreviewFile;
       } else {
         delete media.fileObject;
       }
@@ -516,7 +500,7 @@ const EditAestheticForm = props => {
               value={name} />
           </FormGroup>
           <FormGroup
-            helperText={symbolHelperText || "1-3 letters. Like the Periodic Table, but for aesthetics."}
+            helperText={symbolHelperText || "1-3 characters. Like the Periodic Table, but for aesthetics."}
             intent={symbolIntent} label="Symbol">
             <InputGroup intent={symbolIntent} onChange={handleSymbolChange} value={symbol || ''} />
           </FormGroup>

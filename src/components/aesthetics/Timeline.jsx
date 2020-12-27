@@ -225,7 +225,7 @@ const Timeline = props => {
             <dt>
               <h3>Creator</h3>
             </dt>
-            <dd>{timelineModalSelection.creator?.name || '(unknown)'}</dd>
+            <dd>{timelineModalSelection.creatorObject?.name || '(unknown)'}</dd>
             <dt>
               <h3>Year</h3>
             </dt>

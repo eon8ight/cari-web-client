@@ -51,10 +51,26 @@ const App = props => {
       };
 
       axios.get(API_ROUTE_AUTH_CHECK_SESSION, getOpts)
-        .then(res => setSession({
-          isValid: res.data.status === TOKEN_VALIDITY_VALID,
-          claims: res.data.tokenClaims
-        }))
+        .then(res => {
+          const claims = res.data.tokenClaims;
+
+          if(claims.iss) {
+            claims.iss = parseInt(claims.iss);
+          }
+
+          if(claims.sub) {
+            claims.sub = parseInt(claims.sub);
+          }
+
+          if(claims.roles) {
+            claims.roles = claims.roles.split(',').map(r => parseInt(r.trim()));
+          }
+
+          setSession({
+            isValid: res.data.status === TOKEN_VALIDITY_VALID,
+            claims: claims,
+          });
+        })
         .catch(err => setSession({ isValid: false }));
     }
   }, [session]);

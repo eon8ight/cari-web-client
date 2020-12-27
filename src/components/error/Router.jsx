@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 
+import ForbiddenPage from './pages/ForbiddenPage';
 import NotFoundPage from './pages/NotFoundPage';
 import UnauthorizedPage from './pages/UnauthorizedPage';
 
@@ -9,6 +10,9 @@ const Router = (props) => {
 
   return (
     <Switch>
+      <Route path={`${match.url}/403`}>
+        <ForbiddenPage {...props} />
+      </Route>
       <Route path={`${match.url}/404`}>
         <NotFoundPage {...props} />
       </Route>
