@@ -16,7 +16,7 @@ const Router = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if (!session.claims.roles.includes(ROLE_ADMIN)) {
+  if (!(session.isValid && session.claims.roles.includes(ROLE_ADMIN))) {
       return <Redirect to="/error/403" />;
   }
 

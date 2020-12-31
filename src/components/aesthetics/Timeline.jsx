@@ -13,7 +13,11 @@ import {
 
 import { scaleLinear } from 'd3-scale';
 import { event, select } from 'd3-selection';
-import { zoom } from 'd3-zoom';
+
+import {
+  zoom,
+  zoomIdentity
+} from 'd3-zoom';
 
 import parse from 'html-react-parser';
 
@@ -74,12 +78,6 @@ const Timeline = props => {
     const subdivisions = Math.ceil(yMax / MAX_PER_YEAR_BEFORE_SUBDIVIDING);
     yMax = Math.ceil(yMax / subdivisions);
 
-    if (subdivisions > 1) {
-      select('#canvasContainer')
-        .insert('span', ':first-child')
-        .text('Scroll to zoom in. Click and drag to pan.');
-    }
-
     let subdivisionCounterByYear = {};
     let yPositionByYear = {};
 
@@ -127,6 +125,7 @@ const Timeline = props => {
 
     const xMin = min(data, d => d.year);
     const xMax = max(data, d => d.year) + 1;
+    const xTickCount = xMax - xMin;
 
     const x = scaleLinear()
       .domain([xMin, xMax])
@@ -135,7 +134,7 @@ const Timeline = props => {
     const xAxis = g => g.attr('transform', `translate(0, ${HEIGHT - MARGIN.bottom})`)
       .call(axisBottom(x)
         .tickSizeOuter(0)
-        .ticks(xMax - xMin)
+        .ticks(xTickCount)
         .tickFormat(d => d) // This prevents commas from being inserted in years
       );
 
@@ -163,11 +162,24 @@ const Timeline = props => {
         canvas.selectAll('#xAxis').call(xAxis);
       };
 
-      canvas.call(zoom()
-        .scaleExtent([1, subdivisions])
+      const minScale = Math.max(1, xTickCount / 8);
+
+      const canvasZoom = zoom()
+        .scaleExtent([minScale, xTickCount])
         .translateExtent(extent)
         .extent(extent)
-        .on('zoom', zoomed));
+        .on('zoom', zoomed);
+
+      canvas.call(canvasZoom);
+
+      if (minScale > 1) {
+        const initialXTranslation = (-MARGIN.left / 8) * (xTickCount - 8);
+
+        const initialScale = zoomIdentity.translate(initialXTranslation, 0)
+          .scale(minScale);
+
+        canvas.call(canvasZoom.transform, initialScale);
+      }
     };
 
     const svg = select('#canvas')
@@ -183,7 +195,7 @@ const Timeline = props => {
       .attr('height', d => y(d.yPosition) - y(d.yPosition + 1))
       .attr('x', d => x(d.xPosition))
       .attr('y', d => y(d.yPosition))
-      .attr('preserveAspectRatio', 'xMidYMid slice');
+      .attr('preserveAspectRatio', 'xMaxYMax slice');
 
     svg.selectAll('.images')
       .data(data)
@@ -243,6 +255,7 @@ const Timeline = props => {
   return (
     <>
       <div id="canvasContainer">
+        <span>Scroll to zoom in. Click and drag to pan.</span>
         <svg id="canvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       </div>
       <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
