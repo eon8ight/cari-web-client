@@ -23,6 +23,7 @@ import { API_ROUTE_AUTH_LOGIN } from '../../../functions/constants';
 const LoginPage = props => {
   const session = props.session;
 
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
   const [username, setUsername] = useState('');
@@ -95,22 +96,24 @@ const LoginPage = props => {
       return;
     }
 
+    setIsLoggingIn(true);
+
     const postBody = { username, password, rememberMe };
     const postOpts = {
       headers: { 'Content-Type': 'application/json' },
       withCredentials: true,
-      validateStatus: (httpCode => httpCode === 200 || httpCode === 401),
     };
 
     axios.post(API_ROUTE_AUTH_LOGIN, postBody, postOpts)
       .then(res => {
-        if (res.status === 200) {
-          props.addMessage("You have successfully logged in.");
-          setLoggedIn(true);
-          props.setSession({ isValid: true, claims: res.data.updatedData.token });
-        } else {
-          res.data.fieldErrors.forEach(fieldError => {
-            switch(fieldError.field) {
+        props.addMessage("You have successfully logged in.");
+        setLoggedIn(true);
+        props.setSession({ isValid: true, claims: res.data.updatedData.token });
+      })
+      .catch(err => {
+        if (err.response.status === 401) {
+          err.response.data.fieldErrors.forEach(fieldError => {
+            switch (fieldError.field) {
               case 'username':
                 setUsernameIntent(Intent.DANGER);
                 setUsernameHelperText(fieldError.message);
@@ -123,9 +126,12 @@ const LoginPage = props => {
                 props.addMessage(`An error occurred: ${fieldError.message}`);
             }
           });
+        } else {
+          props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
-      })
-      .catch(err => props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
+
+        setIsLoggingIn(false);
+      });
   };
 
   return (
@@ -143,11 +149,18 @@ const LoginPage = props => {
             intent={passwordIntent} />
           <Checkbox label="Remember Me" large={true} onChange={handleRememberMeChange} />
           <ButtonGroup fill={true} large={true}>
-            <Button intent={Intent.PRIMARY} icon="log-in" type="submit">Login</Button>
-            <AnchorButton intent={Intent.NONE} icon="help" href="/user/forgotPassword">
+            <Button disabled={isLoggingIn} intent={Intent.PRIMARY} icon="log-in" type="submit">
+              Login
+            </Button>
+            <AnchorButton disabled={isLoggingIn} intent={Intent.NONE} icon="help"
+              href="/user/forgotPassword">
               Forgot Password
             </AnchorButton>
           </ButtonGroup>
+          {isLoggingIn && <>
+            <br />
+            <Spinner />
+          </>}
         </form>
       </Card>
     </>

@@ -18,6 +18,7 @@ import { API_ROUTE_MAIL_FORGOT_PASSWORD } from '../../../functions/constants';
 const ForgotPasswordPage = props => {
   const session = props.session;
 
+  const [isSending, setIsSending] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const [username, setUsername] = useState('');
@@ -56,6 +57,8 @@ const ForgotPasswordPage = props => {
       return;
     }
 
+    setIsSending(true);
+
     const postBody = { username };
     const postOpts = { headers: { 'Content-Type': 'application/json' } };
 
@@ -68,6 +71,8 @@ const ForgotPasswordPage = props => {
         } else {
           props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
+
+        setIsSending(false);
       });
   };
 
@@ -95,7 +100,7 @@ const ForgotPasswordPage = props => {
             <ControlGroup>
               <InputGroup fill={true} intent={usernameIntent} leftIcon="user" onChange={handleUsernameChange}
                 placeholder="Username or Email Address" type="text" />
-              <Button icon="log-in" intent={Intent.PRIMARY} type="submit">Send</Button>
+              <Button disabled={isSending} icon="log-in" intent={Intent.PRIMARY} type="submit">Send</Button>
             </ControlGroup>
           </FormGroup>
         </form>
@@ -103,6 +108,7 @@ const ForgotPasswordPage = props => {
           An email containing a unique, secure link to the password reset form will be sent to the
           email address you registered with.
         </p>
+        {isSending && <Spinner />}
       </Card>
     </>
   );

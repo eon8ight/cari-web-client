@@ -40,6 +40,8 @@ const InviteForm = props => {
   const [sortField, setSortField] = useState(null);
   const [asc, setAsc] = useState(null);
 
+  const [isSending, setIsSending] = useState(false);
+
   const callApiRouteInvitedUsersList = params => {
     if (!listRequestMade && props.session.claims.sub) {
       if (typeof params === 'undefined' || params === null) {
@@ -112,8 +114,11 @@ const InviteForm = props => {
   const handleSubmit = event => {
     event.preventDefault();
 
-    if (validateEmailAddress())
+    if (validateEmailAddress()) {
       return;
+    }
+
+    setIsSending(true);
 
     const postOpts = {
       headers: { 'Content-Type': 'application/json' },
@@ -125,6 +130,7 @@ const InviteForm = props => {
         addMessage('Invitation sent.', Intent.SUCCESS);
         setInvitedUsers(invitedUsers.concat(res.data.entity));
         setEmailAddress('');
+        setIsSending(false);
       })
       .catch(err => {
         if (err.response.status === 400) {
@@ -133,6 +139,8 @@ const InviteForm = props => {
         } else {
           addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
+
+        setIsSending(false);
       });
   };
 
@@ -168,6 +176,7 @@ const InviteForm = props => {
               Invite
             </Button>
           </ControlGroup>
+          {isSending && <Spinner />}
         </FormGroup>
       </form>
       <p>

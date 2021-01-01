@@ -33,6 +33,8 @@ const ResetPasswordPage = props => {
   const [confirmPasswordIntent, setConfirmPasswordIntent] = useState(Intent.NONE);
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
 
+  const [isSaving, setIsSaving] = useState(false);
+
   if (session.isValid === null || authtoken.isValid === null) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
@@ -77,8 +79,11 @@ const ResetPasswordPage = props => {
   const handleSubmit = event => {
     event.preventDefault();
 
-    if (validatePassword(password, confirmPassword))
+    if (validatePassword(password, confirmPassword)) {
       return;
+    }
+
+    setIsSaving(true);
 
     const postUrl = `${API_ROUTE_USER_RESET_PASSWORD}?authtoken=${authtoken.token}`;
     const postBody = { token: authtoken.token, password };
@@ -86,7 +91,10 @@ const ResetPasswordPage = props => {
 
     axios.post(postUrl, postBody, postOpts)
       .then(res => setPasswordReset(true))
-      .catch(err => props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
+      .catch(err => {
+        props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
+        setIsSaving(false);
+      });
   };
 
   if (passwordReset) {
@@ -110,7 +118,8 @@ const ResetPasswordPage = props => {
             onChange={handlePasswordChange} placeholder="New Password" />
           <PasswordInput helperText={confirmPasswordHelperText} intent={confirmPasswordIntent}
             onChange={handleConfirmPasswordChange} placeholder="Confirm New Password" />
-          <Button icon="confirm" intent={Intent.PRIMARY} type="submit">Reset Password</Button>
+          <Button disabled={isSaving} icon="confirm" intent={Intent.PRIMARY} type="submit">Reset Password</Button>
+          {isSaving && <Spinner />}
         </form>
       </Card>
     </>
