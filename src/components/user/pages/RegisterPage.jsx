@@ -39,6 +39,8 @@ const RegisterPage = props => {
   const [confirmPasswordIntent, setConfirmPasswordIntent] = useState(Intent.NONE);
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
 
+  const [isRegistering, setIsRegistering] = useState(false);
+
   if (session.isValid === null || authtoken.isValid === null) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
@@ -106,6 +108,8 @@ const RegisterPage = props => {
       return;
     }
 
+    setIsRegistering(true);
+
     const postBody = {
       emailAddress: authtoken.claims.emailAddress,
       username,
@@ -124,6 +128,8 @@ const RegisterPage = props => {
         } else {
           props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER);
         }
+
+        setIsRegistering(false);
       });
   };
 
@@ -157,7 +163,8 @@ const RegisterPage = props => {
           <PasswordInput helperText={confirmPasswordHelperText}
             onChange={handleConfirmPasswordChange} intent={confirmPasswordIntent}
             placeholder="Confirm Password" />
-          <Button intent={Intent.PRIMARY} icon="confirm" type="submit">Register</Button>
+          <Button disabled={isRegistering} intent={Intent.PRIMARY} icon="confirm" type="submit">Register</Button>
+          {isRegistering && <Spinner />}
         </form>
       </Card>
     </>
