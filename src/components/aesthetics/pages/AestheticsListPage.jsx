@@ -142,9 +142,9 @@ const AestheticsListPage = props => {
           <ControlGroup>
             <InputGroup fill={true} onChange={handleKeywordChange} placeholder="Keyword"
               value={keyword || ''} />
-            <NumericInput onValueChange={handleStartYearChange}
+            <NumericInput min={1950} max={2030} onValueChange={handleStartYearChange}
               placeholder="Year of First Known Example" value={startYear || ''} />
-            <NumericInput onValueChange={handleEndYearChange}
+            <NumericInput min={1950} max={2030} onValueChange={handleEndYearChange}
               placeholder="Year of End of Popularity" value={endYear || ''} />
             <Button icon="search" type="submit">Search</Button>
             <Button icon="filter-remove" onClick={handleClearFilters} type="reset">

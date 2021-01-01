@@ -33,8 +33,6 @@ const ResetPasswordPage = props => {
   const [confirmPasswordIntent, setConfirmPasswordIntent] = useState(Intent.NONE);
   const [confirmPasswordHelperText, setConfirmPasswordHelperText] = useState('');
 
-  const token = props.authtoken.token;
-
   if (session.isValid === null || authtoken.isValid === null) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
@@ -82,8 +80,8 @@ const ResetPasswordPage = props => {
     if (validatePassword(password, confirmPassword))
       return;
 
-    const postUrl = `${API_ROUTE_USER_RESET_PASSWORD}?authtoken=${token}`;
-    const postBody = { token, password };
+    const postUrl = `${API_ROUTE_USER_RESET_PASSWORD}?authtoken=${authtoken.token}`;
+    const postBody = { token: authtoken.token, password };
     const postOpts = { headers: { 'Content-Type': 'application/json' } };
 
     axios.post(postUrl, postBody, postOpts)
