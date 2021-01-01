@@ -25,7 +25,7 @@ import {
 import { Suggest } from '@blueprintjs/select';
 
 import ConfirmDelete from './ConfirmDelete';
-import ExpandableSection from './ExpandableSection';
+import ExpandableSection from '../common/ExpandableSection';
 import { API_ROUTE_MEDIA_CREATORS } from '../../functions/constants';
 
 import styles from './styles/MediaSubform.module.scss';

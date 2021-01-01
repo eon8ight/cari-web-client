@@ -11,7 +11,7 @@ const ExpandableSection = props => {
     <div className={styles.expandableSubform}>
       <h2>{props.header}</h2>
       <Button className={styles.editExpandButton} icon={props.icon || (show ? 'minus' : 'plus')}
-        onClick={() => setShow(!show)} />
+        onClick={() => setShow(!show)} text={show ? 'Hide' : 'Show'} />
       {show && <div className={styles.expandableContent}>{props.content}</div>}
     </div>
   )

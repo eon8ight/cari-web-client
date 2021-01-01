@@ -17,7 +17,7 @@ import {
 import { Suggest } from '@blueprintjs/select';
 
 import ConfirmDelete from './ConfirmDelete';
-import ExpandableSection from './ExpandableSection';
+import ExpandableSection from '../common/ExpandableSection';
 
 import { API_ROUTE_AESTHETIC_NAMES } from '../../functions/constants';
 
