@@ -1,7 +1,0 @@
-@use '../../../../assets/scss/mixins';
-
-.sectionHeaderLineButton {
-    @include mixins.flex-two-items-with-spacer(8px);
-
-    align-items: center;
-}

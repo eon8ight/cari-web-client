@@ -16,7 +16,7 @@ import {
 } from '@blueprintjs/core';
 
 import ConfirmDelete from './ConfirmDelete';
-import ExpandableSection from './ExpandableSection';
+import ExpandableSection from '../common/ExpandableSection';
 
 import {
   ARENA_API_URL,
