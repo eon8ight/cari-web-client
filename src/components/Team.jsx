@@ -22,7 +22,8 @@ const Team = props => {
       role: 1,
       includeFavoriteAesthetic: true,
       includeProfileImage: true,
-      sortField: 'lastName,firstName',
+      includeRoles: true,
+      sortField: 'rank,lastName,firstName',
     };
 
     axios.get(API_ROUTE_USER_FIND_FOR_LIST, { params })
@@ -37,6 +38,7 @@ const Team = props => {
   const teamDataElem = userList.map(user => {
     const firstName = user.firstName;
     const lastName = user.lastName;
+    const rolesForDisplay = user.rolesForDisplay;
     const title = user.title;
     const biography = user.biography;
     const profileImage = user.profileImage;
@@ -51,13 +53,19 @@ const Team = props => {
         displayName = `${displayName} ${lastName}`;
       }
 
-      if(title) {
+      if(rolesForDisplay) {
+        displayName = `${displayName} - ${rolesForDisplay}`;
+
+        if(title) {
+          displayName = `${displayName} / ${title}`;
+        }
+      } else if (title) {
         displayName = `${displayName} - ${title}`;
       }
     }
 
     return (
-      <article class={styles.teamArticle}>
+      <article className={styles.teamArticle} key={user.entity}>
         {profileImage && <img alt="Consumer Aesthetics Research Institute" src={profileImage.url}
           class={styles.profileImage} width="100" />}
         <div>
