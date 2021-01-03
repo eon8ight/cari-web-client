@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Modal from 'react-modal';
 
 import axios from 'axios';
 import parse from 'html-react-parser';
@@ -10,7 +9,9 @@ import { Editor } from '@tinymce/tinymce-react';
 import {
   Button,
   Callout,
+  Classes,
   ControlGroup,
+  Dialog,
   FileInput,
   FormGroup,
   InputGroup,
@@ -29,8 +30,6 @@ import ExpandableSection from '../common/ExpandableSection';
 import { API_ROUTE_MEDIA_CREATORS } from '../../functions/constants';
 
 import styles from './styles/MediaSubform.module.scss';
-
-Modal.setAppElement('#root');
 
 const DESCRIPTION_EDITOR_SETTINGS = {
   selector: '#mediaDescription',
@@ -351,8 +350,7 @@ const MediaSubform = props => {
     const fileValue = swapSpace.fileObject?.name || swapSpace.fileUrl;
 
     mediaModalContent = (
-      <form>
-        <h2>{swapSpace.title}</h2>
+      <form className={Classes.DIALOG_BODY}>
         <FormGroup helperText={fileHelperText} intent={fileIntent} label="File"
           labelInfo="(required)">
           <div className={styles.modalPreviewImage}>
@@ -472,10 +470,11 @@ const MediaSubform = props => {
     <>
       <ExpandableSection content={mediaContent} header="Media" icon={props.icon}
         show={props.show} />
-      <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
-        isOpen={swapSpace !== null} onRequestClose={() => handleModalClose(false)}>
+      <Dialog className={styles.modal}
+        isOpen={swapSpace !== null} onClose={() => handleModalClose(false)}
+        title={(swapSpace && swapSpace.label) ? `Edit "${swapSpace.label}"` : 'Add Media'}>
         {mediaModalContent}
-      </Modal>
+      </Dialog>
     </>
   )
 };

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import Modal from 'react-modal';
 
 import axios from 'axios';
 import {
+  Classes,
+  Dialog,
   Intent,
   Spinner,
 } from '@blueprintjs/core';
@@ -44,12 +45,11 @@ const Gallery = props => {
 
   if (galleryModalBlock) {
     galleryModalContent = (
-      <>
-        <h2>{galleryModalBlock.title}</h2>
+      <div className={Classes.DIALOG_BODY}>
         <a href={galleryModalBlock.image.original.url} target="_blank" rel="noopener noreferrer">
-          <img src={galleryModalBlock.image.display.url} alt={galleryModalBlock.description} />
+          <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} />
         </a>
-      </>
+      </div>
     );
   }
 
@@ -62,11 +62,11 @@ const Gallery = props => {
       </div>
       {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
         pageCount={totalPages} onPageChange={handlePageChange} />}
-      <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
-        isOpen={galleryModalBlock !== null}
-        onRequestClose={() => setGalleryModalBlock(null)}>
+      <Dialog className={styles.modal} isOpen={galleryModalBlock !== null}
+        title={galleryModalBlock && galleryModalBlock.title}
+        onClose={() => setGalleryModalBlock(null)}>
         {galleryModalContent}
-      </Modal>
+      </Dialog>
     </>
   );
 }
