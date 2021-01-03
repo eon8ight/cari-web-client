@@ -8,11 +8,15 @@ import {
   Spinner,
 } from '@blueprintjs/core';
 
+import { truncate } from 'lodash/string';
+
 import Paginator from '../common/Paginator';
 
 import { API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT } from '../../functions/constants';
 
 import styles from './styles/Gallery.module.scss';
+
+const TRUNCATE_OPTS = { length: 80 };
 
 const Gallery = props => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -63,7 +67,7 @@ const Gallery = props => {
       {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
         pageCount={totalPages} onPageChange={handlePageChange} />}
       <Dialog className={styles.modal} isOpen={galleryModalBlock !== null}
-        title={galleryModalBlock && galleryModalBlock.title}
+        title={galleryModalBlock && truncate(galleryModalBlock.title, TRUNCATE_OPTS)}
         onClose={() => setGalleryModalBlock(null)}>
         {galleryModalContent}
       </Dialog>

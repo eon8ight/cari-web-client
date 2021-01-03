@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import Modal from 'react-modal';
+
+import {
+  Classes,
+  Dialog,
+} from '@blueprintjs/core';
 
 import {
   max,
@@ -20,10 +24,9 @@ import {
 } from 'd3-zoom';
 
 import parse from 'html-react-parser';
+import { truncate } from 'lodash/string';
 
 import styles from './styles/Timeline.module.scss';
-
-Modal.setAppElement('#root');
 
 const WIDTH = 300;
 const HEIGHT = 100;
@@ -35,6 +38,11 @@ const MARGIN = {
   right: 20,
   bottom: 30,
   left: 30,
+};
+
+const TRUNCATE_OPTS = {
+  length: 80,
+  separator: /\s/
 };
 
 const Timeline = props => {
@@ -222,31 +230,33 @@ const Timeline = props => {
 
   if (timelineModalSelection) {
     timelineModalContent = (
-      <div className={styles.viewer}>
-        <div className={styles.selectedImageContainer}>
-          <a href={timelineModalSelection.originalFile.url} target="_blank" rel="noopener noreferrer">
-            <img className={styles.selectedImage} src={timelineModalSelection.previewFile.url} alt={timelineModalSelection.label} />
-          </a>
-        </div>
-        <div className={styles.selectedImageMetadataContainer}>
-          <dl className={styles.selectedImageMetadata}>
-            <dt>
-              <h3>Title</h3>
-            </dt>
-            <dd>{timelineModalSelection.label}</dd>
-            <dt>
-              <h3>Creator</h3>
-            </dt>
-            <dd>{timelineModalSelection.creatorObject?.name || '(unknown)'}</dd>
-            <dt>
-              <h3>Year</h3>
-            </dt>
-            <dd>{timelineModalSelection.year}</dd>
-            <dt>
-              <h3>Description</h3>
-            </dt>
-            <dd>{parse(timelineModalSelection.description)}</dd>
-          </dl>
+      <div className={Classes.DIALOG_BODY}>
+        <div className={styles.viewer}>
+          <div className={styles.selectedImageContainer}>
+            <a href={timelineModalSelection.originalFile.url} target="_blank" rel="noopener noreferrer">
+              <img className={styles.selectedImage} src={timelineModalSelection.previewFile.url} alt={timelineModalSelection.label} />
+            </a>
+          </div>
+          <div className={styles.selectedImageMetadataContainer}>
+            <dl className={styles.selectedImageMetadata}>
+              <dt>
+                <h3>Title</h3>
+              </dt>
+              <dd>{timelineModalSelection.label}</dd>
+              <dt>
+                <h3>Creator</h3>
+              </dt>
+              <dd>{timelineModalSelection.creatorObject?.name || '(unknown)'}</dd>
+              <dt>
+                <h3>Year</h3>
+              </dt>
+              <dd>{timelineModalSelection.year}</dd>
+              <dt>
+                <h3>Description</h3>
+              </dt>
+              <dd className={styles.viewerDescription}>{parse(timelineModalSelection.description)}</dd>
+            </dl>
+          </div>
         </div>
       </div>
     );
@@ -258,11 +268,11 @@ const Timeline = props => {
         <span>Scroll to zoom in. Click and drag to pan.</span>
         <svg id="canvas" viewBox={`0 0 ${WIDTH} ${HEIGHT}`}></svg>
       </div>
-      <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
-        isOpen={timelineModalSelection !== null}
-        onRequestClose={() => setTimelineModalSelection(null)}>
+      <Dialog className={styles.modal} isOpen={timelineModalSelection !== null}
+        title={timelineModalSelection && truncate(timelineModalSelection.label, TRUNCATE_OPTS)}
+        onClose={() => setTimelineModalSelection(null)}>
         {timelineModalContent}
-      </Modal>
+      </Dialog>
     </>
   );
 };
