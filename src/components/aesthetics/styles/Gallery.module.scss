@@ -1,5 +1,7 @@
 @use '../../../assets/scss/mixins';
 
+@import '@blueprintjs/core/lib/scss/variables';
+
 .content {
     align-items: center;
     display: flex;
@@ -13,11 +15,12 @@
 }
 
 .modal {
-    @include mixins.modal(auto, min-content);
+    width: fit-content !important;
 }
 
-.modalOverlay {
-    @include mixins.modal-overlay;
+.modalImage {
+    margin: auto;
+    margin-top: $pt-grid-size;
 }
 
 .paginator {

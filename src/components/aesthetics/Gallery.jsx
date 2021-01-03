@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import Modal from 'react-modal';
 
 import axios from 'axios';
 import {
+  Classes,
+  Dialog,
   Intent,
   Spinner,
 } from '@blueprintjs/core';
+
+import { truncate } from 'lodash/string';
 
 import Paginator from '../common/Paginator';
 
 import { API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT } from '../../functions/constants';
 
 import styles from './styles/Gallery.module.scss';
+
+const TRUNCATE_OPTS = { length: 80 };
 
 const Gallery = props => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -44,12 +49,11 @@ const Gallery = props => {
 
   if (galleryModalBlock) {
     galleryModalContent = (
-      <>
-        <h2>{galleryModalBlock.title}</h2>
+      <div className={Classes.DIALOG_BODY}>
         <a href={galleryModalBlock.image.original.url} target="_blank" rel="noopener noreferrer">
-          <img src={galleryModalBlock.image.display.url} alt={galleryModalBlock.description} />
+          <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} />
         </a>
-      </>
+      </div>
     );
   }
 
@@ -62,11 +66,11 @@ const Gallery = props => {
       </div>
       {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
         pageCount={totalPages} onPageChange={handlePageChange} />}
-      <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
-        isOpen={galleryModalBlock !== null}
-        onRequestClose={() => setGalleryModalBlock(null)}>
+      <Dialog className={styles.modal} isOpen={galleryModalBlock !== null}
+        title={galleryModalBlock && truncate(galleryModalBlock.title, TRUNCATE_OPTS)}
+        onClose={() => setGalleryModalBlock(null)}>
         {galleryModalContent}
-      </Modal>
+      </Dialog>
     </>
   );
 }

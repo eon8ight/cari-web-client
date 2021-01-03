@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import Modal from 'react-modal';
 
 import axios from 'axios';
-import parse from 'html-react-parser';
 import { cloneDeep } from 'lodash/lang';
+import { truncate } from 'lodash/string';
 import { uniqueId } from 'lodash/util';
 import { Editor } from '@tinymce/tinymce-react';
 
 import {
   Button,
   Callout,
+  Classes,
   ControlGroup,
+  Dialog,
   FileInput,
   FormGroup,
   InputGroup,
@@ -30,7 +31,10 @@ import { API_ROUTE_MEDIA_CREATORS } from '../../functions/constants';
 
 import styles from './styles/MediaSubform.module.scss';
 
-Modal.setAppElement('#root');
+const TRUNCATE_OPTS = {
+  length: 80,
+  separator: /\s/
+};
 
 const DESCRIPTION_EDITOR_SETTINGS = {
   selector: '#mediaDescription',
@@ -351,8 +355,7 @@ const MediaSubform = props => {
     const fileValue = swapSpace.fileObject?.name || swapSpace.fileUrl;
 
     mediaModalContent = (
-      <form>
-        <h2>{swapSpace.title}</h2>
+      <form className={Classes.DIALOG_BODY}>
         <FormGroup helperText={fileHelperText} intent={fileIntent} label="File"
           labelInfo="(required)">
           <div className={styles.modalPreviewImage}>
@@ -429,6 +432,13 @@ const MediaSubform = props => {
       );
     }
 
+    const label = truncate(medium.label, TRUNCATE_OPTS);
+
+    const description = truncate(medium.description.replace(/<[^>]+>/g, ''), {
+      length: 200,
+      separator: /\s/,
+    });
+
     return (
       <li key={medium.aestheticMedia || uniqueId('media_')}>
         <FormGroup>
@@ -441,9 +451,9 @@ const MediaSubform = props => {
             <div>
               <dl className={styles.dataListNoIndent}>
                 <dt><strong>Label:</strong></dt>
-                <dd>{medium.label}</dd>
+                <dd>{label}</dd>
                 <dt><strong>Description:</strong></dt>
-                <dd>{parse(medium.description)}</dd>
+                <dd>{description}</dd>
                 <dt><strong>Creator:</strong></dt>
                 <dd>{creatorNamesMap[medium.mediaCreator] || '(none)'}</dd>
                 <dt><strong>Year:</strong></dt>
@@ -472,10 +482,11 @@ const MediaSubform = props => {
     <>
       <ExpandableSection content={mediaContent} header="Media" icon={props.icon}
         show={props.show} />
-      <Modal className={styles.modal} overlayClassName={styles.modalOverlay}
-        isOpen={swapSpace !== null} onRequestClose={() => handleModalClose(false)}>
+      <Dialog className={styles.modal}
+        isOpen={swapSpace !== null} onClose={() => handleModalClose(false)}
+        title={(swapSpace && swapSpace.label) ? `Edit "${truncate(swapSpace.label, TRUNCATE_OPTS)}"` : 'Add Media'}>
         {mediaModalContent}
-      </Modal>
+      </Dialog>
     </>
   )
 };

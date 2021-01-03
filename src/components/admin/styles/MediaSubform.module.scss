@@ -29,20 +29,7 @@
 }
 
 .modal {
-    @include mixins.modal(auto, 950px);
-    background-color: white;
-    border: 1px black solid;
-    border-radius: 6px;
-    left: 50%;
-    padding: 4px 24px 16px 24px;
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 950px;
-}
-
-.modalOverlay {
-    @include mixins.modal-overlay;
+    width: fit-content !important;
 }
 
 .modalPreviewImage {
