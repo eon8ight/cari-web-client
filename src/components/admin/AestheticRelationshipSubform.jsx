@@ -61,7 +61,7 @@ const AestheticRelationshipSubform = props => {
       aestheticName => !alreadySelectedAesthetics.includes(aestheticName.aesthetic)
     );
 
-    if(query) {
+    if (query) {
       newFilteredNames = newFilteredNames.filter(
         aestheticName => aestheticName.name.toLowerCase().includes(query.toLowerCase())
       );
@@ -95,14 +95,14 @@ const AestheticRelationshipSubform = props => {
     }
   }, [addMessage, isLoading, setIsLoading, similarAesthetics, refilterCallback, aesthetic]);
 
-  if(!names) {
+  if (!names) {
     return <Spinner />;
   }
 
   const nameInputValueRenderer = similarAesthetic => namesMap[similarAesthetic.aesthetic];
 
   const nameRenderer = (aestheticName, { modifiers, handleClick }) => {
-    if(!modifiers.matchesPredicate) {
+    if (!modifiers.matchesPredicate) {
       return null;
     }
 
@@ -171,14 +171,14 @@ const AestheticRelationshipSubform = props => {
 
     let inputs = null;
 
-    if(similarAesthetic.aesthetic) {
+    if (similarAesthetic.aesthetic) {
       inputs = (
         <>
           <FormGroup helperText={helperText[idx].description} intent={intent[idx].description}
             label={<>How does <strong>{similarAestheticName}</strong> relate to <strong>{props.aesthetic.name}</strong>?</>}
             labelInfo="(required)">
-              <InputGroup intent={intent[idx].description} value={similarAesthetic.description || ''}
-                onChange={event => handleChange(event.target.value, 'description', idx)} />
+            <InputGroup intent={intent[idx].description} value={similarAesthetic.description || ''}
+              onChange={event => handleChange(event.target.value, 'description', idx)} />
           </FormGroup>
           <FormGroup helperText={helperText[idx].reverseDescription}
             intent={intent[idx].reverseDescription}
@@ -210,19 +210,16 @@ const AestheticRelationshipSubform = props => {
     );
   });
 
-  const relationshipContent = (
-    <>
+  return (
+    <ExpandableSection header="Related Aesthetics" icon={props.icon} show={props.show}>
       <OL>{elems}</OL>
       <FormGroup>
         <Button icon="add" intent={Intent.PRIMARY} onClick={handleAdd}>
           Add Related Aesthetic
         </Button>
       </FormGroup>
-    </>
+    </ExpandableSection>
   );
-
-  return <ExpandableSection content={relationshipContent} header="Related Aesthetics"
-    icon={props.icon} show={props.show} />;
 };
 
 export default AestheticRelationshipSubform;
