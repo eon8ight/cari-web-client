@@ -191,14 +191,19 @@ const MediaSubform = props => {
     const imageFile = event.target.files[0];
 
     if (imageFile) {
-      previewFileReader.onload = event => {
-        const newSwapSpace = cloneDeep(swapSpace);
-        newSwapSpace.fileObject = imageFile;
-        newSwapSpace.previewFileBlob = event.target.result;
-        setSwapSpace(newSwapSpace);
-      };
+      if(!imageFile.type.startsWith("image/")) {
+        setFileIntent(Intent.DANGER);
+        setFileHelperText('File must be an image.');
+      } else {
+        previewFileReader.onload = event => {
+          const newSwapSpace = cloneDeep(swapSpace);
+          newSwapSpace.fileObject = imageFile;
+          newSwapSpace.previewFileBlob = event.target.result;
+          setSwapSpace(newSwapSpace);
+        };
 
-      previewFileReader.readAsDataURL(imageFile);
+        previewFileReader.readAsDataURL(imageFile);
+      }
     } else {
       const newSwapSpace = cloneDeep(swapSpace);
       newSwapSpace.fileObject = null;
@@ -239,6 +244,10 @@ const MediaSubform = props => {
     if (!swapSpace.fileUrl && !swapSpace.fileObject) {
       setFileIntent(Intent.DANGER);
       setFileHelperText('File is required.');
+      hasError = true;
+    } else if(swapSpace.fileObject.type.startsWith("image/")) {
+      setFileIntent(Intent.DANGER);
+      setFileHelperText('File must be an image.');
       hasError = true;
     } else {
       setFileIntent(Intent.NONE);
