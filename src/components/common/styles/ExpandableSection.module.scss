@@ -1,13 +1,13 @@
 @import '@blueprintjs/core/lib/scss/variables';
 
-.editExpandButton {
+.expandButton {
     float: right;
 }
 
-.expandableContent {
+.expandContent {
     margin-top: $pt-grid-size;
 }
 
-.expandableSubform h2 {
+.expandHeader {
     display: inline;
 }

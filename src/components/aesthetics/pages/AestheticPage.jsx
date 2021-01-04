@@ -56,8 +56,9 @@ const AestheticPage = props => {
     timeline = (
       <>
         <Card>
-          <ExpandableSection content={<Timeline aesthetic={aestheticData} />} header="Timeline"
-            show={showTimeline} />
+          <ExpandableSection header="Timeline" show={showTimeline}>
+            <Timeline aesthetic={aestheticData} />
+          </ExpandableSection>
         </Card>
         <br />
       </>
@@ -70,8 +71,9 @@ const AestheticPage = props => {
     gallery = (
       <>
         <Card>
-          <ExpandableSection content={<Gallery addMessage={addMessage} aesthetic={aestheticData} />}
-            header="Gallery" show={showGallery} />
+          <ExpandableSection header="Gallery" show={showGallery}>
+            <Gallery addMessage={addMessage} aesthetic={aestheticData} />
+          </ExpandableSection>
         </Card>
         <br />
       </>
@@ -84,8 +86,9 @@ const AestheticPage = props => {
     similarityWeb = (
       <>
         <Card>
-          <ExpandableSection content={<SimilarityWeb aesthetic={aestheticData} />}
-            header="Related Aesthetics" show={showSimilarityWeb} />
+          <ExpandableSection header="Related Aesthetics" show={showSimilarityWeb}>
+            <SimilarityWeb aesthetic={aestheticData} />
+          </ExpandableSection>
         </Card>
         <br />
       </>

@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { Button } from '@blueprintjs/core';
+import {
+  Button,
+  Collapse,
+} from '@blueprintjs/core';
 
 import styles from './styles/ExpandableSection.module.scss';
 
@@ -8,11 +11,15 @@ const ExpandableSection = props => {
   const [show, setShow] = props.show;
 
   return (
-    <div className={styles.expandableSubform}>
-      <h2>{props.header}</h2>
-      <Button className={styles.editExpandButton} icon={props.icon || (show ? 'minus' : 'plus')}
+    <div>
+      <h2 className={styles.expandHeader}>{props.header}</h2>
+      <Button className={styles.expandButton} icon={props.icon || (show ? 'minus' : 'plus')}
         onClick={() => setShow(!show)} text={show ? 'Hide' : 'Show'} />
-      {show && <div className={styles.expandableContent}>{props.content}</div>}
+      <Collapse isOpen={show}>
+        <div className={styles.expandContent}>
+          {props.children}
+        </div>
+      </Collapse>
     </div>
   )
 };

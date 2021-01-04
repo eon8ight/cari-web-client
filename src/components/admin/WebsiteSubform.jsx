@@ -123,8 +123,8 @@ const WebsiteSubform = props => {
     );
   });
 
-  const websiteContent = (
-    <>
+  return (
+    <ExpandableSection header="Websites" icon={props.icon} show={props.show}>
       <Callout icon="help" intent={Intent.PRIMARY} title="Media Sources">
         Are.na websites can be used as a media source. If an aesthetic only has one Are.na website,
         it will automatically be selected and used. If there are more than one, the one selected
@@ -135,11 +135,8 @@ const WebsiteSubform = props => {
       <FormGroup>
         <Button icon="add" intent={Intent.PRIMARY} onClick={handleAdd}>Add Website</Button>
       </FormGroup>
-    </>
+    </ExpandableSection>
   );
-
-  return <ExpandableSection content={websiteContent} header="Websites" icon={props.icon}
-    show={props.show} />;
 };
 
 export default WebsiteSubform;

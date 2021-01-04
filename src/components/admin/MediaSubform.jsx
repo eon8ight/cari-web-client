@@ -216,7 +216,7 @@ const MediaSubform = props => {
     const mediaCreator = creatorName.mediaCreator;
     const name = creatorName.name;
 
-    if(!(mediaCreator in creatorNamesMap)) {
+    if (!(mediaCreator in creatorNamesMap)) {
       const newCreatorNamesMap = cloneDeep(creatorNamesMap);
       newCreatorNamesMap[mediaCreator] = name;
       setCreatorNamesMap(newCreatorNamesMap);
@@ -224,7 +224,7 @@ const MediaSubform = props => {
 
     const newCreatorNames = cloneDeep(creatorNames);
 
-    if(creatorNames.filter(n => n.mediaCreator === mediaCreator).length === 0) {
+    if (creatorNames.filter(n => n.mediaCreator === mediaCreator).length === 0) {
       const newCreatorNames = cloneDeep(creatorNames);
       newCreatorNames.push(creatorName);
       setCreatorNames(newCreatorNames);
@@ -385,7 +385,7 @@ const MediaSubform = props => {
               onItemSelect={handleCreatorChange} onQueryChange={refilter}
               popoverProps={SUGGEST_POPOVER_PROPS}
               query={creatorNamesMap[swapSpace.mediaCreator]} resetOnClose={true}
-              selectedItem={{mediaCreator: swapSpace.mediaCreator, name: swapSpace.mediaCreatorName}} />
+              selectedItem={{ mediaCreator: swapSpace.mediaCreator, name: swapSpace.mediaCreatorName }} />
           </ControlGroup>
         </FormGroup>
         <FormGroup helperText={yearHelperText} intent={yearIntent} label="Year"
@@ -411,7 +411,7 @@ const MediaSubform = props => {
         width="250" />
     );
 
-    if(medium.fileUrl) {
+    if (medium.fileUrl) {
       previewImageElem = (
         <a href={medium.fileUrl} target="_blank" rel="noopener noreferrer">
           {previewImageElem}
@@ -421,7 +421,7 @@ const MediaSubform = props => {
 
     let helperCallout = null;
 
-    if(helperText[idx]) {
+    if (helperText[idx]) {
       helperCallout = (
         <>
           <br />
@@ -467,21 +467,16 @@ const MediaSubform = props => {
     );
   });
 
-  const mediaContent = (
-    <>
-      <OL>{mediaElems}</OL>
-      <FormGroup>
-        <Button icon="add" intent={Intent.PRIMARY} onClick={() => handleModalOpen(MEDIA_TEMPLATE)}>
-          Add Media
-        </Button>
-      </FormGroup>
-    </>
-  );
-
   return (
     <>
-      <ExpandableSection content={mediaContent} header="Media" icon={props.icon}
-        show={props.show} />
+      <ExpandableSection header="Media" icon={props.icon} show={props.show}>
+        <OL>{mediaElems}</OL>
+        <FormGroup>
+          <Button icon="add" intent={Intent.PRIMARY} onClick={() => handleModalOpen(MEDIA_TEMPLATE)}>
+            Add Media
+        </Button>
+        </FormGroup>
+      </ExpandableSection>
       <Dialog className={styles.modal}
         isOpen={swapSpace !== null} onClose={() => handleModalClose(false)}
         title={(swapSpace && swapSpace.label) ? `Edit "${truncate(swapSpace.label, TRUNCATE_OPTS)}"` : 'Add Media'}>
