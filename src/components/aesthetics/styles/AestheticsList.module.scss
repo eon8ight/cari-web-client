@@ -2,6 +2,29 @@
     text-align: center;
 }
 
+.listTable {
+    font-size: 14pt !important;
+    border-collapse: collapse;
+    width: 100%;
+
+    td, th {
+        &:not(:first-child) {
+            border-left: 1px solid lightgrey;
+        }
+
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        border-bottom: 1px solid lightgrey;
+    }
+}
+
 .nameColumn {
     width: 60%;
+}
+
+.sortable {
+    cursor: pointer;
 }

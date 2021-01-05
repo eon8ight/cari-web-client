@@ -3,7 +3,3 @@
 .paginator {
     @include mixins.paginator-centered(24px);
 }
-
-.sortable {
-    cursor: pointer;
-}

@@ -7,6 +7,8 @@ import {
   Card,
   Intent,
   Spinner,
+  Tab,
+  Tabs,
 } from '@blueprintjs/core';
 
 import AestheticDetails from '../AestheticDetails';
@@ -15,6 +17,8 @@ import SimilarityWeb from '../SimilarityWeb';
 import Timeline from '../Timeline';
 
 import ExpandableSection from '../../common/ExpandableSection';
+
+import RelatedAestheticsList from '../RelatedAestheticsList';
 
 import { API_ROUTE_AESTHETIC_FIND_FOR_PAGE } from '../../../functions/constants';
 
@@ -80,14 +84,25 @@ const AestheticPage = props => {
     );
   }
 
-  let similarityWeb = null;
+  let relatedAesthetics = null;
 
   if (aestheticData.similarAesthetics && aestheticData.similarAesthetics.length > 0) {
-    similarityWeb = (
+    const relatedAestheticsList = (
+      <RelatedAestheticsList addMessage={addMessage} aesthetic={aestheticData} />
+    );
+
+    const similarityWeb = <SimilarityWeb aesthetic={aestheticData} />;
+
+    relatedAesthetics = (
       <>
         <Card>
           <ExpandableSection header="Related Aesthetics" show={showSimilarityWeb}>
-            <SimilarityWeb aesthetic={aestheticData} />
+            <Tabs>
+              <Tab id="list" title="List View" panel={relatedAestheticsList} />
+              <Tab id="graph" title="Web View" panel={similarityWeb} />
+            </Tabs>
+
+
           </ExpandableSection>
         </Card>
         <br />
@@ -103,7 +118,7 @@ const AestheticPage = props => {
       <AestheticDetails aesthetic={aestheticData} session={props.session} />
       {timeline}
       {gallery}
-      {similarityWeb}
+      {relatedAesthetics}
     </>
   );
 };

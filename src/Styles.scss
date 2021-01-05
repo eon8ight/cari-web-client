@@ -40,21 +40,3 @@ p {
 
     line-height: 2;
 }
-
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-td, th {
-    &:not(:first-child) {
-        border-left: 1px solid lightgrey;
-    }
-
-    padding: 8px;
-    text-align: left;
-}
-
-th {
-    border-bottom: 1px solid lightgrey;
-}

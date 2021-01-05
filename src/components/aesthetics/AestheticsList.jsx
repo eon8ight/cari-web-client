@@ -1,7 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-import { Icon } from '@blueprintjs/core';
+import {
+  HTMLTable,
+  Icon,
+} from '@blueprintjs/core';
 
 import styles from './styles/AestheticsList.module.scss';
 
@@ -19,7 +21,8 @@ const AestheticsList = props => {
   if(props.aesthetics.length > 0) {
     aestheticRows = props.aesthetics.map(a => (
       <tr key={a.aesthetic}>
-        <td><Link to={`/aesthetics/${a.urlSlug}`}>{a.name}</Link></td>
+        {/* <Link> should work here, but it doesn't */}
+        <td><a href={`/aesthetics/${a.urlSlug}`}>{a.name}</a></td>
         <td>{a.startYear || '?'}</td>
         <td>{a.endYear || '?'}</td>
       </tr>
@@ -45,11 +48,11 @@ const AestheticsList = props => {
     : null;
 
   return (
-    <table>
+    <HTMLTable className={styles.listTable}>
       <colgroup>
-        <col span="1" className={styles.nameColumn} />
-        <col span="1" />
-        <col span="1" />
+        <col className={styles.nameColumn} />
+        <col />
+        <col />
       </colgroup>
       <thead>
         <tr>
@@ -67,7 +70,7 @@ const AestheticsList = props => {
       <tbody>
         {aestheticRows}
       </tbody>
-    </table>
+    </HTMLTable>
   );
 };
 
