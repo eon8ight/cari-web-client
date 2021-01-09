@@ -8,6 +8,13 @@ import {
   Intent,
 } from '@blueprintjs/core';
 
+import {
+  ROLE_LEAD_CURATOR,
+  ROLE_LEAD_DIRECTOR,
+} from '../../functions/constants';
+
+import { entityHasPermission } from '../../functions/utils';
+
 import styles from './styles/AestheticDetails.module.scss';
 
 const AestheticDetails = props => {
@@ -32,7 +39,7 @@ const AestheticDetails = props => {
 
   let editButton = null;
 
-  if(props.session.isValid) {
+  if(props.session.isValid && entityHasPermission(props.session, ROLE_LEAD_CURATOR, ROLE_LEAD_DIRECTOR)) {
     editButton = (
       <AnchorButton href={`/admin/edit/${props.aesthetic.aesthetic}`} icon="edit"
         intent={Intent.PRIMARY} large={true} text="Edit" />

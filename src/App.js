@@ -63,7 +63,13 @@ const App = props => {
           }
 
           if(claims.roles) {
-            claims.roles = claims.roles.split(',').map(r => parseInt(r.trim()));
+            let roles = claims.roles.split(',').map(r => parseInt(r.trim()));
+
+            if(!Array.isArray(roles)) {
+              roles = [roles];
+            }
+
+            claims.roles = roles;
           }
 
           setSession({

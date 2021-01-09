@@ -1,7 +1,17 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
+import { Redirect } from 'react-router-dom';
+
+import { Spinner } from '@blueprintjs/core';
 
 import EditAestheticForm from '../EditAestheticForm';
+
+import {
+  ROLE_LEAD_CURATOR,
+  ROLE_LEAD_DIRECTOR,
+} from '../../../functions/constants';
+
+import { entityHasPermission } from '../../../functions/utils';
 
 const AESTHETIC_TEMPLATE = {
   aesthetic: null,
@@ -16,6 +26,16 @@ const AESTHETIC_TEMPLATE = {
 };
 
 const CreateAestheticPage = props => {
+  const session = props.session;
+
+  if (session.isValid === null) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
+
+  if (!(session.isValid && entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR))) {
+    return <Redirect to="/error/403" />;
+  }
+
   return (
     <>
       <Helmet>

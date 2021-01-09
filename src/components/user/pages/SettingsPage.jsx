@@ -13,6 +13,13 @@ import {
 import InviteForm from './SettingsPage/InviteForm';
 import ProfileForm from './SettingsPage/ProfileForm';
 
+import {
+  ROLE_LEAD_CURATOR,
+  ROLE_LEAD_DIRECTOR,
+} from '../../../functions/constants';
+
+import { entityHasPermission } from '../../../functions/utils';
+
 const ID_INVITE = 'invite';
 const ID_PROFILE = 'profile';
 
@@ -40,6 +47,8 @@ const SettingsPage = props => {
     history.push(`${loc.pathname}#${tabId}`);
   };
 
+  const canInvite = entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR);
+
   return (
     <>
       <Helmet>
@@ -50,8 +59,8 @@ const SettingsPage = props => {
           selectedTabId={selectedTab}>
           <Tab id={ID_PROFILE} panel={<ProfileForm addMessage={addMessage} session={session} />}
             title="Profile" />
-          <Tab id={ID_INVITE} panel={<InviteForm addMessage={addMessage} session={session} />}
-            title="Invite" />
+          {canInvite && <Tab id={ID_INVITE} panel={<InviteForm addMessage={addMessage} session={session} />}
+            title="Invite" />}
         </Tabs>
       </Card>
     </>

@@ -17,8 +17,16 @@ import {
 import AestheticsList from '../AestheticsList';
 import Paginator from '../../common/Paginator';
 
-import { API_ROUTE_AESTHETIC_FIND_FOR_LIST } from '../../../functions/constants';
-import { valueExists } from '../../../functions/utils';
+import {
+  API_ROUTE_AESTHETIC_FIND_FOR_LIST,
+  ROLE_LEAD_CURATOR,
+  ROLE_LEAD_DIRECTOR,
+} from '../../../functions/constants';
+
+import {
+  entityHasPermission,
+  valueExists,
+} from '../../../functions/utils';
 
 import styles from './styles/AestheticsListPage.module.scss';
 
@@ -123,7 +131,7 @@ const AestheticsListPage = props => {
 
   let addButton = null;
 
-  if(props.session.isValid) {
+  if(props.session.isValid && entityHasPermission(props.session, ROLE_LEAD_CURATOR, ROLE_LEAD_DIRECTOR)) {
     addButton = (
       <FormGroup>
         <AnchorButton href="/admin/create" icon="add" intent={Intent.PRIMARY}

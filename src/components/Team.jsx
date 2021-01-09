@@ -19,7 +19,7 @@ const Team = props => {
 
   useEffect(() => {
     const params = {
-      role: 1,
+      displayOnTeamPage: true,
       includeFavoriteAesthetic: true,
       includeProfileImage: true,
       includeRoles: true,

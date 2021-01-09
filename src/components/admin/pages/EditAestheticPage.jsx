@@ -11,7 +11,13 @@ import {
 
 import EditAestheticForm from '../EditAestheticForm';
 
-import { API_ROUTE_AESTHETIC_FIND_FOR_EDIT } from '../../../functions/constants';
+import {
+  API_ROUTE_AESTHETIC_FIND_FOR_EDIT,
+  ROLE_LEAD_CURATOR,
+  ROLE_LEAD_DIRECTOR,
+} from '../../../functions/constants';
+
+import { entityHasPermission } from '../../../functions/utils';
 
 const EditAestheticPage = props => {
   const addMessage = props.addMessage;
@@ -38,6 +44,12 @@ const EditAestheticPage = props => {
   if (!session.isValid) {
       props.addMessage('You must be logged in to view this page', Intent.DANGER);
       return <Redirect to="/user/login" />;
+  }
+
+  const hasPermission = entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR);
+
+  if (!(session.isValid && hasPermission)) {
+    return <Redirect to="/error/403" />;
   }
 
   return (

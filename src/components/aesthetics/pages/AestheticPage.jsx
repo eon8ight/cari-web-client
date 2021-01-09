@@ -101,8 +101,6 @@ const AestheticPage = props => {
               <Tab id="list" title="List View" panel={relatedAestheticsList} />
               <Tab id="graph" title="Web View" panel={similarityWeb} />
             </Tabs>
-
-
           </ExpandableSection>
         </Card>
         <br />
