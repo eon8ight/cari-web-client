@@ -52,16 +52,16 @@ const Team = props => {
       if(lastName) {
         displayName = `${displayName} ${lastName}`;
       }
+    }
 
-      if(rolesForDisplay) {
-        displayName = `${displayName} - ${rolesForDisplay}`;
+    if(rolesForDisplay) {
+      displayName = `${displayName} - ${rolesForDisplay}`;
 
-        if(title) {
-          displayName = `${displayName} / ${title}`;
-        }
-      } else if (title) {
-        displayName = `${displayName} - ${title}`;
+      if(title) {
+        displayName = `${displayName} / ${title}`;
       }
+    } else if (title) {
+      displayName = `${displayName} - ${title}`;
     }
 
     return (
