@@ -41,14 +41,7 @@ const EditAestheticPage = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if (!session.isValid) {
-      props.addMessage('You must be logged in to view this page', Intent.DANGER);
-      return <Redirect to="/user/login" />;
-  }
-
-  const hasPermission = entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR);
-
-  if (!(session.isValid && hasPermission)) {
+  if (!(session.isValid && entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR))) {
     return <Redirect to="/error/403" />;
   }
 
