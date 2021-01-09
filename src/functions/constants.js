@@ -31,6 +31,7 @@ const API_ROUTE_WEBSITE_TYPES = `${API_URL}/websiteTypes`;
 const ARENA_API_URL = 'https://api.are.na/v2/channels/';
 
 const ROLE_ADMIN = 1;
+const ROLE_USER = 2;
 const ROLE_LEAD_DIRECTOR = 3;
 const ROLE_LEAD_CURATOR = 4;
 const ROLE_CURATOR = 5;
@@ -69,6 +70,7 @@ export {
   API_ROUTE_WEBSITE_TYPES,
   ARENA_API_URL,
   ROLE_ADMIN,
+  ROLE_USER,
   ROLE_LEAD_DIRECTOR,
   ROLE_LEAD_CURATOR,
   ROLE_CURATOR,

@@ -52,17 +52,20 @@ const Team = props => {
       if(lastName) {
         displayName = `${displayName} ${lastName}`;
       }
+    } else if(lastName) {
+      displayName = lastName;
     }
 
     if(rolesForDisplay) {
       displayName = `${displayName} - ${rolesForDisplay}`;
 
-      if(title) {
+      if (title) {
         displayName = `${displayName} / ${title}`;
       }
-    } else if (title) {
+    } else if(title) {
       displayName = `${displayName} - ${title}`;
     }
+
 
     return (
       <article className={styles.teamArticle} key={user.entity}>

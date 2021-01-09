@@ -23,7 +23,9 @@ import PasswordInput from '../../../common/PasswordInput';
 import {
   API_ROUTE_AESTHETIC_NAMES,
   API_ROUTE_USER_FIND_FOR_EDIT,
-  API_ROUTE_USER_UPDATE
+  API_ROUTE_USER_UPDATE,
+  ROLE_ADMIN,
+  ROLE_USER,
 } from '../../../../functions/constants';
 
 import styles from './styles/ProfileForm.module.scss';
@@ -47,7 +49,7 @@ const SUGGEST_POPOVER_PROPS = {
 
 const compareNames = (aestheticNameA, aestheticNameB) => aestheticNameA.aesthetic === aestheticNameB.aesthetic;
 
-const ProfileForm = (props) => {
+const ProfileForm = props => {
   const addMessage = props.addMessage;
 
   const [isLoadingNames, setIsLoadingNames] = useState(false);
@@ -81,6 +83,7 @@ const ProfileForm = (props) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [biography, setBiography] = useState('');
+  const [roles, setRoles] = useState('');
   const [title, setTitle] = useState('');
   const [favoriteAesthetic, setFavoriteAesthetic] = useState(null);
 
@@ -119,11 +122,18 @@ const ProfileForm = (props) => {
         .then(res => {
           const entity = res.data;
 
+          let newRoles = entity.roles
+            .filter(r => r.role !== ROLE_ADMIN && r.role !== ROLE_USER);
+
+          newRoles.sort((firstEl, secondEl) => firstEl.rank - secondEl.rank);
+          newRoles = newRoles.map(r => r.label).join(' / ');
+
           setUsername(entity.username);
           setEmailAddress(entity.emailAddress);
           setFirstName(entity.firstName);
           setLastName(entity.lastName);
           setBiography(entity.biography);
+          setRoles(newRoles);
           setTitle(entity.title);
           setFavoriteAesthetic(entity.favoriteAesthetic);
 
@@ -365,7 +375,9 @@ const ProfileForm = (props) => {
           </ControlGroup>
         </FormGroup>
         <FormGroup label="Title">
-          <InputGroup onChange={handleTitleChange} placeholder="New Title" value={title} />
+          <FormGroup className={styles.softText} label={`${roles} /`} inline={true}>
+            <InputGroup onChange={handleTitleChange} placeholder="New Title" value={title} />
+          </FormGroup>
         </FormGroup>
         <FormGroup label="Biography">
           <Editor apiKey={process.env.REACT_APP_TINYMCE_API_KEY} init={BIOGRAPHY_EDITOR_SETTINGS}
