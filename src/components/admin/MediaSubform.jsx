@@ -245,7 +245,7 @@ const MediaSubform = props => {
       setFileIntent(Intent.DANGER);
       setFileHelperText('File is required.');
       hasError = true;
-    } else if(swapSpace.fileObject.type.startsWith("image/")) {
+    } else if(!swapSpace.fileObject.type.startsWith("image/")) {
       setFileIntent(Intent.DANGER);
       setFileHelperText('File must be an image.');
       hasError = true;
