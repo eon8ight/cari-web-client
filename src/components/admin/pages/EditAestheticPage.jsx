@@ -13,7 +13,6 @@ import EditAestheticForm from '../EditAestheticForm';
 
 import {
   API_ROUTE_AESTHETIC_FIND_FOR_EDIT,
-  ROLE_CURATOR,
   ROLE_LEAD_CURATOR,
   ROLE_LEAD_DIRECTOR,
 } from '../../../functions/constants';
@@ -42,7 +41,7 @@ const EditAestheticPage = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if (!(session.isValid && entityHasPermission(session, ROLE_CURATOR, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR))) {
+  if (!(session.isValid && entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR))) {
     return <Redirect to="/error/403" />;
   }
 
