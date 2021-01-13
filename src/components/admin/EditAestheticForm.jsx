@@ -549,7 +549,7 @@ const EditAestheticForm = props => {
         <Card>
           <MediaSubform addMessage={addMessage}
             helperText={[mediaHelperTexts, setMediaHelperTexts]} icon={mediaSubformIcon}
-            intent={[mediaIntents, setMediaIntents]} media={mediaState}
+            intent={[mediaIntents, setMediaIntents]} isExpandable={true} media={mediaState}
             show={[showMediaSubform, setShowMediaSubform]} />
         </Card>
         <br />

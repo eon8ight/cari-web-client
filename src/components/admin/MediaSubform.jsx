@@ -191,7 +191,7 @@ const MediaSubform = props => {
     const imageFile = event.target.files[0];
 
     if (imageFile) {
-      if(!imageFile.type.startsWith("image/")) {
+      if (!imageFile.type.startsWith('image/')) {
         setFileIntent(Intent.DANGER);
         setFileHelperText('File must be an image.');
       } else {
@@ -245,7 +245,7 @@ const MediaSubform = props => {
       setFileIntent(Intent.DANGER);
       setFileHelperText('File is required.');
       hasError = true;
-    } else if(swapSpace.fileObject.type.startsWith("image/")) {
+    } else if (!swapSpace.fileObject.type.startsWith('image/')) {
       setFileIntent(Intent.DANGER);
       setFileHelperText('File must be an image.');
       hasError = true;
@@ -476,16 +476,28 @@ const MediaSubform = props => {
     );
   });
 
+  let formGroup = (
+    <>
+      <OL>{mediaElems}</OL>
+      <FormGroup>
+        <Button icon="add" intent={Intent.PRIMARY} onClick={() => handleModalOpen(MEDIA_TEMPLATE)}>
+          Add Media
+        </Button>
+      </FormGroup>
+    </>
+  );
+
+  if(props.isExpandable) {
+    formGroup = (
+      <ExpandableSection header="Media" icon={props.icon} show={props.show}>
+        {formGroup}
+      </ExpandableSection>
+    );
+  }
+
   return (
     <>
-      <ExpandableSection header="Media" icon={props.icon} show={props.show}>
-        <OL>{mediaElems}</OL>
-        <FormGroup>
-          <Button icon="add" intent={Intent.PRIMARY} onClick={() => handleModalOpen(MEDIA_TEMPLATE)}>
-            Add Media
-        </Button>
-        </FormGroup>
-      </ExpandableSection>
+      {formGroup}
       <Dialog className={styles.modal}
         isOpen={swapSpace !== null} onClose={() => handleModalClose(false)}
         title={(swapSpace && swapSpace.label) ? `Edit "${truncate(swapSpace.label, TRUNCATE_OPTS)}"` : 'Add Media'}>
