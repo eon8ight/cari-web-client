@@ -44,7 +44,7 @@ const DESCRIPTION_EDITOR_SETTINGS = {
   toolbar: `
 undo redo | copy cut paste | styleselect | bold italic underline strikethrough subscript
 superscript blockquote code | bullist numlist | link unlink | searchreplace |  removeformat remove
-`
+`,
 };
 
 const MEDIA_TEMPLATE = {
@@ -356,11 +356,6 @@ const MediaSubform = props => {
       );
     }
 
-    if (aestheticDescriptionEditorHeader !== null) {
-      // Hack to prevent aesthetic description editor's toolbar from appearing over the modal
-      aestheticDescriptionEditorHeader.style['z-index'] = 'initial';
-    }
-
     const fileValue = swapSpace.fileObject?.name || swapSpace.fileUrl;
 
     mediaModalContent = (
@@ -409,9 +404,6 @@ const MediaSubform = props => {
         </ControlGroup>
       </form>
     );
-  } else if (aestheticDescriptionEditorHeader !== null) {
-    // Hack to undo the above hack
-    aestheticDescriptionEditorHeader.style['z-index'] = 1;
   }
 
   const mediaElems = media.map((medium, idx) => {
@@ -498,7 +490,7 @@ const MediaSubform = props => {
   return (
     <>
       {formGroup}
-      <Dialog className={styles.modal}
+      <Dialog className={styles.modal} enforceFocus={false}
         isOpen={swapSpace !== null} onClose={() => handleModalClose(false)}
         title={(swapSpace && swapSpace.label) ? `Edit "${truncate(swapSpace.label, TRUNCATE_OPTS)}"` : 'Add Media'}>
         {mediaModalContent}
