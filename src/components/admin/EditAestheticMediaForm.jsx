@@ -64,7 +64,7 @@ const EditAestheticMediaForm = props => {
 
       const mediaCreator = media.mediaCreator;
 
-      if (typeof mediaCreator === 'string' && mediaCreator.startsWith('temp_')) {
+      if (!mediaCreator || (typeof mediaCreator === 'string' && mediaCreator.startsWith('temp_'))) {
         delete media.mediaCreator;
       } else {
         delete media.mediaCreatorName;

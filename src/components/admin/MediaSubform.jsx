@@ -54,7 +54,7 @@ const MEDIA_TEMPLATE = {
   previewFileBlob: '',
   description: '',
   label: '',
-  mediaCreator: null,
+  mediaCreator: 0,
   mediaCreatorName: '',
   mediaFile: null,
   mediaThumbnailFile: null,
