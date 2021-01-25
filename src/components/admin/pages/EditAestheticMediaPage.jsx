@@ -9,17 +9,16 @@ import {
   Spinner,
 } from '@blueprintjs/core';
 
-import EditAestheticForm from '../EditAestheticForm';
+import EditAestheticMediaForm from '../EditAestheticMediaForm';
 
 import {
   API_ROUTE_AESTHETIC_FIND_FOR_EDIT,
-  ROLE_LEAD_CURATOR,
-  ROLE_LEAD_DIRECTOR,
+  ROLE_CURATOR,
 } from '../../../functions/constants';
 
 import { entityHasPermission } from '../../../functions/utils';
 
-const EditAestheticPage = props => {
+const EditAestheticMediaPage = props => {
   const addMessage = props.addMessage;
   const session = props.session;
   const match = useRouteMatch();
@@ -41,7 +40,7 @@ const EditAestheticPage = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if (!(session.isValid && entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR))) {
+  if (!(session.isValid && entityHasPermission(session, ROLE_CURATOR))) {
     return <Redirect to="/error/403" />;
   }
 
@@ -50,9 +49,9 @@ const EditAestheticPage = props => {
       <Helmet>
         <title>CARI | Admin | Edit {aestheticData.name}</title>
       </Helmet>
-      <EditAestheticForm addMessage={addMessage} aesthetic={aestheticData} />
+      <EditAestheticMediaForm addMessage={addMessage} aesthetic={aestheticData} />
     </>
   );
 };
 
-export default EditAestheticPage;
+export default EditAestheticMediaPage;
