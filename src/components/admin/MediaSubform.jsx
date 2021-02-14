@@ -335,11 +335,6 @@ const MediaSubform = props => {
   };
 
   let mediaModalContent = null;
-
-  const aestheticDescriptionEditorHeader = document.querySelector(
-    '#aestheticDescription + .tox-tinymce > .tox-editor-container > .tox-editor-header'
-  );
-
   let fileImageElem = null;
 
   if (swapSpace) {
