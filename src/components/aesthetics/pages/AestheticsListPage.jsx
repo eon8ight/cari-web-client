@@ -12,8 +12,11 @@ import {
   Intent,
   NumericInput,
   Spinner,
+  Tab,
+  Tabs,
 } from '@blueprintjs/core';
 
+import AestheticsGrid from '../AestheticsGrid';
 import AestheticsList from '../AestheticsList';
 import Paginator from '../../common/Paginator';
 
@@ -30,6 +33,8 @@ import {
 
 import styles from './styles/AestheticsListPage.module.scss';
 
+const SORT_FIELD_NAME = 'name';
+
 const AestheticsListPage = props => {
   const addMessage = props.addMessage;
 
@@ -38,8 +43,8 @@ const AestheticsListPage = props => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [sortField, setSortField] = useState(null);
-  const [asc, setAsc] = useState(null);
+  const [sortField, setSortField] = useState(SORT_FIELD_NAME);
+  const [asc, setAsc] = useState(true);
   const [keyword, setKeyword] = useState(null);
   const [startYear, setStartYear] = useState(null);
   const [endYear, setEndYear] = useState(null);
@@ -103,10 +108,22 @@ const AestheticsListPage = props => {
   if (!aesthetics) {
     aestheticsList = <Spinner size={Spinner.SIZE_LARGE} />;
   } else {
+    const gridView = (
+      <AestheticsGrid aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
+        asc={asc} setAsc={setAsc} callApi={callApi} />
+    );
+
+    const listView = (
+      <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
+        asc={asc} setAsc={setAsc} callApi={callApi} />
+    );
+
     aestheticsList = (
       <>
-        <AestheticsList aesthetics={aesthetics} sortField={sortField} setSortField={setSortField}
-          asc={asc} setAsc={setAsc} callApi={callApi} />
+        <Tabs>
+          <Tab id="grid" title="Grid View" panel={gridView} />
+          <Tab id="list" title="List View" panel={listView} />
+        </Tabs>
         {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
           pageCount={totalPages} onPageChange={handlePageChange} />}
       </>
