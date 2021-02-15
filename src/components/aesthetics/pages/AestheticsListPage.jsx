@@ -131,7 +131,7 @@ const AestheticsListPage = props => {
 
   let addButton = null;
 
-  if(props.session.isValid && entityHasPermission(props.session, ROLE_LEAD_CURATOR, ROLE_LEAD_DIRECTOR)) {
+  if (entityHasPermission(props.session, ROLE_LEAD_CURATOR, ROLE_LEAD_DIRECTOR)) {
     addButton = (
       <FormGroup>
         <AnchorButton href="/admin/create" icon="add" intent={Intent.PRIMARY}

@@ -13,6 +13,7 @@ import EditAestheticForm from '../EditAestheticForm';
 
 import {
   API_ROUTE_AESTHETIC_FIND_FOR_EDIT,
+  ROLE_CURATOR,
   ROLE_LEAD_CURATOR,
   ROLE_LEAD_DIRECTOR,
 } from '../../../functions/constants';
@@ -28,7 +29,7 @@ const EditAestheticPage = props => {
   const [aestheticData, setAestheticData] = useState(null);
 
   useEffect(() => {
-    if(!requestMade) {
+    if (!requestMade) {
       setRequestMade(true);
 
       axios.get(`${API_ROUTE_AESTHETIC_FIND_FOR_EDIT}/${match.params.aesthetic}`)
@@ -41,7 +42,7 @@ const EditAestheticPage = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if (!(session.isValid && entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR))) {
+  if (!entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR, ROLE_CURATOR)) {
     return <Redirect to="/error/403" />;
   }
 
@@ -50,7 +51,7 @@ const EditAestheticPage = props => {
       <Helmet>
         <title>CARI | Admin | Edit {aestheticData.name}</title>
       </Helmet>
-      <EditAestheticForm addMessage={addMessage} aesthetic={aestheticData} />
+      <EditAestheticForm addMessage={addMessage} aesthetic={aestheticData} session={session} />
     </>
   );
 };

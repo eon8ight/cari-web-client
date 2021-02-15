@@ -1,8 +1,11 @@
 import { ROLE_ADMIN } from './constants';
 
 const entityHasPermission = (session, ...permittedRoles) => {
-  const allPermittedRoles = [ROLE_ADMIN].concat(permittedRoles);
+  if(!session.isValid) {
+    return false;
+  }
 
+  const allPermittedRoles = [ROLE_ADMIN].concat(permittedRoles);
   let userRoles = session.claims.roles;
 
   if(typeof userRoles === 'string') {

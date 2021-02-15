@@ -32,7 +32,7 @@ const CreateAestheticPage = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if (!(session.isValid && entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR))) {
+  if (!entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR)) {
     return <Redirect to="/error/403" />;
   }
 

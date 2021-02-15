@@ -26,9 +26,14 @@ import WebsiteSubform from './WebsiteSubform';
 
 import {
   API_ROUTE_AESTHETIC_EDIT,
+  API_ROUTE_AESTHETIC_MEDIA_EDIT,
   API_ROUTE_ERAS,
   API_ROUTE_WEBSITE_TYPES,
+  ROLE_LEAD_CURATOR,
+  ROLE_LEAD_DIRECTOR,
 } from '../../functions/constants';
+
+import { entityHasPermission } from '../../functions/utils';
 
 import styles from './styles/EditAestheticForm.module.scss';
 
@@ -47,6 +52,9 @@ const SELECT_NULL_LABEL = '--';
 
 const EditAestheticForm = props => {
   const addMessage = props.addMessage;
+  const session = props.session;
+
+  const hasFullEditAccess = entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR);
 
   const originalWebsites = props.aesthetic.websites || [];
   const originalSimilarAesthetics = props.aesthetic.similarAesthetics || [];
@@ -131,7 +139,7 @@ const EditAestheticForm = props => {
       axios.get(API_ROUTE_ERAS)
         .then(res => {
           setEras(res.data.reduce((map, era) => {
-            if(!(era.eraSpecifier in map)) {
+            if (!(era.eraSpecifier in map)) {
               map[era.eraSpecifier] = {
                 label: era.specifier.label,
                 years: {},
@@ -140,12 +148,12 @@ const EditAestheticForm = props => {
 
             map[era.eraSpecifier].years[era.year] = era.era;
 
-            if(startEra === era.era) {
+            if (startEra === era.era) {
               setStartEraSpecifier(era.eraSpecifier);
               setStartYear(era.year);
             }
 
-            if(endEra === era.era) {
+            if (endEra === era.era) {
               setEndEraSpecifier(era.eraSpecifier);
               setEndYear(era.year);
             }
@@ -161,7 +169,7 @@ const EditAestheticForm = props => {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
-  if(edited) {
+  if (edited) {
     return <Redirect to={urlSlug ? `/aesthetics/${urlSlug}` : '/aesthetics'} />
   }
 
@@ -175,7 +183,7 @@ const EditAestheticForm = props => {
     const value = event.target.value;
     setStartEraSpecifier(value);
 
-    if(value === SELECT_NULL_LABEL) {
+    if (value === SELECT_NULL_LABEL) {
       setStartYear(SELECT_NULL_LABEL);
       setStartEra(null);
     }
@@ -191,7 +199,7 @@ const EditAestheticForm = props => {
     const value = event.target.value;
     setEndEraSpecifier(value);
 
-    if(value === SELECT_NULL_LABEL) {
+    if (value === SELECT_NULL_LABEL) {
       setEndYear(SELECT_NULL_LABEL);
       setEndEra(null);
     }
@@ -248,7 +256,7 @@ const EditAestheticForm = props => {
       const intStartYear = parseInt(startYear);
       const intEndYear = parseInt(endYear);
 
-      if(intStartYear > intEndYear || (intStartYear === intEndYear && startEraSpecifier > endEraSpecifier)) {
+      if (intStartYear > intEndYear || (intStartYear === intEndYear && startEraSpecifier > endEraSpecifier)) {
         setEndYearIntent(Intent.DANGER);
         setEndYearHelperText('End of popularity cannot be before year first observed.');
         hasError = true;
@@ -321,7 +329,7 @@ const EditAestheticForm = props => {
     const newSimilarAestheticHelperTexts = cloneDeep(similarAestheticHelperTexts);
 
     similarAestheticsState[0].forEach((similarAesthetic, idx) => {
-      if(!similarAesthetic.aesthetic) {
+      if (!similarAesthetic.aesthetic) {
         newSimilarAestheticIntents[idx].aesthetic = Intent.DANGER;
         newSimilarAestheticHelperTexts[idx].aesthetic = 'Aesthetic is required.';
         hasError = true;
@@ -334,7 +342,7 @@ const EditAestheticForm = props => {
     setSimilarAestheticIntents(newSimilarAestheticIntents);
     setSimilarAestheticHelperTexts(newSimilarAestheticHelperTexts);
 
-    if(hasError) {
+    if (hasError) {
       setShowAestheticRelationshipSubform(true);
       setAestheticRelationshipSubformIcon(<Icon icon="warning-sign" intent={Intent.WARNING} />);
     } else {
@@ -349,25 +357,21 @@ const EditAestheticForm = props => {
 
     setMediaSubformIcon(null);
 
-    const hasNameError = validateName();
-    const hasStartEraError = validateStartEra();
-    const hasEndEraError = validateEndEra();
-    const hasDescriptionError = validateDescription();
-    const hasWebsiteError = validateWebsites();
-    const hasSimilarAestheticError = validateSimilarAesthetics();
+    if (hasFullEditAccess) {
+      const hasNameError = validateName();
+      const hasStartEraError = validateStartEra();
+      const hasEndEraError = validateEndEra();
+      const hasDescriptionError = validateDescription();
+      const hasWebsiteError = validateWebsites();
+      const hasSimilarAestheticError = validateSimilarAesthetics();
 
-    if (hasNameError || hasStartEraError || hasEndEraError || hasDescriptionError
-      || hasWebsiteError || hasSimilarAestheticError) {
-      return;
+      if (hasNameError || hasStartEraError || hasEndEraError || hasDescriptionError
+        || hasWebsiteError || hasSimilarAestheticError) {
+        return;
+      }
     }
 
     setIsSaving(true);
-
-    const websitesToSend = cloneDeep(websitesState[0]);
-
-    websitesToSend.forEach(website => {
-      delete website.aestheticWebsite;
-    });
 
     const mediaToSend = cloneDeep(mediaState[0]);
 
@@ -384,7 +388,7 @@ const EditAestheticForm = props => {
         delete media.mediaCreatorName;
       }
 
-      if(media.fileObject) {
+      if (media.fileObject) {
         delete media.mediaFile;
         delete media.mediaThumbnailFile;
         delete media.mediaPreviewFile;
@@ -395,23 +399,32 @@ const EditAestheticForm = props => {
 
     const newAesthetic = {
       aesthetic: props.aesthetic.aesthetic,
-      name,
-      symbol,
-      startEra,
-      description,
-      websites: websitesToSend,
-      similarAesthetics: similarAestheticsState[0],
       media: mediaToSend,
     };
 
-    if(endEra) {
-      newAesthetic.endEra = endEra;
-    }
+    if (hasFullEditAccess) {
+      const websitesToSend = cloneDeep(websitesState[0]);
 
-    const mediaSourceUrl = mediaSourceUrlState[0];
+      websitesToSend.forEach(website => {
+        delete website.aestheticWebsite;
+      });
 
-    if(mediaSourceUrl) {
-      newAesthetic.mediaSourceUrl = mediaSourceUrl;
+      newAesthetic.name = name;
+      newAesthetic.symbol = symbol;
+      newAesthetic.startEra = startEra;
+      newAesthetic.description = description;
+      newAesthetic.websites = websitesToSend;
+      newAesthetic.similarAesthetics = similarAestheticsState[0];
+
+      if (endEra) {
+        newAesthetic.endEra = endEra;
+      }
+
+      const mediaSourceUrl = mediaSourceUrlState[0];
+
+      if (mediaSourceUrl) {
+        newAesthetic.mediaSourceUrl = mediaSourceUrl;
+      }
     }
 
     const formData = serialize(
@@ -419,11 +432,15 @@ const EditAestheticForm = props => {
       { indices: true }
     );
 
+    const postUrl = hasFullEditAccess ? API_ROUTE_AESTHETIC_EDIT : API_ROUTE_AESTHETIC_MEDIA_EDIT;
     const postOpts = { withCredentials: true };
 
-    axios.post(API_ROUTE_AESTHETIC_EDIT, formData, postOpts)
+    axios.post(postUrl, formData, postOpts)
       .then(res => {
-        setUrlSlug(res.data.updatedData.urlSlug);
+        if (res.data.updatedData) {
+          setUrlSlug(res.data.updatedData.urlSlug);
+        }
+
         addMessage("Successfully updated.");
         setEdited(true);
       })
@@ -478,6 +495,75 @@ const EditAestheticForm = props => {
 
   yearSpecifierOptions.unshift({ label: SELECT_NULL_LABEL, value: 0 });
 
+  const basicInfoCard = (
+    <Card>
+      <h2>Basic Information</h2>
+      <FormGroup helperText={nameHelperText} intent={nameIntent} label="Name"
+        labelInfo="(required)">
+        <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
+          value={name} />
+      </FormGroup>
+      <FormGroup
+        helperText={symbolHelperText || "1-3 characters. Like the Periodic Table, but for aesthetics."}
+        intent={symbolIntent} label="Symbol">
+        <InputGroup intent={symbolIntent} onChange={handleSymbolChange} value={symbol || ''} />
+      </FormGroup>
+      <FormGroup helperText={startYearHelperText} intent={startYearIntent}
+        label="Year First Observed" labelInfo="(required)">
+        <ControlGroup>
+          <HTMLSelect options={eraSpecifierOptions}
+            onChange={handleStartEraSpecifierChange} value={startEraSpecifier} />
+          <HTMLSelect disabled={!startEraSpecifier} options={yearSpecifierOptions}
+            onChange={handleStartYearChange} value={startYear} />
+        </ControlGroup>
+      </FormGroup>
+      <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End of Popularity">
+        <ControlGroup>
+          <HTMLSelect options={eraSpecifierOptions}
+            onChange={handleEndEraSpecifierChange} value={endEraSpecifier} />
+          <HTMLSelect disabled={!endEraSpecifier} options={yearSpecifierOptions}
+            onChange={handleEndYearChange} value={endYear} />
+        </ControlGroup>
+      </FormGroup>
+      <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
+        label="Description" labelInfo="(required)">
+        <Editor apiKey={process.env.REACT_APP_TINYMCE_API_KEY} id="aestheticDescription"
+          init={DESCRIPTION_EDITOR_SETTINGS}
+          initialValue={description}
+          onEditorChange={(content, editor) => setDescription(content)} />
+      </FormGroup>
+    </Card>
+  );
+
+  const websitesCard = (
+    <Card>
+      <WebsiteSubform helperText={[websiteHelperTexts, setWebsiteHelperTexts]}
+        icon={websiteSubformIcon} intent={[websiteIntents, setWebsiteIntents]}
+        mediaSourceUrl={mediaSourceUrlState} show={[showWebsiteSubform, setShowWebsiteSubform]}
+        websites={websitesState} websiteTypes={websiteTypes} />
+    </Card>
+  );
+
+  const relationshipsCard = (
+    <Card>
+      <AestheticRelationshipSubform addMessage={addMessage} aesthetic={props.aesthetic}
+        helperText={[similarAestheticHelperTexts, setSimilarAestheticHelperTexts]}
+        icon={aestheticRelationshipSubformIcon}
+        intent={[similarAestheticIntents, setSimilarAestheticIntents]}
+        show={[showAestheticRelationshipSubform, setShowAestheticRelationshipSubform]}
+        similarAesthetics={similarAestheticsState} />
+    </Card>
+  );
+
+  const mediaCard = (
+    <Card>
+      <MediaSubform addMessage={addMessage}
+        helperText={[mediaHelperTexts, setMediaHelperTexts]} icon={mediaSubformIcon}
+        intent={[mediaIntents, setMediaIntents]} isExpandable={true} media={mediaState}
+        show={[showMediaSubform, setShowMediaSubform]} />
+    </Card>
+  );
+
   return (
     <>
       <Overlay canEscapeKeyClose={false} canOutsideClickClose={false} isOpen={isSaving}>
@@ -492,66 +578,17 @@ const EditAestheticForm = props => {
         </Card>
       </Overlay>
       <form className={styles.editAestheticForm} onSubmit={handleSubmit}>
-        <Card>
-          <h2>Basic Information</h2>
-          <FormGroup helperText={nameHelperText} intent={nameIntent} label="Name"
-            labelInfo="(required)">
-            <InputGroup intent={nameIntent} onChange={event => setName(event.target.value)}
-              value={name} />
-          </FormGroup>
-          <FormGroup
-            helperText={symbolHelperText || "1-3 characters. Like the Periodic Table, but for aesthetics."}
-            intent={symbolIntent} label="Symbol">
-            <InputGroup intent={symbolIntent} onChange={handleSymbolChange} value={symbol || ''} />
-          </FormGroup>
-          <FormGroup helperText={startYearHelperText} intent={startYearIntent}
-            label="Year First Observed" labelInfo="(required)">
-            <ControlGroup>
-              <HTMLSelect options={eraSpecifierOptions}
-                onChange={handleStartEraSpecifierChange} value={startEraSpecifier} />
-              <HTMLSelect disabled={!startEraSpecifier} options={yearSpecifierOptions}
-                onChange={handleStartYearChange} value={startYear} />
-            </ControlGroup>
-          </FormGroup>
-          <FormGroup helperText={endYearHelperText} intent={endYearIntent} label="End of Popularity">
-            <ControlGroup>
-              <HTMLSelect options={eraSpecifierOptions}
-                onChange={handleEndEraSpecifierChange} value={endEraSpecifier} />
-              <HTMLSelect disabled={!endEraSpecifier} options={yearSpecifierOptions}
-                onChange={handleEndYearChange} value={endYear} />
-            </ControlGroup>
-          </FormGroup>
-          <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
-            label="Description" labelInfo="(required)">
-            <Editor apiKey={process.env.REACT_APP_TINYMCE_API_KEY} id="aestheticDescription"
-              init={DESCRIPTION_EDITOR_SETTINGS}
-              initialValue={description}
-              onEditorChange={(content, editor) => setDescription(content)} />
-          </FormGroup>
-        </Card>
-        <br />
-        <Card>
-          <WebsiteSubform helperText={[websiteHelperTexts, setWebsiteHelperTexts]}
-            icon={websiteSubformIcon} intent={[websiteIntents, setWebsiteIntents]}
-            mediaSourceUrl={mediaSourceUrlState} show={[showWebsiteSubform, setShowWebsiteSubform]}
-            websites={websitesState} websiteTypes={websiteTypes} />
-        </Card>
-        <br />
-        <Card>
-          <AestheticRelationshipSubform addMessage={addMessage} aesthetic={props.aesthetic}
-            helperText={[similarAestheticHelperTexts, setSimilarAestheticHelperTexts]}
-            icon={aestheticRelationshipSubformIcon}
-            intent={[similarAestheticIntents, setSimilarAestheticIntents]}
-            show={[showAestheticRelationshipSubform, setShowAestheticRelationshipSubform]}
-            similarAesthetics={similarAestheticsState} />
-        </Card>
-        <br />
-        <Card>
-          <MediaSubform addMessage={addMessage}
-            helperText={[mediaHelperTexts, setMediaHelperTexts]} icon={mediaSubformIcon}
-            intent={[mediaIntents, setMediaIntents]} isExpandable={true} media={mediaState}
-            show={[showMediaSubform, setShowMediaSubform]} />
-        </Card>
+        {hasFullEditAccess && (
+          <>
+            {basicInfoCard}
+            <br />
+            {websitesCard}
+            <br />
+            {relationshipsCard}
+            <br />
+          </>
+        )}
+        {mediaCard}
         <br />
         <FormGroup>
           <ControlGroup>
