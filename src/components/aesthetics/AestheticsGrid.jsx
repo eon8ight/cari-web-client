@@ -24,7 +24,7 @@ const AestheticsGrid = props => {
 
       if (a.displayImageUrl) {
         gridBlockClassName = styles.gridBlock;
-        gridBlockStyle = { backgroundImage: `url("${a.displayImageUrl})` };
+        gridBlockStyle = { backgroundImage: `url("${a.displayImageUrl}")` };
       }
 
       return (
