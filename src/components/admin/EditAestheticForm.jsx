@@ -11,6 +11,7 @@ import {
   Button,
   Card,
   ControlGroup,
+  FileInput,
   FormGroup,
   HTMLSelect,
   Icon,
@@ -56,6 +57,7 @@ const EditAestheticForm = props => {
 
   const hasFullEditAccess = entityHasPermission(session, ROLE_LEAD_DIRECTOR, ROLE_LEAD_CURATOR);
 
+  const displayImage = props.aesthetic.displayImage;
   const originalWebsites = props.aesthetic.websites || [];
   const originalSimilarAesthetics = props.aesthetic.similarAesthetics || [];
   const originalMedia = props.aesthetic.media || [];
@@ -66,6 +68,7 @@ const EditAestheticForm = props => {
   const [startEra, setStartEra] = useState(props.aesthetic.startEra);
   const [endEra, setEndEra] = useState(props.aesthetic.endEra);
   const [description, setDescription] = useState(props.aesthetic.description);
+  const [displayImageFile, setDisplayImageFile] = useState(null);
 
   const mediaSourceUrlState = useState(props.aesthetic.mediaSourceUrl);
   const websitesState = useState(originalWebsites);
@@ -82,6 +85,7 @@ const EditAestheticForm = props => {
   const [startYearIntent, setStartYearIntent] = useState(Intent.NONE);
   const [endYearIntent, setEndYearIntent] = useState(Intent.NONE);
   const [descriptionIntent, setDescriptionIntent] = useState(Intent.NONE);
+  const [displayImageIntent, setDisplayImageIntent] = useState(Intent.NONE);
   const [mediaIntents, setMediaIntents] = useState(originalMedia.map(() => Intent.NONE));
   const [websiteIntents, setWebsiteIntents] = useState(originalWebsites.map(() => Intent.NONE));
   const [similarAestheticIntents, setSimilarAestheticIntents] = useState(originalSimilarAesthetics.map(() => ({
@@ -95,6 +99,7 @@ const EditAestheticForm = props => {
   const [startYearHelperText, setStartYearHelperText] = useState('');
   const [endYearHelperText, setEndYearHelperText] = useState('');
   const [descriptionHelperText, setDescriptionHelperText] = useState('');
+  const [displayImageHelperText, setDisplayImageHelperText] = useState('');
   const [mediaHelperTexts, setMediaHelperTexts] = useState(originalMedia.map(() => ''));
   const [websiteHelperTexts, setWebsiteHelperTexts] = useState(originalWebsites.map(() => ''));
   const [similarAestheticHelperTexts, setSimilarAestheticHelperTexts] = useState(originalSimilarAesthetics.map(() => ({
@@ -117,6 +122,7 @@ const EditAestheticForm = props => {
   const [edited, setEdited] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [displayImageBlob, setDisplayImageBlob] = useState(null);
 
   useEffect(() => {
     if (!isLoading) {
@@ -173,6 +179,8 @@ const EditAestheticForm = props => {
     return <Redirect to={urlSlug ? `/aesthetics/${urlSlug}` : '/aesthetics'} />
   }
 
+  const previewFileReader = new FileReader();
+
   const handleSymbolChange = event => {
     let newSymbol = event.target.value.replace(/[^a-z0-9]/gi, '');
     newSymbol = newSymbol.substring(0, 1).toUpperCase() + newSymbol.substring(1, 3).toLowerCase();
@@ -209,6 +217,22 @@ const EditAestheticForm = props => {
     const year = event.target.value;
     setEndYear(year);
     setEndEra(eras[endEraSpecifier].years[year]);
+  };
+
+  const handleDisplayImageChange = event => {
+    const imageFile = event.target.files[0];
+
+    if (!imageFile.type.startsWith('image/')) {
+      setDisplayImageIntent(Intent.DANGER);
+      setDisplayImageHelperText('File must be an image.');
+    } else {
+      setDisplayImageIntent(Intent.NONE);
+      setDisplayImageHelperText('');
+      setDisplayImageFile(imageFile);
+
+      previewFileReader.onload = event => setDisplayImageBlob(event.target.result);
+      previewFileReader.readAsDataURL(imageFile);
+    }
   };
 
   const handleCancel = () => {
@@ -279,6 +303,21 @@ const EditAestheticForm = props => {
     } else {
       setDescriptionIntent(Intent.NONE);
       setDescriptionHelperText('');
+    }
+
+    return hasError;
+  };
+
+  const validateDisplayImage = () => {
+    let hasError = false;
+
+    if (!(displayImageFile == null || displayImageFile.type.startsWith('image/'))) {
+      setDisplayImageIntent(Intent.DANGER);
+      setDisplayImageHelperText('File must be an image.');
+      hasError = true;
+    } else {
+      setDisplayImageIntent(Intent.NONE);
+      setDisplayImageHelperText('');
     }
 
     return hasError;
@@ -371,6 +410,12 @@ const EditAestheticForm = props => {
       }
     }
 
+    const hasDisplayImageError = validateDisplayImage();
+
+    if (hasDisplayImageError) {
+      return;
+    }
+
     setIsSaving(true);
 
     const mediaToSend = cloneDeep(mediaState[0]);
@@ -401,6 +446,12 @@ const EditAestheticForm = props => {
       aesthetic: props.aesthetic.aesthetic,
       media: mediaToSend,
     };
+
+    if (displayImageFile) {
+      newAesthetic.displayImage = displayImageFile;
+    } else {
+      newAesthetic.displayImageFile = displayImage.file;
+    }
 
     if (hasFullEditAccess) {
       const websitesToSend = cloneDeep(websitesState[0]);
@@ -456,6 +507,10 @@ const EditAestheticForm = props => {
                 setSymbolIntent(Intent.DANGER);
                 setSymbolHelperText(fieldError.message);
                 break;
+              case 'displayImage':
+                setDisplayImageIntent(Intent.DANGER);
+                setDisplayImageHelperText(fieldError.message);
+                break;
               case 'media':
                 const newMediaIntents = cloneDeep(mediaIntents);
                 const newMediaHelperTexts = cloneDeep(mediaHelperTexts);
@@ -495,6 +550,22 @@ const EditAestheticForm = props => {
 
   yearSpecifierOptions.unshift({ label: SELECT_NULL_LABEL, value: 0 });
 
+  let displayImageElem = null;
+
+  if (displayImage?.url || displayImageBlob) {
+    displayImageElem = (
+      <img src={displayImageBlob || displayImage?.url} width="150"
+        alt="Visual for aesthetic grid view" />
+    );
+  } else {
+    displayImageElem = (
+      <svg height="150" width="150">
+        <rect height="150" style={{ fill: 'rgba(133, 185, 243, 0.85)' }} width="200" />
+        <text x="27" y="75">No image</text>
+      </svg>
+    );
+  }
+
   const basicInfoCard = (
     <Card>
       <h2>Basic Information</h2>
@@ -524,6 +595,15 @@ const EditAestheticForm = props => {
           <HTMLSelect disabled={!endEraSpecifier} options={yearSpecifierOptions}
             onChange={handleEndYearChange} value={endYear} />
         </ControlGroup>
+      </FormGroup>
+      <FormGroup helperText={displayImageHelperText} intent={displayImageIntent}
+        label="Display Image">
+        <div className={styles.displayImage}>
+          {displayImageElem}
+          <FileInput fill={true} hasSelection={displayImageFile != null}
+            inputProps={{ multiple: false }} onChange={handleDisplayImageChange}
+            text={displayImage?.name} />
+        </div>
       </FormGroup>
       <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
         label="Description" labelInfo="(required)">

@@ -1,0 +1,76 @@
+@import '@blueprintjs/core/lib/scss/variables';
+
+$grid-block-color: #cecece;
+$grid-block-size: 200px;
+$transition-time: all 0.2s;
+
+@mixin grid-block-base {
+    height: $grid-block-size;
+    transition: $transition-time;
+    -webkit-transition: $transition-time;
+    width: $grid-block-size;
+}
+
+@mixin grid-block-base-text {
+    @include grid-block-base;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: $pt-grid-size;
+    padding: 2 * $pt-grid-size;
+    text-align: center;
+}
+
+.grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.gridBlock {
+    @include grid-block-base-text;
+
+    color: rgba(#000000, 0);
+
+    &::after {
+        @include grid-block-base;
+
+        background-color: rgba($grid-block-color, 0.6);
+        content: '';
+        margin-left: -2 * $pt-grid-size;
+        opacity: 0;
+        position: absolute;
+    }
+
+    &:hover {
+        color: initial;
+    }
+
+    &:hover::after {
+        opacity: 1;
+    }
+}
+
+.gridBlockContent {
+    z-index: 1;
+}
+
+.gridBlockNoImage {
+    @include grid-block-base-text;
+
+    background-color: rgba($grid-block-color, 0.6);
+
+    &:hover {
+        background-color: $grid-block-color;
+    }
+}
+
+.gridLink {
+    text-decoration: none;
+
+    &:hover {
+        color: initial;
+        text-decoration: none;
+    }
+}
