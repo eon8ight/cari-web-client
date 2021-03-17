@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { Redirect } from 'react-router-dom';
 
 import axios from 'axios';
 
@@ -37,6 +38,7 @@ const SORT_FIELD_NAME = 'name';
 
 const AestheticsListPage = props => {
   const addMessage = props.addMessage;
+  const session = props.session;
 
   const [requestMade, setRequestMade] = useState(false);
   const [aesthetics, setAesthetics] = useState(null);
@@ -102,6 +104,17 @@ const AestheticsListPage = props => {
     setCurrentPage(data.selected);
     callApi({ page: data.selected });
   };
+
+  if(process.env.REACT_APP_PROTECTED_MODE) {
+    if (session.isValid === null) {
+      return <Spinner size={Spinner.SIZE_LARGE} />;
+    }
+
+    if (!session.isValid) {
+        addMessage('You must be logged in to view this page', Intent.DANGER);
+        return <Redirect to="/user/login" />;
+    }
+  }
 
   let aestheticsList = null;
 

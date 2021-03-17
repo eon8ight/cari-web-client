@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useRouteMatch } from 'react-router-dom';
+import { Redirect, useRouteMatch } from 'react-router-dom';
 
 import axios from 'axios';
 import {
@@ -26,6 +26,7 @@ const AestheticPage = props => {
   const match = useRouteMatch();
 
   const addMessage = props.addMessage;
+  const session = props.session;
 
   const [aestheticData, setAestheticData] = useState(null);
   const [requestMade, setRequestMade] = useState(false);
@@ -49,6 +50,17 @@ const AestheticPage = props => {
         .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
   }, [addMessage, match.params.aestheticUrlName, requestMade, setRequestMade]);
+
+  if(process.env.REACT_APP_PROTECTED_MODE) {
+    if (session.isValid === null) {
+      return <Spinner size={Spinner.SIZE_LARGE} />;
+    }
+
+    if (!session.isValid) {
+        addMessage('You must be logged in to view this page', Intent.DANGER);
+        return <Redirect to="/user/login" />;
+    }
+  }
 
   if (!aestheticData) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
