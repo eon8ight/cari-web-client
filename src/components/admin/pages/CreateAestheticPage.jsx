@@ -41,7 +41,8 @@ const CreateAestheticPage = props => {
       <Helmet>
         <title>CARI | Admin | Create</title>
       </Helmet>
-      <EditAestheticForm addMessage={props.addMessage} aesthetic={AESTHETIC_TEMPLATE} />
+      <EditAestheticForm addMessage={props.addMessage} aesthetic={AESTHETIC_TEMPLATE}
+        session={session} />
     </>
   )
 };
