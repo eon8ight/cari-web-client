@@ -449,7 +449,7 @@ const EditAestheticForm = props => {
 
     if (displayImageFile) {
       newAesthetic.displayImage = displayImageFile;
-    } else {
+    } else if (displayImage) {
       newAesthetic.displayImageFile = displayImage.file;
     }
 
@@ -602,7 +602,7 @@ const EditAestheticForm = props => {
           {displayImageElem}
           <FileInput fill={true} hasSelection={displayImageFile != null}
             inputProps={{ multiple: false }} onChange={handleDisplayImageChange}
-            text={displayImage?.name} />
+            text={displayImageFile?.name} />
         </div>
       </FormGroup>
       <FormGroup helperText={descriptionHelperText} intent={descriptionIntent}
