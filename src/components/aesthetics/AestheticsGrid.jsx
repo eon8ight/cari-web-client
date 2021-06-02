@@ -32,7 +32,7 @@ const AestheticsGrid = props => {
           <div className={gridBlockClassName} style={gridBlockStyle}>
             <div className={styles.gridBlockContent}>
               <h3>{a.name}</h3>
-              <h4>{`${a.startYear || '?'} - ${a.endYear || '?'}`}</h4>
+              <h4>{`${a.startYear || '?'} - ${a.endYear || ''}`}</h4>
             </div>
           </div>
         </a>

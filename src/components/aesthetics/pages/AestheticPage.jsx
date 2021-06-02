@@ -51,14 +51,14 @@ const AestheticPage = props => {
     }
   }, [addMessage, match.params.aestheticUrlName, requestMade, setRequestMade]);
 
-  if(process.env.REACT_APP_PROTECTED_MODE) {
+  if (process.env.REACT_APP_PROTECTED_MODE) {
     if (session.isValid === null) {
       return <Spinner size={Spinner.SIZE_LARGE} />;
     }
 
     if (!session.isValid) {
-        addMessage('You must be logged in to view this page', Intent.DANGER);
-        return <Redirect to="/user/login" />;
+      addMessage('You must be logged in to view this page', Intent.DANGER);
+      return <Redirect to="/user/login" />;
     }
   }
 
@@ -83,17 +83,26 @@ const AestheticPage = props => {
 
   let gallery = null;
 
-  if (aestheticData.galleryContent && aestheticData.galleryContent.length > 0) {
-    gallery = (
-      <>
-        <Card>
-          <ExpandableSection header="Gallery" show={showGallery}>
-            <Gallery addMessage={addMessage} aesthetic={aestheticData} />
-          </ExpandableSection>
-        </Card>
-        <br />
-      </>
-    );
+  if (aestheticData.galleryContent) {
+    const galleryErrorStatusCode = aestheticData.galleryContent.errorStatusCode;
+
+    if (aestheticData.galleryContent.length > 0) {
+      gallery = (
+        <>
+          <Card>
+            <ExpandableSection header="Gallery" show={showGallery}>
+              <Gallery addMessage={addMessage} aesthetic={aestheticData} />
+            </ExpandableSection>
+          </Card>
+          <br />
+        </>
+      );
+    } else if (galleryErrorStatusCode) {
+      console.log(
+        `Could not retrieve gallery content - call to Are.na API returned status code ${galleryErrorStatusCode}.`,
+        aestheticData.galleryContent.errorMessage
+      );
+    }
   }
 
   let relatedAesthetics = null;
