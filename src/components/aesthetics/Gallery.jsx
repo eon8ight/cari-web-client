@@ -35,8 +35,6 @@ const Gallery = props => {
       .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
   };
 
-  console.log(galleryData);
-
   const galleryContent = galleryData.contents.filter(block => block.image !== null).map(block => {
     return (
       <div className={styles.image} key={block.id}>
