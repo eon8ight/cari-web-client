@@ -40,7 +40,7 @@ const Gallery = props => {
   const galleryContent = galleryData.contents.filter(block => block.image !== null).map(block => {
     return (
       <div className={styles.image} key={block.id}>
-        <img src={block.image.thumb.url} alt={block.description}
+        <img src={block.image.square.url} alt={block.description} width={300}
           onClick={() => setGalleryModalBlock(block)} />
       </div>
     );
@@ -52,7 +52,7 @@ const Gallery = props => {
     galleryModalContent = (
       <div className={Classes.DIALOG_BODY}>
         <a href={galleryModalBlock.image.original.url} target="_blank" rel="noopener noreferrer">
-          <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} />
+          <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} width={600} />
         </a>
       </div>
     );
@@ -62,11 +62,11 @@ const Gallery = props => {
 
   return (
     <>
+      {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
+        pageCount={totalPages} onPageChange={handlePageChange} />}
       <div className={styles.content}>
         {galleryContent}
       </div>
-      {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
-        pageCount={totalPages} onPageChange={handlePageChange} />}
       <Dialog className={styles.modal} isOpen={galleryModalBlock !== null}
         onClose={() => setGalleryModalBlock(null)}>
         {galleryModalContent}
