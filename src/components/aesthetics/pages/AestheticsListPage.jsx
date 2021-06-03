@@ -89,7 +89,7 @@ const AestheticsListPage = props => {
           setTotalPages(res.data.totalPages);
           setRequestMade(false);
         })
-        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));;
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
   };
 

@@ -20,7 +20,10 @@ import ExpandableSection from '../../common/ExpandableSection';
 
 import RelatedAestheticsList from '../RelatedAestheticsList';
 
-import { API_ROUTE_AESTHETIC_FIND_FOR_PAGE } from '../../../functions/constants';
+import {
+  API_ROUTE_AESTHETIC_FIND_FOR_PAGE,
+  ARENA_API_MAX,
+} from '../../../functions/constants';
 
 const AestheticPage = props => {
   const match = useRouteMatch();
@@ -29,27 +32,67 @@ const AestheticPage = props => {
   const session = props.session;
 
   const [aestheticData, setAestheticData] = useState(null);
-  const [requestMade, setRequestMade] = useState(false);
+  const [aestheticDataRequestMade, setAestheticDataRequestMade] = useState(false);
+  const [initialGalleryData, setInitialGalleryData] = useState(null);
+  const [initialGalleryDataRequestMade, setInitialGalleryDataRequestMade] = useState(false);
 
   const showGallery = useState(false);
   const showSimilarityWeb = useState(false);
   const showTimeline = useState(false);
 
   useEffect(() => {
-    if (!requestMade) {
-      setRequestMade(true);
+    if (!aestheticDataRequestMade) {
+      setAestheticDataRequestMade(true);
 
       const params = {
         includeSimilarAesthetics: true,
         includeMedia: true,
-        includeGalleryContent: true,
       };
 
       axios.get(`${API_ROUTE_AESTHETIC_FIND_FOR_PAGE}/${match.params.aestheticUrlName}`, { params })
         .then(res => setAestheticData(res.data))
         .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
-  }, [addMessage, match.params.aestheticUrlName, requestMade, setRequestMade]);
+
+    if (aestheticData) {
+      if(aestheticData.mediaSourceUrl) {
+        if(!initialGalleryDataRequestMade) {
+          setInitialGalleryDataRequestMade(true);
+
+          axios.get(`${aestheticData.mediaSourceUrl}?page=1&per=${ARENA_API_MAX}`)
+            .then(res => setInitialGalleryData(res.data))
+            .catch(err => {
+              const errorStatusCode = err.response.status;
+              let errorMessage = `Could not retrieve gallery content - call to Are.na API returned status code ${errorStatusCode}. `;
+
+              switch (err.response.status) {
+                case 401:
+                  errorMessage += 'This usually means the Are.na is private. Please make it public or remove it from the aesthetic.';
+                  break;
+                case 404:
+                  errorMessage += 'Please either remove the Are.na link from the aesthetic or update it to an existing Are.na.';
+                  break;
+                default:
+                  errorMessage += 'This is an unhandled exception.';
+                  break;
+              }
+
+              console.log(errorMessage);
+              setInitialGalleryData({ length: 0 });
+            });
+        }
+      } else {
+        setInitialGalleryData({ length: 0 });
+      }
+    }
+  }, [
+    addMessage,
+    match.params.aestheticUrlName,
+    aestheticDataRequestMade,
+    setAestheticDataRequestMade,
+    aestheticData,
+    initialGalleryDataRequestMade,
+  ]);
 
   if (process.env.REACT_APP_PROTECTED_MODE) {
     if (session.isValid === null) {
@@ -62,7 +105,7 @@ const AestheticPage = props => {
     }
   }
 
-  if (!aestheticData) {
+  if (!aestheticData || initialGalleryData === null) {
     return <Spinner size={Spinner.SIZE_LARGE} />;
   }
 
@@ -83,26 +126,18 @@ const AestheticPage = props => {
 
   let gallery = null;
 
-  if (aestheticData.galleryContent) {
-    const galleryErrorStatusCode = aestheticData.galleryContent.errorStatusCode;
-
-    if (aestheticData.galleryContent.length > 0) {
-      gallery = (
-        <>
-          <Card>
-            <ExpandableSection header="Gallery" show={showGallery}>
-              <Gallery addMessage={addMessage} aesthetic={aestheticData} />
-            </ExpandableSection>
-          </Card>
-          <br />
-        </>
-      );
-    } else if (galleryErrorStatusCode) {
-      console.log(
-        `Could not retrieve gallery content - call to Are.na API returned status code ${galleryErrorStatusCode}.`,
-        aestheticData.galleryContent.errorMessage
-      );
-    }
+  if (initialGalleryData !== null && initialGalleryData.length > 0) {
+    gallery = (
+      <>
+        <Card>
+          <ExpandableSection header="Gallery" show={showGallery}>
+            <Gallery addMessage={addMessage} aesthetic={aestheticData}
+              initialContent={initialGalleryData} />
+          </ExpandableSection>
+        </Card>
+        <br />
+      </>
+    );
   }
 
   let relatedAesthetics = null;

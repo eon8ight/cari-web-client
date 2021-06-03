@@ -10,29 +10,34 @@ import {
 
 import Paginator from '../common/Paginator';
 
-import { API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT } from '../../functions/constants';
+import { ARENA_API_MAX } from '../../functions/constants';
 
 import styles from './styles/Gallery.module.scss';
 
 const Gallery = props => {
+  const addMessage = props.addMessage;
+  const mediaSourceUrl = props.aesthetic.mediaSourceUrl;
+
   const [currentPage, setCurrentPage] = useState(0);
   const [galleryModalBlock, setGalleryModalBlock] = useState(null);
-  const [galleryData, setGalleryData] = useState(props.aesthetic.galleryContent.contents);
+  const [galleryData, setGalleryData] = useState(props.initialContent);
+
+  if (galleryData === null) {
+    return <Spinner size={Spinner.SIZE_LARGE} />;
+  }
 
   const handlePageChange = data => {
     setCurrentPage(data.selected);
     setGalleryData(null);
 
-    axios.get(`${API_ROUTE_AESTHETIC_FIND_GALLERY_CONTENT}/${props.aesthetic.aesthetic}?page=${data.selected + 1}`)
-      .then(res => setGalleryData(res.data.contents))
-      .catch(err => props.addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
+    axios.get(`${mediaSourceUrl}?page=${data.selected + 1}&per=${ARENA_API_MAX}`)
+      .then(res => setGalleryData(res.data))
+      .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
   };
 
-  if(!galleryData) {
-    return <Spinner size={Spinner.SIZE_LARGE} />;
-  }
+  console.log(galleryData);
 
-  const galleryContent = galleryData.filter(block => block.image !== null).map(block => {
+  const galleryContent = galleryData.contents.filter(block => block.image !== null).map(block => {
     return (
       <div className={styles.image} key={block.id}>
         <img src={block.image.thumb.url} alt={block.description}
@@ -53,7 +58,7 @@ const Gallery = props => {
     );
   }
 
-  const totalPages = Math.ceil(props.aesthetic.galleryContent.length / 15);
+  const totalPages = Math.ceil(galleryData.length / ARENA_API_MAX);
 
   return (
     <>
