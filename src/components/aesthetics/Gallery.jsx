@@ -14,6 +14,9 @@ import { ARENA_API_MAX } from '../../functions/constants';
 
 import styles from './styles/Gallery.module.scss';
 
+const BLOCK_CLASS_ATTACHMENT = 'Attachment';
+const BLOCK_CLASS_IMAGE = 'Image';
+
 const Gallery = props => {
   const addMessage = props.addMessage;
   const mediaSourceUrl = props.aesthetic.mediaSourceUrl;
@@ -35,33 +38,85 @@ const Gallery = props => {
       .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
   };
 
-  const galleryContent = galleryData.contents.filter(block => block.image !== null).map(block => {
-    return (
-      <div className={styles.image} key={block.id}>
-        <img src={block.image.square.url} alt={block.description} width={300}
-          onClick={() => setGalleryModalBlock(block)} />
-      </div>
-    );
-  });
+  const galleryContent = galleryData.contents.map(block => {
+    switch (block.class) {
+      case BLOCK_CLASS_IMAGE:
+        return (
+          <div className={styles.image} key={block.id}>
+            <img src={block.image.square.url} alt={block.description} height={300} width={300}
+              onClick={() => setGalleryModalBlock(block)} />
+          </div>
+        );
+      case BLOCK_CLASS_ATTACHMENT:
+        return (
+          <div className={styles.blockPreview} key={block.id}
+            onClick={() => setGalleryModalBlock(block)}>
+            <h3>
+              No Preview
+              <br />
+              ({block.attachment.content_type})
+            </h3>
+          </div>
+        );
+      default:
+        return null;
+    }
+  }).filter(blockElem => blockElem !== null);
 
   let galleryModalContent = null;
 
   if (galleryModalBlock) {
+    switch (galleryModalBlock.class) {
+      case BLOCK_CLASS_IMAGE:
+        galleryModalContent = (
+          <a href={galleryModalBlock.image.original.url} target="_blank" rel="noopener noreferrer">
+            <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} width={600} />
+          </a>
+        );
+
+        break;
+      case BLOCK_CLASS_ATTACHMENT:
+        switch (galleryModalBlock.attachment.content_type.split('/')[0]) {
+          case 'video':
+            galleryModalContent = (
+              <video autoplay controls muted>
+                <source src={galleryModalBlock.attachment.url} />
+                Your browser does not support video playback.
+              </video>
+            );
+
+            break;
+          default:
+            galleryModalContent = 'This file type is not yet supported.';
+            break;
+        }
+
+        break;
+      default:
+        galleryModalContent = 'This file type is not yet supported.';
+        break;
+    }
+
     galleryModalContent = (
       <div className={Classes.DIALOG_BODY}>
-        <a href={galleryModalBlock.image.original.url} target="_blank" rel="noopener noreferrer">
-          <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} width={600} />
-        </a>
+        {galleryModalContent}
       </div>
     );
   }
 
+  let paginator = null;
   const totalPages = Math.ceil(galleryData.length / ARENA_API_MAX);
+
+  if (totalPages > 0) {
+    paginator = (
+      <Paginator currentPage={currentPage} className={styles.paginator}
+        pageCount={totalPages} onPageChange={handlePageChange} />
+    );
+  }
 
   return (
     <>
-      {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
-        pageCount={totalPages} onPageChange={handlePageChange} />}
+      {paginator}
       <div className={styles.content}>
         {galleryContent}
       </div>
@@ -69,6 +124,7 @@ const Gallery = props => {
         onClose={() => setGalleryModalBlock(null)}>
         {galleryModalContent}
       </Dialog>
+      {paginator}
     </>
   );
 }

@@ -2,6 +2,29 @@
 
 @import '@blueprintjs/core/lib/scss/variables';
 
+$block-preview-color: #cecece;
+$block-preview-size: 300px;
+$transition-time: all 0.2s;
+
+.blockPreview {
+    background-color: rgba($block-preview-color, 0.6);
+    display: flex;
+    flex-direction: column;
+    height: $block-preview-size;
+    justify-content: center;
+    margin: $pt-grid-size;
+    padding: 2 * $pt-grid-size;
+    text-align: center;
+    transition: $transition-time;
+    -webkit-transition: $transition-time;
+    width: $block-preview-size;
+
+    &:hover {
+        background-color: $block-preview-color;
+        cursor: pointer;
+    }
+}
+
 .content {
     align-items: center;
     display: flex;
