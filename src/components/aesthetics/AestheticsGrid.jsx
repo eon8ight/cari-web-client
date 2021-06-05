@@ -41,15 +41,20 @@ const AestheticsGrid = props => {
   }
 
   const handleSortClick = (newSortField, newAsc) => {
+    let useAsc = props.asc;
+    let useSortField = props.sortField;
+
     if (newSortField) {
       props.setSortField(newSortField);
+      useSortField = newSortField;
     }
 
     if (newAsc !== null && typeof newAsc !== 'undefined') {
       props.setAsc(newAsc);
+      useAsc = newAsc;
     }
 
-    props.callApi({ page: 0, sortField: newSortField, asc: newAsc });
+    props.callApi({ page: 0, sortField: useSortField, asc: useAsc });
   };
 
   return (

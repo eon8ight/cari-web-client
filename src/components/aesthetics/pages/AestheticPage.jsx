@@ -11,19 +11,25 @@ import {
   Tabs,
 } from '@blueprintjs/core';
 
+import { cloneDeep } from 'lodash';
+
 import AestheticDetails from '../AestheticDetails';
 import Gallery from '../Gallery';
-import SimilarityWeb from '../SimilarityWeb';
 import Timeline from '../Timeline';
 
 import ExpandableSection from '../../common/ExpandableSection';
 
-import RelatedAestheticsList from '../RelatedAestheticsList';
+import AestheticsGrid from '../AestheticsGrid';
+import AestheticsList from '../AestheticsList';
 
 import {
   API_ROUTE_AESTHETIC_FIND_FOR_PAGE,
   ARENA_API_MAX,
 } from '../../../functions/constants';
+
+const SORT_FIELD_END_YEAR = 'endYear';
+const SORT_FIELD_NAME = 'name';
+const SORT_FIELD_START_YEAR = 'startYear';
 
 const AestheticPage = props => {
   const match = useRouteMatch();
@@ -40,6 +46,11 @@ const AestheticPage = props => {
   const showSimilarityWeb = useState(false);
   const showTimeline = useState(false);
 
+  const [relatedAesthetics, setRelatedAesthetics] = useState(null);
+
+  const [relatedAestheticsSortField, setRelatedAestheticsSortField] = useState(SORT_FIELD_NAME);
+  const [relatedAestheticsSortAsc, setRelatedAestheticsSortAsc] = useState(true);
+
   useEffect(() => {
     if (!aestheticDataRequestMade) {
       setAestheticDataRequestMade(true);
@@ -50,13 +61,16 @@ const AestheticPage = props => {
       };
 
       axios.get(`${API_ROUTE_AESTHETIC_FIND_FOR_PAGE}/${match.params.aestheticUrlName}`, { params })
-        .then(res => setAestheticData(res.data))
+        .then(res => {
+          setAestheticData(res.data);
+          setRelatedAesthetics(res.data.similarAesthetics);
+        })
         .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
 
     if (aestheticData) {
-      if(aestheticData.mediaSourceUrl) {
-        if(!initialGalleryDataRequestMade) {
+      if (aestheticData.mediaSourceUrl) {
+        if (!initialGalleryDataRequestMade) {
           setInitialGalleryDataRequestMade(true);
 
           axios.get(`${aestheticData.mediaSourceUrl}?page=1&per=${ARENA_API_MAX}`)
@@ -93,6 +107,76 @@ const AestheticPage = props => {
     aestheticData,
     initialGalleryDataRequestMade,
   ]);
+
+  const sortRelatedAesthetics = params => {
+    if (typeof params === 'undefined' || params === null) {
+      params = {};
+    }
+
+    const useSortField = params.sortField ?? relatedAestheticsSortField;
+    const useAsc = params.asc !== null ? params.asc : relatedAestheticsSortAsc;
+
+    const newAesthetics = cloneDeep(relatedAesthetics);
+
+    newAesthetics.sort((firstEl, secondEl) => {
+      let rval;
+
+      switch (useSortField) {
+        case SORT_FIELD_NAME:
+          rval = firstEl.name.localeCompare(secondEl.name);
+
+          if (!useAsc) {
+            rval = -rval;
+          }
+
+          break;
+        case SORT_FIELD_START_YEAR:
+          const firstElStartYear = firstEl.approximateStartYear;
+          const secondElStartYear = secondEl.approximateStartYear;
+
+          if (firstElStartYear === null && secondElStartYear === null) {
+            rval = 0;
+          } else if (firstElStartYear === null) {
+            rval = -1;
+          } else if (secondElStartYear === null) {
+            rval = 1;
+          } else {
+            rval = firstElStartYear - secondElStartYear;
+
+            if (!useAsc) {
+              rval = -rval;
+            }
+          }
+
+          break;
+        case SORT_FIELD_END_YEAR:
+          const firstElEndYear = firstEl.approximateEndYear;
+          const secondElEndYear = secondEl.approximateEndYear;
+
+          if (firstElEndYear === null && secondElEndYear === null) {
+            rval = 0;
+          } else if (firstElEndYear === null) {
+            rval = -1;
+          } else if (secondElEndYear === null) {
+            rval = 1;
+          } else {
+            rval = firstElEndYear - secondElEndYear;
+
+            if (!useAsc) {
+              rval = -rval;
+            }
+          }
+
+          break;
+        default:
+          rval = 0;
+      }
+
+      return rval;
+    });
+
+    setRelatedAesthetics(newAesthetics);
+  };
 
   if (process.env.REACT_APP_PROTECTED_MODE) {
     if (session.isValid === null) {
@@ -140,22 +224,28 @@ const AestheticPage = props => {
     );
   }
 
-  let relatedAesthetics = null;
+  let relatedAestheticsElem = null;
 
   if (aestheticData.similarAesthetics && aestheticData.similarAesthetics.length > 0) {
     const relatedAestheticsList = (
-      <RelatedAestheticsList addMessage={addMessage} aesthetic={aestheticData} />
+      <AestheticsList aesthetics={relatedAesthetics} sortField={relatedAestheticsSortField}
+        setSortField={setRelatedAestheticsSortField} asc={relatedAestheticsSortAsc}
+        setAsc={setRelatedAestheticsSortAsc} callApi={sortRelatedAesthetics} />
     );
 
-    const similarityWeb = <SimilarityWeb aesthetic={aestheticData} />;
+    const relatedAestheticsGrid = (
+      <AestheticsGrid aesthetics={relatedAesthetics} sortField={relatedAestheticsSortField}
+        setSortField={setRelatedAestheticsSortField} asc={relatedAestheticsSortAsc}
+        setAsc={setRelatedAestheticsSortAsc} callApi={sortRelatedAesthetics} />
+    );
 
-    relatedAesthetics = (
+    relatedAestheticsElem = (
       <>
         <Card>
           <ExpandableSection header="Related Aesthetics" show={showSimilarityWeb}>
             <Tabs>
+              <Tab id="grid" title="Grid View" panel={relatedAestheticsGrid} />
               <Tab id="list" title="List View" panel={relatedAestheticsList} />
-              <Tab id="graph" title="Web View" panel={similarityWeb} />
             </Tabs>
           </ExpandableSection>
         </Card>
@@ -172,7 +262,7 @@ const AestheticPage = props => {
       <AestheticDetails aesthetic={aestheticData} session={props.session} />
       {timeline}
       {gallery}
-      {relatedAesthetics}
+      {relatedAestheticsElem}
     </>
   );
 };
