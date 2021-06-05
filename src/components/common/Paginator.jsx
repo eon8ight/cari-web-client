@@ -25,7 +25,7 @@ const Paginator = props => {
       <ReactPaginate pageCount={props.pageCount} pageRangeDisplayed={5} marginPagesDisplayed={2}
         previousLabel="<<" nextLabel=">>" breakClassName={styles.paginationItem}
         breakLinkClassName={LINK_CLASS_NAME} onPageChange={props.onPageChange}
-        initialPage={props.currentPage} disableInitialCallback={true}
+        initialPage={props.currentPage} forcePage={props.currentPage} disableInitialCallback={true}
         containerClassName={styles.pagination} pageClassName={styles.paginationItem}
         pageLinkClassName={LINK_CLASS_NAME}
         activeClassName={styles.paginationItem}

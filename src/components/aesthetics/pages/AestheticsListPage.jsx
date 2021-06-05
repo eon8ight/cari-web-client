@@ -42,14 +42,14 @@ const AestheticsListPage = props => {
 
   const [requestMade, setRequestMade] = useState(false);
   const [aesthetics, setAesthetics] = useState(null);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(window.history.state.page ?? 0);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [sortField, setSortField] = useState(SORT_FIELD_NAME);
-  const [asc, setAsc] = useState(true);
-  const [keyword, setKeyword] = useState(null);
-  const [startYear, setStartYear] = useState(null);
-  const [endYear, setEndYear] = useState(null);
+  const [sortField, setSortField] = useState(window.history.state.sortField ?? SORT_FIELD_NAME);
+  const [asc, setAsc] = useState(window.history.state.asc ?? true);
+  const [keyword, setKeyword] = useState(window.history.state.keyword);
+  const [startYear, setStartYear] = useState(window.history.state.startYear);
+  const [endYear, setEndYear] = useState(window.history.state.endYear);
 
   const callApi = params => {
     if (!requestMade) {
@@ -83,6 +83,9 @@ const AestheticsListPage = props => {
         params.endYear = endYear;
       }
 
+      window.history.replaceState(params, '');
+      setCurrentPage(params.page);
+
       axios.get(API_ROUTE_AESTHETIC_FIND_FOR_LIST, { params })
         .then(res => {
           setAesthetics(res.data.content);
@@ -97,13 +100,10 @@ const AestheticsListPage = props => {
 
   useEffect(() => {
     if (!aesthetics)
-      callApiCallback({ page: 0 });
+      callApiCallback({ page: currentPage });
   }, [aesthetics, callApiCallback]);
 
-  const handlePageChange = data => {
-    setCurrentPage(data.selected);
-    callApi({ page: data.selected });
-  };
+  const handlePageChange = data => callApi({ page: data.selected });
 
   if(process.env.REACT_APP_PROTECTED_MODE) {
     if (session.isValid === null) {

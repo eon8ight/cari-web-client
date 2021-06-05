@@ -28,7 +28,7 @@ const AestheticsGrid = props => {
       }
 
       return (
-        <a className={styles.gridLink} href={`/aesthetics/${a.urlSlug}`}>
+        <a className={styles.gridLink} href={`/aesthetics/${a.urlSlug}`} key={a.aesthetic}>
           <div className={gridBlockClassName} style={gridBlockStyle}>
             <div className={styles.gridBlockContent}>
               <h3>{a.name}</h3>
