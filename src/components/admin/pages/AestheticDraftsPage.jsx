@@ -58,7 +58,7 @@ const AestheticDraftsPage = props => {
 
       return (
         <tr key={a.aesthetic}>
-          <td><a href={`/admin/edit/${a.aesthetic}`}>{a.name}</a></td>
+          <td><a href={`/aesthetics/${a.urlSlug}`}>{a.name}</a></td>
           <td>{modifiedParts[1]} at {modifiedParts[2]}</td>
         </tr>
       );

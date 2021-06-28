@@ -33,6 +33,10 @@ $transition-time: all 0.2s;
 }
 
 .image {
+    object-fit: scale-down;
+}
+
+.imageContainer {
     cursor: pointer;
     margin: 8px 0;
 }

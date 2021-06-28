@@ -42,9 +42,9 @@ const Gallery = props => {
     switch (block.class) {
       case BLOCK_CLASS_IMAGE:
         return (
-          <div className={styles.image} key={block.id}>
-            <img src={block.image.square.url} alt={block.description} height={300} width={300}
-              onClick={() => setGalleryModalBlock(block)} />
+          <div className={styles.imageContainer} key={block.id}>
+            <img src={block.image.square.url} alt={block.description} className={styles.image}
+              height={300} width={300} onClick={() => setGalleryModalBlock(block)} />
           </div>
         );
       case BLOCK_CLASS_ATTACHMENT:
