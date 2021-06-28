@@ -7,6 +7,7 @@ import {
   Intent,
   Spinner,
 } from '@blueprintjs/core';
+import { decode } from 'he';
 
 import Paginator from '../common/Paginator';
 
@@ -16,6 +17,7 @@ import styles from './styles/Gallery.module.scss';
 
 const BLOCK_CLASS_ATTACHMENT = 'Attachment';
 const BLOCK_CLASS_IMAGE = 'Image';
+const BLOCK_CLASS_MEDIA = 'Media';
 
 const Gallery = props => {
   const addMessage = props.addMessage;
@@ -41,6 +43,7 @@ const Gallery = props => {
   const galleryContent = galleryData.contents.map(block => {
     switch (block.class) {
       case BLOCK_CLASS_IMAGE:
+      case BLOCK_CLASS_MEDIA:
         return (
           <div className={styles.imageContainer} key={block.id}>
             <img src={block.image.square.url} alt={block.description} className={styles.image}
@@ -91,6 +94,10 @@ const Gallery = props => {
             break;
         }
 
+        break;
+      case BLOCK_CLASS_MEDIA:
+        const embedHtml = decode(galleryModalBlock.embed.html);
+        galleryModalContent = <div dangerouslySetInnerHTML={{ __html: embedHtml }}></div>;
         break;
       default:
         galleryModalContent = 'This file type is not yet supported.';
