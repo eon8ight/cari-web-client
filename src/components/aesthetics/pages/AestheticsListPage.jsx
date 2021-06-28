@@ -7,6 +7,7 @@ import axios from 'axios';
 import {
   AnchorButton,
   Button,
+  ButtonGroup,
   ControlGroup,
   FormGroup,
   InputGroup,
@@ -23,6 +24,7 @@ import Paginator from '../../common/Paginator';
 
 import {
   API_ROUTE_AESTHETIC_FIND_FOR_LIST,
+  ROLE_CURATOR,
   ROLE_LEAD_CURATOR,
   ROLE_LEAD_DIRECTOR,
 } from '../../../functions/constants';
@@ -42,14 +44,14 @@ const AestheticsListPage = props => {
 
   const [requestMade, setRequestMade] = useState(false);
   const [aesthetics, setAesthetics] = useState(null);
-  const [currentPage, setCurrentPage] = useState(window.history.state.page ?? 0);
+  const [currentPage, setCurrentPage] = useState(window.history.state?.page ?? 0);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [sortField, setSortField] = useState(window.history.state.sortField ?? SORT_FIELD_NAME);
-  const [asc, setAsc] = useState(window.history.state.asc ?? true);
-  const [keyword, setKeyword] = useState(window.history.state.keyword);
-  const [startYear, setStartYear] = useState(window.history.state.startYear);
-  const [endYear, setEndYear] = useState(window.history.state.endYear);
+  const [sortField, setSortField] = useState(window.history.state?.sortField ?? SORT_FIELD_NAME);
+  const [asc, setAsc] = useState(window.history.state?.asc ?? true);
+  const [keyword, setKeyword] = useState(window.history.state?.keyword);
+  const [startYear, setStartYear] = useState(window.history.state?.startYear);
+  const [endYear, setEndYear] = useState(window.history.state?.endYear);
 
   const callApi = params => {
     if (!requestMade) {
@@ -99,20 +101,21 @@ const AestheticsListPage = props => {
   const callApiCallback = useCallback(callApi, [addMessage, asc, keyword, endYear, requestMade, sortField, startYear]);
 
   useEffect(() => {
-    if (!aesthetics)
+    if (!aesthetics) {
       callApiCallback({ page: currentPage });
-  }, [aesthetics, callApiCallback]);
+    }
+  }, [aesthetics, callApiCallback, currentPage]);
 
   const handlePageChange = data => callApi({ page: data.selected });
 
-  if(process.env.REACT_APP_PROTECTED_MODE) {
+  if (process.env.REACT_APP_PROTECTED_MODE) {
     if (session.isValid === null) {
       return <Spinner size={Spinner.SIZE_LARGE} />;
     }
 
     if (!session.isValid) {
-        addMessage('You must be logged in to view this page', Intent.DANGER);
-        return <Redirect to="/user/login" />;
+      addMessage('You must be logged in to view this page', Intent.DANGER);
+      return <Redirect to="/user/login" />;
     }
   }
 
@@ -163,10 +166,17 @@ const AestheticsListPage = props => {
 
   if (entityHasPermission(props.session, ROLE_LEAD_CURATOR, ROLE_LEAD_DIRECTOR)) {
     addButton = (
-      <FormGroup>
-        <AnchorButton href="/admin/create" icon="add" intent={Intent.PRIMARY}
-          large={true} text="Create" />
-      </FormGroup>
+      <AnchorButton href="/admin/create" icon="add" intent={Intent.PRIMARY}
+        large={true} text="Create" />
+    );
+  }
+
+  let viewDraftButton = null;
+
+  if (entityHasPermission(props.session, ROLE_CURATOR, ROLE_LEAD_CURATOR, ROLE_LEAD_DIRECTOR)) {
+    viewDraftButton = (
+      <AnchorButton href="/admin/drafts" icon="edit" intent={Intent.WARNING} large={true}
+        text="Drafts" />
     );
   }
 
@@ -190,7 +200,12 @@ const AestheticsListPage = props => {
             </Button>
           </ControlGroup>
         </FormGroup>
-        {addButton}
+        <FormGroup>
+          <ButtonGroup>
+            {addButton}
+            {viewDraftButton}
+          </ButtonGroup>
+        </FormGroup>
       </form>
       {aestheticsList}
     </>

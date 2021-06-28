@@ -34,7 +34,7 @@ const EditAestheticPage = props => {
 
       axios.get(`${API_ROUTE_AESTHETIC_FIND_FOR_EDIT}/${match.params.aesthetic}`)
         .then(res => setAestheticData(res.data))
-        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));;
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
   }, [addMessage, match.params.aesthetic, requestMade, setRequestMade]);
 

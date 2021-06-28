@@ -69,6 +69,7 @@ const EditAestheticForm = props => {
   const [endEra, setEndEra] = useState(props.aesthetic.endEra);
   const [description, setDescription] = useState(props.aesthetic.description);
   const [displayImageFile, setDisplayImageFile] = useState(null);
+  const [isDraft, setIsDraft] = useState(props.aesthetic.isDraft);
 
   const mediaSourceUrlState = useState(props.aesthetic.mediaSourceUrl);
   const websitesState = useState(originalWebsites);
@@ -468,6 +469,7 @@ const EditAestheticForm = props => {
       newAesthetic.description = description;
       newAesthetic.websites = websitesToSend;
       newAesthetic.similarAesthetics = similarAestheticsState[0];
+      newAesthetic.isDraft = isDraft;
 
       if (endEra) {
         newAesthetic.endEra = endEra;
@@ -674,12 +676,17 @@ const EditAestheticForm = props => {
         <br />
         <FormGroup>
           <ControlGroup>
-            <Button disabled={isSaving} icon="undo" large={true} onClick={handleCancel}>
+            <Button disabled={isSaving} icon="undo" intent={Intent.DANGER} large={true}
+              onClick={handleCancel}>
               Cancel
             </Button>
-            <Button disabled={isSaving} icon="floppy-disk" intent={Intent.SUCCESS} large={true}
-              type="submit">
-              Save
+            <Button disabled={isSaving} icon="floppy-disk" intent={Intent.PRIMARY} large={true}
+              onClick={() => setIsDraft(true)} type="submit">
+              Save Draft
+            </Button>
+            <Button disabled={isSaving} icon="confirm" intent={Intent.SUCCESS} large={true}
+              onClick={() => setIsDraft(false)} type="submit">
+              Publish
             </Button>
           </ControlGroup>
         </FormGroup>
