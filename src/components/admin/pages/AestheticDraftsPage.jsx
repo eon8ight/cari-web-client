@@ -32,7 +32,7 @@ const AestheticDraftsPage = props => {
     if (!requestMade) {
       setRequestMade(true);
 
-      axios.get(`${API_ROUTE_AESTHETIC_FIND_DRAFT}`)
+      axios.get(`${API_ROUTE_AESTHETIC_FIND_DRAFT}`, { withCredentials: true })
         .then(res => setDraftAesthetics(res.data))
         .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
