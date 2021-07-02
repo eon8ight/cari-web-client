@@ -17,7 +17,11 @@ import styles from './styles/Gallery.module.scss';
 
 const BLOCK_CLASS_ATTACHMENT = 'Attachment';
 const BLOCK_CLASS_IMAGE = 'Image';
+const BLOCK_CLASS_LINK = 'Link';
 const BLOCK_CLASS_MEDIA = 'Media';
+const BLOCK_CLASS_TEXT = 'Text';
+
+const TEXT_BLOCK_PREVIEW_MAX_LENGTH = 100;
 
 const Gallery = props => {
   const addMessage = props.addMessage;
@@ -42,6 +46,7 @@ const Gallery = props => {
 
   const galleryContent = galleryData.contents.map(block => {
     switch (block.class) {
+      case BLOCK_CLASS_LINK:
       case BLOCK_CLASS_IMAGE:
       case BLOCK_CLASS_MEDIA:
         return (
@@ -50,17 +55,26 @@ const Gallery = props => {
               height={300} width={300} onClick={() => setGalleryModalBlock(block)} />
           </div>
         );
-      case BLOCK_CLASS_ATTACHMENT:
+      case BLOCK_CLASS_TEXT:
+        const blockContent = block.content.length >= TEXT_BLOCK_PREVIEW_MAX_LENGTH
+          ? block.content.substring(0, TEXT_BLOCK_PREVIEW_MAX_LENGTH - 3) + '...'
+          : block.content;
+
         return (
           <div className={styles.blockPreview} key={block.id}
             onClick={() => setGalleryModalBlock(block)}>
-            <h3>
-              No Preview
-              <br />
-              ({block.attachment.content_type})
-            </h3>
+            {blockContent}
           </div>
-        );
+        )
+      case BLOCK_CLASS_ATTACHMENT:
+        return (
+          <a href={block.attachment.url} target="_blank" rel="noopener noreferrer">
+            <div className={styles.imageContainer} key={block.id}>
+              <img src={block.image.square.url} alt={block.description} className={styles.image}
+                height={300} width={300} />
+            </div>
+          </a>
+        )
       default:
         return null;
     }
@@ -71,36 +85,41 @@ const Gallery = props => {
   if (galleryModalBlock) {
     switch (galleryModalBlock.class) {
       case BLOCK_CLASS_IMAGE:
+      case BLOCK_CLASS_LINK:
         galleryModalContent = (
-          <a href={galleryModalBlock.image.original.url} target="_blank" rel="noopener noreferrer">
-            <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} width={600} />
+          <a href={galleryModalBlock.source?.url || galleryModalBlock.image.original.url}
+            target="_blank" rel="noopener noreferrer">
+            <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} className={styles.image} width={600} />
           </a>
         );
 
         break;
       case BLOCK_CLASS_ATTACHMENT:
-        switch (galleryModalBlock.attachment.content_type.split('/')[0]) {
-          case 'video':
-            galleryModalContent = (
-              <video autoplay controls muted>
-                <source src={galleryModalBlock.attachment.url} />
-                Your browser does not support video playback.
-              </video>
-            );
-
-            break;
-          default:
-            galleryModalContent = 'This file type is not yet supported.';
-            break;
+        if (galleryModalBlock.attachment.content_type.split('/')[0] === 'video') {
+          galleryModalContent = (
+            <video autoplay controls muted>
+              <source src={galleryModalBlock.attachment.url} />
+              Your browser does not support video playback.
+            </video>
+          );
+        } else {
+          galleryModalContent = 'This media type is not yet supported.';
         }
 
         break;
       case BLOCK_CLASS_MEDIA:
-        const embedHtml = decode(galleryModalBlock.embed.html);
-        galleryModalContent = <div dangerouslySetInnerHTML={{ __html: embedHtml }}></div>;
+        galleryModalContent = <div dangerouslySetInnerHTML={{ __html: decode(galleryModalBlock.embed.html) }}></div>;
+        break;
+      case BLOCK_CLASS_TEXT:
+        galleryModalContent = (
+          <div dangerouslySetInnerHTML={{ __html: decode(galleryModalBlock.content_html) }}
+            className={styles.modalText}>
+          </div>
+        );
+
         break;
       default:
-        galleryModalContent = 'This file type is not yet supported.';
+        galleryModalContent = 'This media type is not yet supported.';
         break;
     }
 

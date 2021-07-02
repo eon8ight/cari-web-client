@@ -50,6 +50,11 @@ $transition-time: all 0.2s;
     margin-top: $pt-grid-size;
 }
 
+.modalText {
+    margin: auto;
+    max-width: 600px;
+}
+
 .paginator {
     @include mixins.paginator-centered(32px);
 }

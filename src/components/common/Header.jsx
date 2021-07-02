@@ -42,7 +42,7 @@ const Header = props => {
         <Link className={styles.link} to="/faq">FAQ</Link>
         <Link className={styles.link} to="/team">our team</Link>
         <a className={styles.linkDiscord} href={process.env.REACT_APP_DISCORD_LINK} target="_blank"
-          rel="noreferrer">
+          rel="noopener noreferrer">
           our discord
         </a>
         {userActions}
