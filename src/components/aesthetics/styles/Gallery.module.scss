@@ -48,11 +48,17 @@ $transition-time: all 0.2s;
 .modalImage {
     margin: auto;
     margin-top: $pt-grid-size;
+    max-height: 600px;
+    width: auto;
 }
 
 .modalText {
-    margin: auto;
     max-width: 600px;
+}
+
+.modalVideo {
+    max-height: 600px;
+    width: auto;
 }
 
 .paginator {

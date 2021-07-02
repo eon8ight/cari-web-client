@@ -67,14 +67,29 @@ const Gallery = props => {
           </div>
         )
       case BLOCK_CLASS_ATTACHMENT:
-        return (
-          <a href={block.attachment.url} target="_blank" rel="noopener noreferrer">
-            <div className={styles.imageContainer} key={block.id}>
-              <img src={block.image.square.url} alt={block.description} className={styles.image}
-                height={300} width={300} />
+        const blockImage = block.image;
+
+        if (blockImage) {
+          return (
+            <a href={block.attachment.url} target="_blank" rel="noopener noreferrer">
+              <div className={styles.imageContainer} key={block.id}>
+                <img src={blockImage.square.url} alt={block.description} className={styles.image}
+                  height={300} width={300} />
+              </div>
+            </a>
+          );
+        } else {
+          return (
+            <div className={styles.blockPreview} key={block.id}
+              onClick={() => setGalleryModalBlock(block)}>
+              <h3>
+                No Preview
+                <br />
+                ({block.attachment.content_type})
+              </h3>
             </div>
-          </a>
-        )
+          );
+        }
       default:
         return null;
     }
@@ -89,7 +104,7 @@ const Gallery = props => {
         galleryModalContent = (
           <a href={galleryModalBlock.source?.url || galleryModalBlock.image.original.url}
             target="_blank" rel="noopener noreferrer">
-            <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} className={styles.image} width={600} />
+            <img alt={galleryModalBlock.description} src={galleryModalBlock.image.display.url} className={styles.modalImage} width={600} />
           </a>
         );
 
@@ -97,7 +112,7 @@ const Gallery = props => {
       case BLOCK_CLASS_ATTACHMENT:
         if (galleryModalBlock.attachment.content_type.split('/')[0] === 'video') {
           galleryModalContent = (
-            <video autoplay controls muted>
+            <video autoplay controls muted className={styles.modalVideo}>
               <source src={galleryModalBlock.attachment.url} />
               Your browser does not support video playback.
             </video>
