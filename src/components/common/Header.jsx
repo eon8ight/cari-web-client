@@ -14,7 +14,7 @@ const Header = props => {
   let aestheticNav = null;
   let userActions = null;
 
-  if(props.session.isValid) {
+  if (props.session.isValid) {
     userActions = (
       <div>
         <ButtonGroup>
@@ -25,7 +25,7 @@ const Header = props => {
     );
   }
 
-  if(!process.env.REACT_APP_PROTECTED_MODE || props.session.isValid) {
+  if (!process.env.REACT_APP_PROTECTED_MODE || props.session.isValid) {
     aestheticNav = (
       <Link className={styles.link} to="/aesthetics">aesthetic categories</Link>
     );
@@ -36,12 +36,15 @@ const Header = props => {
       <nav className={styles.headerLinks}>
         <Link to="/">
           <img alt="Consumer Aesthetics Research Institute"
-              src={cariLogo} width="88.9" />
+            src={cariLogo} width="88.9" />
         </Link>
         {aestheticNav}
         <Link className={styles.link} to="/faq">FAQ</Link>
         <Link className={styles.link} to="/team">our team</Link>
-        <Link className={styles.link} to="/about">about</Link>
+        <a className={styles.linkDiscord} href={process.env.REACT_APP_DISCORD_LINK} target="_blank"
+          rel="noreferrer">
+          our discord
+        </a>
         {userActions}
       </nav>
     </header>

@@ -17,6 +17,11 @@ const Home = props => (
         We hope that you will participate with us in researching and developing this new medium
         of cataloging design history.
       </p>
+      <br />
+      <p>
+        If you would like to follow and participate in our ongoing research, join our Discord
+        server at the link above.
+      </p>
     </section>
   </>
 );

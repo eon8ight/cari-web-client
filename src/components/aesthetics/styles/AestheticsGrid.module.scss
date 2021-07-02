@@ -36,7 +36,7 @@ $transition-time: all 0.2s;
     &::after {
         @include grid-block-base;
 
-        background-color: rgba($grid-block-color, 0.6);
+        background-color: rgba($grid-block-color, 0.67);
         content: '';
         margin-left: -2 * $pt-grid-size;
         opacity: 0;

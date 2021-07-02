@@ -180,6 +180,19 @@ const AestheticsListPage = props => {
     );
   }
 
+  let adminButtons = null;
+
+  if (addButton || viewDraftButton) {
+    adminButtons = (
+      <FormGroup>
+        <ButtonGroup>
+          {addButton}
+          {viewDraftButton}
+        </ButtonGroup>
+      </FormGroup>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -200,12 +213,7 @@ const AestheticsListPage = props => {
             </Button>
           </ControlGroup>
         </FormGroup>
-        <FormGroup>
-          <ButtonGroup>
-            {addButton}
-            {viewDraftButton}
-          </ButtonGroup>
-        </FormGroup>
+        {adminButtons}
       </form>
       {aestheticsList}
     </>

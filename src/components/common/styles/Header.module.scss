@@ -1,3 +1,5 @@
+$discord-color: #7289da;
+
 .commonHeader {
     margin-bottom: 24px;
 }
@@ -15,6 +17,17 @@
 
 .link {
     border-bottom: 2px solid black;
+    text-decoration: none !important;
+
+    &:hover {
+        border-bottom: 2px solid #0000FF;
+        color: #0000FF;
+    }
+}
+
+.linkDiscord {
+    border-bottom: 2px solid $discord-color;
+    color: $discord-color;
     text-decoration: none !important;
 
     &:hover {
