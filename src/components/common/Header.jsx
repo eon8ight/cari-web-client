@@ -39,6 +39,7 @@ const Header = props => {
             src={cariLogo} width="88.9" />
         </Link>
         {aestheticNav}
+        <Link className={styles.link} to="/updates">news & updates</Link>
         <Link className={styles.link} to="/faq">FAQ</Link>
         <Link className={styles.link} to="/team">our team</Link>
         <a className={styles.linkDiscord} href={process.env.REACT_APP_DISCORD_LINK} target="_blank"

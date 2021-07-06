@@ -16,12 +16,14 @@ import AdminRouter from './components/admin/Router';
 import AestheticsRouter from './components/aesthetics/Router';
 import ErrorRouter from './components/error/Router';
 import UserRouter from './components/user/Router';
+
 import Faq from './components/Faq';
 import Footer from './components/common/Footer';
 import Header from './components/common/Header';
 import Home from './components/Home';
 import NotFoundPage from './components/error/pages/NotFoundPage';
 import Team from './components/Team';
+import Updates from './components/Updates';
 
 import {
   API_ROUTE_AUTH_CHECK_SESSION,
@@ -119,6 +121,9 @@ const App = props => {
         </Route>
         <Route path="/faq">
           <Faq />
+        </Route>
+        <Route path="/updates">
+          <Updates />
         </Route>
         <Route path="/aesthetics">
           <AestheticsRouter addMessage={addMessage} session={session} />

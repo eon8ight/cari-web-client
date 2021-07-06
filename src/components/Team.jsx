@@ -66,7 +66,6 @@ const Team = props => {
       displayName = `${displayName} - ${title}`;
     }
 
-
     return (
       <article className={styles.teamArticle} key={user.entity}>
         {profileImage && <img alt="Consumer Aesthetics Research Institute" src={profileImage.url}

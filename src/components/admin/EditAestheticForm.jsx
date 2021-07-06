@@ -208,7 +208,7 @@ const EditAestheticForm = props => {
   const handleEndEraSpecifierChange = event => {
     const value = event.target.value;
     setEndEraSpecifier(value);
-    setEndEra(eras[value].years[endYear]);
+    setEndEra(eras[value]?.years[endYear]);
 
     if (value === SELECT_NULL_LABEL) {
       setEndYear(SELECT_NULL_LABEL);
@@ -219,7 +219,7 @@ const EditAestheticForm = props => {
   const handleEndYearChange = event => {
     const year = event.target.value;
     setEndYear(year);
-    setEndEra(eras[endEraSpecifier].years[year]);
+    setEndEra(eras[endEraSpecifier]?.years[year]);
   };
 
   const handleDisplayImageChange = event => {
