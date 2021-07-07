@@ -89,7 +89,7 @@ const Updates = props => {
           ).join(', ');
 
           updatedFields = <span dangerouslySetInnerHTML={{ __html: updatedFields }}></span>;
-          const aestheticLink = <Link to={`/aesthetic/${e.aestheticUrlSlug}`}>{e.aestheticName}</Link>;
+          const aestheticLink = <Link to={`/aesthetics/${e.aestheticUrlSlug}`}>{e.aestheticName}</Link>;
 
           switch (e.eventType) {
             case EVENT_TYPE_CREATED:
