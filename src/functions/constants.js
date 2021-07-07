@@ -35,6 +35,9 @@ const API_ROUTE_WEBSITE_TYPES = `${API_URL}/websiteTypes`;
 const ARENA_API_MAX = 15;
 const ARENA_API_URL = 'https://api.are.na/v2/channels/';
 
+const EVENT_TYPE_CREATED = 1;
+const EVENT_TYPE_UPDATED = 2;
+
 const ROLE_ADMIN = 1;
 const ROLE_USER = 2;
 const ROLE_LEAD_DIRECTOR = 3;
@@ -77,6 +80,8 @@ export {
   API_ROUTE_WEBSITE_TYPES,
   ARENA_API_MAX,
   ARENA_API_URL,
+  EVENT_TYPE_CREATED,
+  EVENT_TYPE_UPDATED,
   ROLE_ADMIN,
   ROLE_USER,
   ROLE_LEAD_DIRECTOR,

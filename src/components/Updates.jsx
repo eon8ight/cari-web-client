@@ -1,16 +1,22 @@
 import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 
 import {
   Intent,
+  OL,
   Spinner,
-  UL
 } from '@blueprintjs/core';
 
 import Paginator from './common/Paginator';
 
-import { API_ROUTE_UPDATES } from '../functions/constants';
+import {
+  API_ROUTE_UPDATES,
+  EVENT_TYPE_CREATED,
+  EVENT_TYPE_UPDATED,
+} from '../functions/constants';
+
 import { valueExists } from '../functions/utils';
 
 import styles from './styles/Updates.module.scss';
@@ -57,7 +63,7 @@ const Updates = props => {
   );
 
   useEffect(() => {
-    if(!updates) {
+    if (!updates) {
       callApiRouteUpdatesCallback({ page: 0 });
     }
   });
@@ -69,43 +75,77 @@ const Updates = props => {
 
   let updatesList = <Spinner size={100} />;
 
-  if(updates) {
+  if (updates) {
     const updatesFormatted = updates.map(update => {
-      const updateEntries = update.entries.map(entry => (
-          <li>
-            <span dangerouslySetInnerHTML={{__html: entry }}></span>
+      const updateEntries = update.entries.map(e => {
+        let description = null;
+
+        if (e.descriptionOverride) {
+          description = e.descriptionOverride;
+        } else {
+          let updatedFields = e.updatedFields.map(f => f.oldValue
+            ? f.name + ' (was <strong>' + f.oldValue + '</strong>)'
+            : f.name
+          ).join(', ');
+
+          updatedFields = <span dangerouslySetInnerHTML={{ __html: updatedFields }}></span>;
+          const aestheticLink = <Link to={`/aesthetic/${e.aestheticUrlSlug}`}>{e.aestheticName}</Link>;
+
+          switch (e.eventType) {
+            case EVENT_TYPE_CREATED:
+              description = (
+                <span>{e.creator} {e.eventTypeLabel.toLowerCase()} {updatedFields} for {aestheticLink}.</span>
+              );
+
+              break;
+            case EVENT_TYPE_UPDATED:
+              description = (
+                <span>{e.creator} {e.eventTypeLabel.toLowerCase()} {aestheticLink}: changed {updatedFields}.</span>
+              );
+
+              break;
+            default:
+              return null;
+          }
+        }
+
+        return (
+          <li className={styles.entryLogLi} key={e.updateLog}>
+            <span className={styles.entryLogTime}>{e.createdTime}</span>
+            <span>{description}</span>
           </li>
-      ));
+        );
+      });
 
       return (
-        <>
+        <li key={update.created}>
           <h4>{update.created}</h4>
-          <UL>
+          <OL>
             {updateEntries}
-          </UL>
-        </>
+          </OL>
+        </li>
       )
     });
 
     updatesList = (
       <>
-        <UL>
+        <OL className={styles.entriesForDate}>
           {updatesFormatted}
-        </UL>
+        </OL>
         {totalPages > 0 && <Paginator currentPage={currentPage} className={styles.paginator}
           pageCount={totalPages} onPageChange={handlePageChange} />}
       </>
     );
   } else {
-    updatesList = <p>No recent updates or news.</p>;
+    updatesList = <p>No recent news or updates.</p>;
   }
 
   return (
     <>
       <Helmet>
-        <title>CARI | News and Updates</title>
+        <title>CARI | News & Updates</title>
       </Helmet>
-      <h1>Latest Updates</h1>
+      <h1>Latest News and Updates</h1>
       {updatesList}
     </>
   )

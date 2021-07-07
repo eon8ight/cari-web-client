@@ -1,5 +1,18 @@
 @use '../../assets/scss/mixins';
 
+.entriesForDate {
+    list-style-type: none;
+}
+
+.entryLogLi {
+    align-items: flex-start;
+    display: flex;
+}
+
+.entryLogTime {
+    min-width: 110px;
+}
+
 .paginator {
     @include mixins.paginator-centered(24px);
 }
