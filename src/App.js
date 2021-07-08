@@ -45,43 +45,55 @@ const App = props => {
   const [session, setSession] = useState(null);
   const [messages, setMessages] = useState([]);
 
+  const cookies = document.cookie
+    .split(';')
+    .map(t => t.split('='))
+    .reduce((acc, entry) => {
+      acc[entry[0]] = entry[1];
+      return acc;
+    }, {});
+
   useEffect(() => {
-    if(session === null) {
-      const getOpts = {
-        withCredentials: true,
-        validateStatus: (httpCode => httpCode === 200 || httpCode === 401),
-      };
+    if (session === null) {
+      if (cookies.sessionToken) {
+        const getOpts = {
+          withCredentials: true,
+          validateStatus: (httpCode => httpCode === 200 || httpCode === 401),
+        };
 
-      axios.get(API_ROUTE_AUTH_CHECK_SESSION, getOpts)
-        .then(res => {
-          const claims = res.data.tokenClaims;
+        axios.get(API_ROUTE_AUTH_CHECK_SESSION, getOpts)
+          .then(res => {
+            const claims = res.data.tokenClaims;
 
-          if(claims.iss) {
-            claims.iss = parseInt(claims.iss);
-          }
-
-          if(claims.sub) {
-            claims.sub = parseInt(claims.sub);
-          }
-
-          if(claims.roles) {
-            let roles = claims.roles.split(',').map(r => parseInt(r.trim()));
-
-            if(!Array.isArray(roles)) {
-              roles = [roles];
+            if (claims.iss) {
+              claims.iss = parseInt(claims.iss);
             }
 
-            claims.roles = roles;
-          }
+            if (claims.sub) {
+              claims.sub = parseInt(claims.sub);
+            }
 
-          setSession({
-            isValid: res.data.status === TOKEN_VALIDITY_VALID,
-            claims: claims,
-          });
-        })
-        .catch(err => setSession({ isValid: false }));
+            if (claims.roles) {
+              let roles = claims.roles.split(',').map(r => parseInt(r.trim()));
+
+              if (!Array.isArray(roles)) {
+                roles = [roles];
+              }
+
+              claims.roles = roles;
+            }
+
+            setSession({
+              isValid: res.data.status === TOKEN_VALIDITY_VALID,
+              claims: claims,
+            });
+          })
+          .catch(err => setSession({ isValid: false }));
+      } else {
+        setSession({ isValid: false })
+      }
     }
-  }, [session]);
+  }, [session, cookies.sessionToken]);
 
   useEffect(() => {
     TOASTER.clear();
