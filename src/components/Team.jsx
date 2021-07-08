@@ -69,18 +69,16 @@ const Team = props => {
     return (
       <article className={styles.teamArticle} key={user.entity}>
         {profileImage && <img alt="Consumer Aesthetics Research Institute" src={profileImage.url}
-          class={styles.profileImage} width="100" />}
+          className={styles.profileImage} width="100" />}
         <div>
           <h3>{displayName}</h3>
-          <p>
-            {biography && parse(biography)}
-            {favoriteAestheticData && <em>
-              Favorite Aesthetic:&nbsp;
-              <a href={`/aesthetics/${favoriteAestheticData.urlSlug}`}>
-                {favoriteAestheticData.name}
-              </a>
-            </em>}
-          </p>
+          {biography && parse(biography)}
+          {favoriteAestheticData && <em>
+            Favorite Aesthetic:&nbsp;
+            <a href={`/aesthetics/${favoriteAestheticData.urlSlug}`}>
+              {favoriteAestheticData.name}
+            </a>
+          </em>}
         </div>
       </article>
     );

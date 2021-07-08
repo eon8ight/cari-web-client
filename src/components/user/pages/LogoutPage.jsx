@@ -20,16 +20,16 @@ const LogoutPage = props => {
   const [loggedOut, setLoggedOut] = useState(false);
 
   useEffect(() => {
-    if(session.isValid && !calledLogout) {
+    if (session.isValid && !calledLogout) {
       setCalledLogout(true);
 
       axios.post(API_ROUTE_AUTH_LOGOUT, {}, { withCredentials: true })
-      .then(res => {
-        addMessage('You have successfully logged out.');
-        setLoggedOut(true);
-        setSession({ isValid: false });
-      })
-      .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
+        .then(res => {
+          addMessage('You have successfully logged out.');
+          setLoggedOut(true);
+          setSession({ isValid: false });
+        })
+        .catch(err => addMessage(`A server error occurred: ${err.response.data.message}`, Intent.DANGER));
     }
   }, [session.isValid, addMessage, calledLogout, setSession]);
 
