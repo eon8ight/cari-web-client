@@ -68,14 +68,18 @@ const Updates = props => {
     }
   });
 
+  if (!updates) {
+    return <Spinner size={100} />;
+  }
+
   const handlePageChange = data => {
     setCurrentPage(data.selected);
     callApiRouteUpdates({ page: data.selected });
   }
 
-  let updatesList = <Spinner size={100} />;
+  let updatesList = <p>No recent news or updates.</p>;
 
-  if (updates) {
+  if (updates.length > 0) {
     const updatesFormatted = updates.map(update => {
       const updateEntries = update.entries.map(e => {
         let description = null;
@@ -94,7 +98,7 @@ const Updates = props => {
             case EVENT_TYPE_CREATED:
               description = (
                 <span>
-                  {e.eventTypeLabel} <span dangerouslySetInnerHTML={{ __html: updatedFields[0]}}></span> for {aestheticLink}.
+                  {e.eventTypeLabel} <span dangerouslySetInnerHTML={{ __html: updatedFields[0] }}></span> for {aestheticLink}.
                 </span>
               );
 
@@ -102,7 +106,7 @@ const Updates = props => {
             case EVENT_TYPE_UPDATED:
               description = (
                 <span>
-                  {e.eventTypeLabel} {aestheticLink}: changed <span dangerouslySetInnerHTML={{ __html: updatedFields.join(', ')}}></span>.
+                  {e.eventTypeLabel} {aestheticLink}: changed <span dangerouslySetInnerHTML={{ __html: updatedFields.join(', ') }}></span>.
                 </span>
               );
 
@@ -139,8 +143,6 @@ const Updates = props => {
           pageCount={totalPages} onPageChange={handlePageChange} />}
       </>
     );
-  } else {
-    updatesList = <p>No recent news or updates.</p>;
   }
 
   return (
