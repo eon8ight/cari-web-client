@@ -86,26 +86,29 @@ const Updates = props => {
           let updatedFields = e.updatedFields.map(f => f.oldValue
             ? f.name + ' (was <strong>' + f.oldValue + '</strong>)'
             : f.name
-          ).join(', ');
+          );
 
-          updatedFields = <span dangerouslySetInnerHTML={{ __html: updatedFields }}></span>;
           const aestheticLink = <Link to={`/aesthetics/${e.aestheticUrlSlug}`}>{e.aestheticName}</Link>;
 
           switch (e.eventType) {
             case EVENT_TYPE_CREATED:
               description = (
-                <span>{e.creator} {e.eventTypeLabel.toLowerCase()} {updatedFields} for {aestheticLink}.</span>
+                <span>
+                  {e.eventTypeLabel} <span dangerouslySetInnerHTML={{ __html: updatedFields[0]}}></span> for {aestheticLink}.
+                </span>
               );
 
               break;
             case EVENT_TYPE_UPDATED:
               description = (
-                <span>{e.creator} {e.eventTypeLabel.toLowerCase()} {aestheticLink}: changed {updatedFields}.</span>
+                <span>
+                  {e.eventTypeLabel} {aestheticLink}: changed <span dangerouslySetInnerHTML={{ __html: updatedFields.join(', ')}}></span>.
+                </span>
               );
 
               break;
             default:
-              return null;
+              return e.descriptionOverride;
           }
         }
 
